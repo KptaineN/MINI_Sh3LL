@@ -3,24 +3,14 @@
 void	init_minishell(t_minishell *shell, char **envp)
 {
     shell->envp = envp;
+    shell->env = init_env(envp); // Initialize the environment linked list
     shell->args = NULL;
     shell->input = NULL;
     shell->exit_status = 0;
+    shell->ast = NULL; // Initialize the AST to NULL
 
     // Initialize other components as needed
     // For example, set up signal handlers, initialize data structures, etc.
-}
-
-// parse la string "KEY=VALUE" en t_env
-t_env *create_env(char *env_str)
-{
-    t_env *node = malloc(sizeof(t_env));
-    char *equal = strchr(env_str, '=');
-    size_t key_len = equal - env_str;
-    node->key = strndup(env_str, key_len);
-    node->value = strdup(equal + 1);
-    node->next = NULL;
-    return node;
 }
 
 // construit toute la liste à partir de envp
@@ -39,4 +29,19 @@ t_env *init_env(char **envp)
         i++;
     }
     return head;
+}
+
+int start_init_minishell(t_minishell *shell, char **envp)
+{
+    if (!shell || !envp)
+        return 0;
+
+    init_minishell(shell, envp);
+    looping(shell);
+    // Here, you can add any additional initialization steps needed for your minishell
+
+    // Additional initialization steps can be added here
+    // For example, setting up signal handlers, initializing the AST, etc.
+
+    return 1; // Return 1 on success
 }
