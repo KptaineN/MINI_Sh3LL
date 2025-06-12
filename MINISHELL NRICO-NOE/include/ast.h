@@ -27,6 +27,7 @@ typedef struct s_ast
 
 // Fonctions de gestion de l'AST
 void    free_ast(t_ast *ast);
+
 // ... autres prototypes liés à l'AST
 
 #endif
