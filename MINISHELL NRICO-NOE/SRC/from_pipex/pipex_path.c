@@ -212,7 +212,7 @@ void	initialize_positions_forsplitdemesc(int pos[3])
 	pos[1] = 0;
 	pos[2] = 0;
 }
-
+*/
 char	*pwd_path(char *cmd, char **envlp)
 {
 	char	*pwd;
@@ -227,7 +227,7 @@ char	*pwd_path(char *cmd, char **envlp)
 	free(full_path);
 	return (NULL);
 }
-
+/*
 void	ft_free_split(char **ft_split)
 {
 	int	i;

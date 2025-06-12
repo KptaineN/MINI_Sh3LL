@@ -2,26 +2,36 @@
 
 
 // parse la string "KEY=VALUE" en t_env
+// Dans ton create_env (ou équivalent) :
 t_env *create_env(char *env_str)
 {
     t_env *node;
     char *equal;
     size_t key_len;
-    
+
     node = malloc(sizeof(t_env));
     if (!node)
         return NULL;
     equal = ft_strchr(env_str, '=');
     if (!equal)
-    {   free(node);
+    {
+        free(node);
         return NULL;
     }
     key_len = equal - env_str;
-    node->key = ft_strndup(env_str, key_len);
+    node->key = malloc(key_len + 1);
+    if (!node->key)
+    {
+        free(node);
+        return NULL;
+    }
+    strncpy(node->key, env_str, key_len);
+    node->key[key_len] = '\0';
     node->value = ft_strdup(equal + 1);
     node->next = NULL;
     return node;
 }
+
 
 void	init_minishell(t_minishell *shell, char **envp)
 {
