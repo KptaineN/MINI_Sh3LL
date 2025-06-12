@@ -25,4 +25,21 @@
             ├── main.c
             ├── minishell.h
             ├── Makefile
+
+
+a faire
+
+            exec/executor.c → gère l’appel principal à l’exécuteur AST, builtins, etc.
+
+            parser/parser.c → parse l’input, remplit l’AST
+
+            utils/utils.c → toutes les petites fonctions de split/join/free
+
+            builtins/echo.c, builtins/cd.c → tes builtins
+
+            env/env_list.c → init/free/print env chaîné
+
+            env/export.c, env/unset.c
+
+            redirection.c → setup_redirections, gestion des fd
             
