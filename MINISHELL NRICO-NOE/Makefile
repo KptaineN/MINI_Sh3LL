@@ -24,7 +24,10 @@ SRC/env/export.c \
 SRC/env/unset.c \
 SRC/env/utils_env.c \
 SRC/signals/signals.c \
-SRC/utils/utils.c
+SRC/utils/util-3.c \
+SRC/utils/util-2.c \
+SRC/utils/util-1.c \
+
 # SRC/builtins/echo.c 
 # SRC/builtins/exit.c 
 

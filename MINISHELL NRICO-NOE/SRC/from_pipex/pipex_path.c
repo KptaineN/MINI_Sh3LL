@@ -1,11 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex_path.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/12 16:32:48 by eganassi          #+#    #+#             */
+/*   Updated: 2025/06/12 16:34:54 by eganassi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../include/minishell.h"
 
 char	*get_env_value(t_env *env, const char *name)
 {
-	size_t n;
-	
-	n = ft_strlen(name);
+	size_t	n;
 
+	n = ft_strlen(name);
 	while (env)
 	{
 		if (ft_strncmp(env->key, name, n) == 0 && env->key[n] == '\0')
@@ -29,7 +40,7 @@ char	*ft_strjoin_3(const char *a, const char *b, const char *c)
 	return (res);
 }
 
-char	*get_valid_path(char *cmd,t_minishell *envp)
+char	*get_valid_path(char *cmd, t_minishell *envp)
 {
 	char	*path;
 
@@ -60,214 +71,24 @@ char	*search_in_paths(char **paths, char *cmd)
 
 char	*find_command_path(char *cmd, t_env *env)
 {
-    char	**envp;
-    char	*path_env;
+	char	**envp;
+	char	*path_env;
 
-    if (!env || !cmd)
-        return (NULL);
-    if (ft_strchr(cmd, '/'))
-    {
-        if (access(cmd, F_OK) == 0)
-            return (ft_strdup(cmd));
-        else
-            return (NULL);
-    }
-    path_env = get_env_path(envp, "PATH=");
-    if (!path_env)
-        return (get_valid_path(cmd, envp));
+	if (!env || !cmd)
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK) == 0)
+			return (ft_strdup(cmd));
+		else
+			return (NULL);
+	}
+	path_env = get_env_path(envp, "PATH=");
+	if (!path_env)
+		return (get_valid_path(cmd, envp));
 	path_env = ft_split(path_env, ':');
 	if (!path_env)
 		return (NULL);
-    return (search_in_paths(path_env, cmd));
-}
-/* 
-void	handle_input(t_exec *exec, char *filename)
-{
-	exec->infile_fd = open(filename, O_RDONLY);
-	if (exec->infile_fd == -1)
-	{
-		ft_putstr_fd("pipex: ", STDERR_FILENO);
-		perror(filename);
-		exec->infile_fd = open("/dev/null", O_RDONLY);
-		if (exec->infile_fd == -1)
-			error_exit("Error: /dev/null", NULL);
-	}
-}*/
-/*
-static void	clean_exit(char **cmd_args, char *cmd, char *msg, int code)
-{
-	if (msg)
-		error_msg(cmd_args, msg, code);
-	else
-		error_exit(cmd, cmd_args);
-	ft_free_split(cmd_args);
-	exit(code);
+	return (search_in_paths(path_env, cmd));
 }
 
-void	handle_absolute_path(char **cmd_args, char **envp)
-{
-	if (access(cmd_args[0], F_OK) == -1)
-		clean_exit(cmd_args, cmd_args[0], "No such file or directory", 127);
-	if (access(cmd_args[0], X_OK) == -1)
-		clean_exit(cmd_args, cmd_args[0], "Permission denied", 126);
-	execve(cmd_args[0], cmd_args, envp);
-	clean_exit(cmd_args, cmd_args[0], "execve failed", 1);
-}
-
-void	execute_command(char *cmd, char **envp)
-{
-	char	**cmd_args;
-	char	*path;
-
-	cmd_args = NULL;
-	path = NULL;
-	if (ft_strlen(cmd) == 0)
-		clean_exit(NULL, "", "command not found", 127);
-	cmd_args = split_command(cmd);
-	if (!cmd_args || !cmd_args[0])
-		clean_exit(cmd_args, "", "command not found", 127);
-	if (ft_strchr(cmd_args[0], '/'))
-		handle_absolute_path(cmd_args, envp);
-	path = find_command_path(cmd_args[0], envp);
-	if (!path)
-		clean_exit(cmd_args, cmd_args[0], "command not found", 127);
-	execve(path, cmd_args, envp);
-	free(path);
-	clean_exit(cmd_args, cmd_args[0], "execve failed", EXIT_FAILURE);
-}
-
-void	run_pipex(t_pipex *pipex, char **argv)
-{
-	t_exec	exec;
-	int		status;
-
-	ft_memset(&exec, 0, sizeof(t_exec));
-	handle_input(&exec, argv[1]);
-	if (pipe(pipex->pipefd) == -1)
-		error_exit("Pipe error", NULL);
-	exec.pid1 = fork();
-	if (exec.pid1 == 0)
-		first_child(pipex, &exec, argv[2]);
-	close(pipex->pipefd[1]);
-	exec.pid2 = fork();
-	if (exec.pid2 == 0)
-		second_child(pipex, &exec, argv[3]);
-	close(pipex->pipefd[0]);
-	close(exec.infile_fd);
-	waitpid(exec.pid1, NULL, 0);
-	waitpid(exec.pid2, &status, 0);
-	if (WIFEXITED(status))
-		exit(WEXITSTATUS(status));
-	exit(EXIT_FAILURE);
-}
-
-
-void	child_process(t_pipex *pipex, t_exec *exec, t_child *child_data)
-{
-	if (dup2(child_data->input_fd, STDIN_FILENO) == -1)
-		error_exit("Dup2 input", NULL);
-	if (dup2(child_data->output_fd, STDOUT_FILENO) == -1)
-		error_exit("Dup2 output", NULL);
-	close_pipes(pipex);
-	close(exec->infile_fd);
-	if (exec->outfile_fd > 0)
-		close(exec->outfile_fd);
-	execute_command(child_data->cmd, pipex->envlp);
-}
-
-void	first_child(t_pipex *pipex, t_exec *exec, char *cmd)
-{
-	close(pipex->pipefd[0]);
-	if (dup2(exec->infile_fd, STDIN_FILENO) == -1)
-		error_exit("Error: Dup2 failed (input)", NULL);
-	close(exec->infile_fd);
-	if (dup2(pipex->pipefd[1], STDOUT_FILENO) == -1)
-		error_exit("Error: Dup2 failed (output)", NULL);
-	close(pipex->pipefd[1]);
-	execute_command(cmd, pipex->envlp);
-	close(pipex->pipefd[0]);
-	close(pipex->pipefd[1]);
-}
-
-void	second_child(t_pipex *pipex, t_exec *exec, char *cmd)
-{
-	t_child	child_data;
-
-	exec->outfile_fd = open(pipex->outfile_name, O_WRONLY | O_CREAT | O_TRUNC,
-			0644);
-	if (exec->outfile_fd == -1)
-		error_exit("Error: Outfile", NULL);
-	child_data.input_fd = pipex->pipefd[0];
-	child_data.output_fd = exec->outfile_fd;
-	child_data.cmd = cmd;
-	child_process(pipex, exec, &child_data);
-	close(exec->outfile_fd);
-	close(pipex->pipefd[0]);
-	close(pipex->pipefd[1]);
-}
-
-void	initialize_positions_forsplitdemesc(int pos[3])
-{
-	pos[0] = 0;
-	pos[1] = 0;
-	pos[2] = 0;
-}
-*/
-char	*pwd_path(char *cmd, char **envlp)
-{
-	char	*pwd;
-	char	*full_path;
-
-	pwd = get_env_path(envlp, "PWD=");
-	if (!pwd)
-		return (NULL);
-	full_path = join_with_slash(pwd, cmd);
-	if (full_path && access(full_path, X_OK) == 0)
-		return (full_path);
-	free(full_path);
-	return (NULL);
-}
-/*
-void	ft_free_split(char **ft_split)
-{
-	int	i;
-
-	i = 0;
-	if (!ft_split)
-		return ;
-	while (ft_split[i])
-	{
-		free(ft_split[i]);
-		i++;
-	}
-	free(ft_split);
-}
-
-int	handle_quote(const char *str, int i, char quote)
-{
-	i++;
-	while (str[i] && str[i] != quote)
-		i++;
-	if (str[i] == quote)
-		i++;
-	return (i);
-}
-
-int	skip_whitespace(const char *str, int pos)
-{
-	while (str[pos] && (str[pos] == ' ' || str[pos] == '\t'))
-		pos++;
-	return (pos);
-}
-
-int	skip_arg(const char *str, int pos)
-{
-	while (str[pos] && !(str[pos] == ' ' || str[pos] == '\t'))
-	{
-		if (str[pos] == '\'' || str[pos] == '"')
-			pos = handle_quote(str, pos, str[pos]);
-		else
-			pos++;
-	}
-	return (pos);
-}*/
