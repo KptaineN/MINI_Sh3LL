@@ -6,13 +6,14 @@
 /*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:29:05 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/12 17:15:08 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-int	main(void) // int argc, char **argv, char **envp)
+//int main(void)
+int	main(int argc, char **argv, char **envp)
 {
 	t_minishell	shell;
 

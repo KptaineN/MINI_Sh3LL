@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:35:55 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/12 16:38:49 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	is_builtin(t_ast *ast)
 		return (0);
 	if (ft_strcmp(ast->args[0], "cd") == 0)
 		return (1);
+		
 	if (ft_strcmp(ast->args[0], "echo") == 0)
 		return (1);
 	if (ft_strcmp(ast->args[0], "export") == 0)
