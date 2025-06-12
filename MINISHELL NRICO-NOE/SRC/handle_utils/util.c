@@ -1,4 +1,28 @@
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
+
+// Assemble trois chaînes (ex: "bin", "/", "ls" -> "bin/ls")
+char	*ft_strjoin_3(const char *a, const char *b, const char *c)
+{
+	char	*tmp;
+	char	*res;
+
+	tmp = ft_strjoin(a, b);
+	if (!tmp)
+		return (NULL);
+	res = ft_strjoin(tmp, c);
+	free(tmp);
+	return (res);
+}
+
+void	ft_free_split(char **tab)
+{
+	int i = 0;
+	if (!tab)
+		return;
+	while (tab[i])
+		free(tab[i++]);
+	free(tab);
+}
 
 void handle_error(const char *message)
 {
@@ -70,4 +94,12 @@ void free_ast(t_ast *ast)
         // Here you would typically free the AST nodes
         // free_ast_nodes(ast);
     }
+}
+void clean_exit(char **cmd_args, char *msg, int code)
+{
+    if (msg)
+        ft_putendl_fd(msg, 2);
+    if (cmd_args)
+        ft_free_split(cmd_args);
+    exit(code);
 }

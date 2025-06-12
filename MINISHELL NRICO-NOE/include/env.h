@@ -5,16 +5,17 @@
 
 typedef struct s_env
 {
-    char            *key;   // nom de la variable d'env
-    char            *value; // valeur de la variable
-    struct s_env    *next;  // maillon suivant
+    char            *key;
+    char            *value;
+    struct s_env    *next;
 }   t_env;
 
-// Fonctions pour créer et gérer la liste (header ici, code dans env.c)
+// Fonctions de gestion de l'env
 t_env   *init_env(char **envp);
 void    free_env(t_env *env);
-void    print_env(t_env *env); // affichage de la liste pour debug
-
+void    print_env(t_env *env);
+char    *get_env_value(t_env *env, const char *name);
+// ... autres prototypes liés à l'env
 #endif
 /*
 why ?

@@ -18,12 +18,15 @@ typedef enum e_node_type
 // Un nœud d'AST : il peut représenter une commande, un pipe, une redirection...
 typedef struct s_ast
 {
-    t_node_type     type;       // type du nœud, d’action représentée (commande, pipe, etc)
-    char            **args;     // arguments de la commande (ou NULL si pas une commande)
-    int             append;      // descripteur de fichier pour redirection input (sinon -1)
-    char            *filename;  // nom du fichier pour une redirection (sinon NULL)
-    struct s_ast    *left;      // branche gauche (ex: commande avant un pipe)
-    struct s_ast    *right;     // branche droite (ex: commande après un pipe)
+    t_node_type     type;
+    char            **args;
+    char            *filename;
+    struct s_ast    *left;
+    struct s_ast    *right;
 }   t_ast;
+
+// Fonctions de gestion de l'AST
+void    free_ast(t_ast *ast);
+// ... autres prototypes liés à l'AST
 
 #endif

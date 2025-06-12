@@ -1,4 +1,22 @@
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
+
+
+// Pour lancer un pipeline complet (même si c'est juste une commande)
+void execute_command(t_ast *ast, t_env *env)
+{
+    execute_ast_pipeline(ast, env, STDIN_FILENO);
+}
+
+
+void	execute_ast(t_ast *ast, t_env *env)
+{
+    if (!ast)
+        return ;
+    if (ast->type == NODE_PIPE)
+        execute_ast_pipeline(ast, env, STDIN_FILENO);
+    else
+        exec_cmd_node(ast, env, STDIN_FILENO);
+}
 
 /*
 Regarder le contenu de ton AST (arbre de commandes que tu as construit en parsant l’input).

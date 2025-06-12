@@ -76,3 +76,15 @@ void handle_unset(t_minishell *shell)
         fprintf(stderr, "unset: missing argument\n");
     }
 }
+/*void	handle_input(t_exec *exec, char *filename)
+{
+	exec->infile_fd = open(filename, O_RDONLY);
+	if (exec->infile_fd == -1)
+	{
+		ft_putstr_fd("pipex: ", STDERR_FILENO);
+		perror(filename);
+		exec->infile_fd = open("/dev/null", O_RDONLY);
+		if (exec->infile_fd == -1)
+			error_exit("Error: /dev/null", NULL);
+	}
+}*/
