@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/12 15:14:09 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/12 15:48:37 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_minishell
 int     start_init_minishell(t_minishell *shell, char **envp);
 void    init_minishell(t_minishell *shell, char **envp);
 int     main_loop(t_minishell *shell);
+
 void    free_minishell(t_minishell *shell);
 
 // Gestion du prompt et boucle utilisateur

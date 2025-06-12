@@ -8,12 +8,9 @@ CFLAGS = -Wall -Wextra -Werror
 SRC = \
 SRC/main.c \
 SRC/init.c \
-SRC/builtins/echo.c \
-SRC/builtins/cd.c \
-SRC/builtins/exit.c \
-SRC/builtins/env.c \
-SRC/builtins/export.c \
-SRC/builtins/unset.c \
+SRC/built/env.c \
+SRC/built/export.c \
+SRC/built/unset.c \
 SRC/parser/lexer.c \
 SRC/parser/parser.c \
 SRC/parser/ast.c \
@@ -28,6 +25,9 @@ SRC/env/unset.c \
 SRC/env/utils_env.c \
 SRC/signals/signals.c \
 SRC/utils/utils.c
+# SRC/builtins/echo.c 
+# SRC/builtins/exit.c 
+
 
 OBJ = $(SRC:.c=.o)
 
