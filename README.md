@@ -1,4 +1,6 @@
-
+<p align="center" width="100">
+    <img src=".Picture4rdme/minishell.png"/>
+</p>
             minishell/
             ├── builtins/       # → Tes builtins (echo, cd, exit, export, unset, env)
             │   ├── echo.c
