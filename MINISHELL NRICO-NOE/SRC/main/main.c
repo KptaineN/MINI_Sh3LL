@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 17:15:08 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/16 15:35:49 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 //int main(void)
 int	main(int argc, char **argv, char **envp)
@@ -19,7 +19,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
-	if (!start_init_minishell(&shell, envp))
+	if (!start_minishell(&shell, envp))
 	{
 		ft_putendl_fd("Error initializing minishell\n", STDERR_FILENO);
 		exit(EXIT_FAILURE);

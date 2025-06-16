@@ -6,8 +6,9 @@ CFLAGS = -Wall -Wextra -Werror
 # Fichiers sources (récupère tous les .c dans tous les sous-dossiers)
 # Liste explicite des fichiers source
 SRC = \
-SRC/main.c \
-SRC/init.c \
+SRC/main/main.c \
+SRC/main/main_utils.c \
+SRC/main/start_init.c \
 SRC/built/env.c \
 SRC/built/export.c \
 SRC/built/unset.c \

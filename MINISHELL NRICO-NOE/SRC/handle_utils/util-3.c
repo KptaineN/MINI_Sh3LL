@@ -3,14 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   util-3.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:27:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:27:59 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/16 16:13:59 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+
+void	free_args(char **args)
+{
+	int	i = 0;
+
+	if (!args)
+		return;
+	while (args[i])
+	{
+		free(args[i]);
+		i++;
+	}
+	free(args);
+}
 
 void	parse_input(t_minishell *shell)
 {
@@ -24,16 +39,24 @@ void	parse_input(t_minishell *shell)
 	}
 }
 
-void	free_ast(t_ast *ast)
+void	free_ast(t_ast *node)
 {
-	// This function should free the AST structure
-	// For now, we will just print a message for debugging
-	if (ast)
-	{
-		printf("Freeing AST...\n");
-		// Here you would typically free the AST nodes
-		// free_ast_nodes(ast);
-	}
+	if (!node)
+		return;
+
+	// Libère récursivement les sous-arbres
+	free_ast(node->left);
+	free_ast(node->right);
+
+	// Libère le tableau d'arguments (pour les commandes)
+	free_args(node->args);
+
+	// Libère le nom de fichier (pour les redirections)
+	if (node->filename)
+		free(node->filename);
+
+	// Libère le nœud lui-même
+	free(node);
 }
 void	clean_exit(char **cmd_args, char *msg, int code)
 {

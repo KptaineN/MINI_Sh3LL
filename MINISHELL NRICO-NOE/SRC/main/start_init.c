@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:19 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:36:46 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/16 15:35:38 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void	init_minishell(t_minishell *shell, char **envp)
 {
@@ -32,36 +32,16 @@ void	init_minishell(t_minishell *shell, char **envp)
 						// initialize data structures, etc.
 }
 
-int	looping(t_minishell *shell)
-{
-	while (1)
-	{
-		shell->input = readline("minishell$ ");
-		if (!shell->input)
-		{
-			ft_putendl_fd("exit", STDERR_FILENO);
-			break ;
-		}
-		if (ft_strlen(shell->input) > 0)
-		{
-			add_history(shell->input);
-			parse_input(shell);     // À écrire : transforme en AST
-			execute_command(shell); // À écrire : exécute l’AST
-		}
-		free(shell->input);
-		shell->input = NULL;
-	}
-	return (0);
-}
+/*loop principal dans mainloop.c*/
 
-int	start_init_minishell(t_minishell *shell, char **envp)
+int	start_minishell(t_minishell *shell, char **envp)
 {
 	if (!shell || !envp)
 		return (0);
 	init_minishell(shell, envp);
 	looping(shell);
 	// Here,
-		you can add any additional initialization steps needed for your minishell
+	//	you can add any additional initialization steps needed for your minishell
 	// Additional initialization steps can be added here
 	// For example, setting up signal handlers, initializing the AST, etc.
 	return (1); // Return 1 on success

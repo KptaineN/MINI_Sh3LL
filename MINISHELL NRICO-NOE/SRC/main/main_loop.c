@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   main_loop.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:16 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:24:18 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/16 15:38:01 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 int	looping(t_minishell *shell)
 {
 	while (1)
 	{
-		shell->input = readline("minishell$ ");
+		shell->input = readline("ᕕ( ᐛ )ᕗ minishell$ ");
 		if (!shell->input)
 		{
 			ft_putendl_fd("exit", STDERR_FILENO);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/12 16:23:04 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/16 15:32:31 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ typedef struct s_minishell
 }		t_minishell;
 
 // Fonctions globales d'initialisation
-int		start_init_minishell(t_minishell *shell, char **envp);
+int		start_minishell(t_minishell *shell, char **envp);
 void	init_minishell(t_minishell *shell, char **envp);
 int		main_loop(t_minishell *shell);
 

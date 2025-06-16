@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ast.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:22:47 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:23:26 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/16 16:02:45 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,10 @@ typedef struct s_ast
 
 // Fonctions de gestion de l'AST
 void				free_ast(t_ast *ast);
+t_ast	*init_command_node(char **args);
+t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child);
+
+
 
 // ... autres prototypes liés à l'AST
 
