@@ -6,72 +6,48 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:41 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/16 16:25:14 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/17 15:03:04 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../../include/minishell.h"
 
 
-void	execute_ast(t_ast *ast, t_env *env)
-{
-	if (!ast)
-		return ;
-	if (ast->type == NODE_PIPE)
-		execute_ast_pipeline(ast, env, STDIN_FILENO);
-	else
-		exec_cmd_node(ast, env, STDIN_FILENO);
+char *find_cmd(const char *cmd, t_env *env) {
+    (void)cmd; (void)env;
+    return NULL;
 }
 
+
+
 /*
-Regarder le contenu de ton AST (arbre de commandes que tu as construit en parsant l’input).
-
-Décider : est-ce que c’est…
-
-	Un builtin ? (commande interne du shell comme cd, echo, export…)
-
-	Un pipeline ? (plusieurs commandes reliées par des pipes,
-		ex : ls | grep .c | wc -l)
-
-	Une commande simple ? (juste un binaire sans pipe, ex : ls -l)
-
-Appeler la fonction adaptée pour gérer le cas :
-
-	builtin : Exécution spéciale (souvent SANS fork)
-
-	pipeline : Exécution pipex-style (fork + pipe entre chaque)
-
-	simple : Juste fork + execve, redirections éventuelles
-*/
-void	execute_command(t_minishell *shell)
-{
-	if (!shell->ast)
-		return ;
-	if (is_builtin(shell->ast))
-		execute_builtin(shell, shell->ast);
-	else if (is_pipeline(shell->ast))
-		execute_ast_pipeline(shell->ast, shell->env, STDIN_FILENO);
-	else
-		execute_simple(shell->ast, shell->env);
-}
-/*
-chatgpt v1
-
-#include "minishell.h"
-#include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-
+ * Executes a simple command node (without redirections or pipes).
+ */
 static void exec_simple_command(t_ast *node, t_env *env)
 {
+	char *cmd_path;
+
 	if (!node || node->type != NODE_COMMAND || !node->args)
 		exit(1);
-
-	execve(get_command_path(node->args[0], env), node->args, env_to_envp(env));
+	cmd_path = find_command_path(node->args[0], env);
+	if (!cmd_path)
+	{
+		fprintf(stderr, "Command not found: %s\n", node->args[0]);
+		exit(1);
+	}
+	execve(cmd_path, node->args, env_to_envp(env)); // utilise la bonne fonction ici
 	perror("execve");
 	exit(1);
 }
 
+/*
+ * Executes a redirection node.
+ * Opens the file according to redirection type and duplicates the file descriptor.
+ */
 static void exec_redirection(t_ast *node, t_env *env)
 {
 	int fd;
@@ -83,31 +59,41 @@ static void exec_redirection(t_ast *node, t_env *env)
 	else if (node->type == NODE_REDIR_IN)
 		fd = open(node->filename, O_RDONLY);
 	else
-		return ;
-
+		return;
 	if (fd < 0)
 	{
 		perror("open");
 		exit(1);
 	}
-
 	if (node->type == NODE_REDIR_OUT || node->type == NODE_REDIR_APPEND)
 		dup2(fd, STDOUT_FILENO);
 	else if (node->type == NODE_REDIR_IN)
 		dup2(fd, STDIN_FILENO);
-
 	close(fd);
 	execute_ast(node->left, env);
 	exit(1);
 }
 
+/*
+ * Executes a pipeline node.
+ * It forks two processes; the first writes to the pipe, the second reads from it.
+ */
 static void exec_pipe(t_ast *node, t_env *env)
 {
-	int pipefd[2];
-	pid_t pid1, pid2;
+	int     pipefd[2];
+	pid_t   pid1, pid2;
 
-	pipe(pipefd);
+	if (pipe(pipefd) < 0)
+	{
+		perror("pipe");
+		exit(1);
+	}
 	pid1 = fork();
+	if (pid1 < 0)
+	{
+		perror("fork");
+		exit(1);
+	}
 	if (pid1 == 0)
 	{
 		close(pipefd[0]);
@@ -117,6 +103,11 @@ static void exec_pipe(t_ast *node, t_env *env)
 		exit(1);
 	}
 	pid2 = fork();
+	if (pid2 < 0)
+	{
+		perror("fork");
+		exit(1);
+	}
 	if (pid2 == 0)
 	{
 		close(pipefd[1]);
@@ -131,13 +122,24 @@ static void exec_pipe(t_ast *node, t_env *env)
 	waitpid(pid2, NULL, 0);
 }
 
+/*
+ * Recursively executes an AST node.
+ * This function handles command nodes, pipelines, and redirections.
+ */
 void execute_ast(t_ast *node, t_env *env)
 {
+	pid_t pid;
+
 	if (!node)
 		return;
 	if (node->type == NODE_COMMAND)
 	{
-		pid_t pid = fork();
+		pid = fork();
+		if (pid < 0)
+		{
+			perror("fork");
+			exit(1);
+		}
 		if (pid == 0)
 			exec_simple_command(node, env);
 		else
@@ -146,9 +148,14 @@ void execute_ast(t_ast *node, t_env *env)
 	else if (node->type == NODE_PIPE)
 		exec_pipe(node, env);
 	else if (node->type == NODE_REDIR_IN || node->type == NODE_REDIR_OUT ||
-		node->type == NODE_REDIR_APPEND)
+			 node->type == NODE_REDIR_APPEND)
 	{
-		pid_t pid = fork();
+		pid = fork();
+		if (pid < 0)
+		{
+			perror("fork");
+			exit(1);
+		}
 		if (pid == 0)
 			exec_redirection(node, env);
 		else
@@ -156,8 +163,19 @@ void execute_ast(t_ast *node, t_env *env)
 	}
 }
 
+/*
+ * The main entry point for executing a command.
+ * If the AST represents a builtin, we execute it directly;
+ * otherwise, we recursively execute the AST.
+ */
 void execute_command(t_minishell *shell)
 {
-	execute_ast(shell->ast, shell->env_list);
+	if (!shell->ast)
+		return;
+	//if (is_builtin(shell->ast))//avant test
+	if (is_builtin(shell->ast->args[0]))
+		execute_builtin(shell->ast, shell->env);
+		//execute_builtin(shell, shell->ast);
+	else
+		execute_ast(shell->ast, shell->env);
 }
-*/

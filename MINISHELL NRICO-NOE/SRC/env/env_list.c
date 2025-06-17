@@ -3,14 +3,45 @@
 /*                                                        :::      ::::::::   */
 /*   env_list.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:29 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:35:31 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/17 14:09:22 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
+#include <stdlib.h>
+
+
+char	**env_to_envp(t_env *env)
+{
+    t_env	*curr;
+    int		count = 0;
+    char	**envp;
+    int		i;
+
+    curr = env;
+    while (curr)
+    {
+        count++;
+        curr = curr->next;
+    }
+    envp = malloc(sizeof(char *) * (count + 1));
+    if (!envp)
+        handle_error("malloc");
+    i = 0;
+    curr = env;
+    while (curr)
+    {
+        envp[i] = ft_strjoin_3(curr->key, "=", curr->value);
+        i++;
+        curr = curr->next;
+    }
+    envp[i] = NULL;
+    return (envp);
+}
 
 // parse la string "KEY=VALUE" en t_env
 // Dans ton create_env (ou équivalent) :
@@ -36,26 +67,13 @@ t_env	*create_env(char *env_str)
 		free(node);
 		return (NULL);
 	}
-	ft_strncpy(node->key, env_str, key_len);
-	node->key[key_len] = '\0';
+	if (ft_strlcpy(node->key, env_str, key_len + 1) != key_len)
+		handle_error("ft_strlcpy error copying key");
 	node->value = ft_strdup(equal + 1);
 	node->next = NULL;
 	return (node);
 }
 
-char	*get_env_value(t_env *env, const char *name)
-{
-	size_t	n;
-
-	n = ft_strlen(name);
-	while (env)
-	{
-		if (ft_strncmp(env->key, name, n) == 0 && env->key[n] == '\0')
-			return (env->value);
-		env = env->next;
-	}
-	return (NULL);
-}
 
 // construit toute la liste à partir de envp
 t_env	*init_env(char **envp)

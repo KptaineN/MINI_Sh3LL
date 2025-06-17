@@ -45,4 +45,14 @@ a faire
             env/export.c, env/unset.c
 
             redirection.c → setup_redirections, gestion des fd
-            
+
+a faire aussi
+
+			init_ast_node, init_redirection_node, etc. → SRC/parser/ast_helper.c
+
+		parse_line_to_ast → SRC/parser/ast.c ou SRC/parser/parser.c
+
+			get_env_value → SRC/env/env_list.c
+
+		ft_strjoin_3, free_strtab → SRC/handle_utils/util-3.c (ou un util.c global)
+ 		           

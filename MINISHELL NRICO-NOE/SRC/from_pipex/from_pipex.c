@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   from_pipex.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:32:42 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:35:06 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/17 12:07:00 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,15 @@ int	is_pipeline(t_ast *ast)
 	return (0);
 }
 
-char	*pwd_path(char *cmd, char **envlp)
+char	*pwd_path(char *cmd, t_env *env)
 {
 	char *pwd;
 	char *full_path;
 
-	pwd = get_env_path(envlp, "PWD=");
+	pwd = get_env_value(env, "PWD");
 	if (!pwd)
 		return (NULL);
-	full_path = join_with_slash(pwd, cmd);
+	full_path = ft_strjoin_3(pwd, "/", cmd);
 	if (full_path && access(full_path, X_OK) == 0)
 		return (full_path);
 	free(full_path);

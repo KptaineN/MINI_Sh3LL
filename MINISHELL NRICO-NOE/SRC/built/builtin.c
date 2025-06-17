@@ -3,15 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:38:49 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:04:51 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
+
+int is_builtin(const char *cmd) {
+    // Ex: "cd", "echo", etc. À compléter
+    return 0;
+}
+int execute_builtin(t_ast *cmd, t_env *env) {
+	void(cmd)(t_ast *, t_env);
+    // À compléter selon ta logique
+    return 0;
+}
+
+ /*
 int	is_builtin(t_ast *ast)
 {
 	if (!ast || ast->type != NODE_COMMAND || !ast->args || !ast->args[0])
@@ -89,3 +101,4 @@ void	execute_simple(t_ast *ast, t_env *env)
 	}
 	waitpid(pid, &status, 0);
 }
+*/

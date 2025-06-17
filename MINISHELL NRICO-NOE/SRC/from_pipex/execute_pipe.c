@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   execute_pipe.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:32:25 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/12 16:32:33 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/06/17 12:11:07 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-static void	exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
+void	exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
 {
 	pid_t	pid;
 	char	*cmd_path;
@@ -28,7 +28,7 @@ static void	exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
 		}
 		setup_redirections(ast);
 		cmd_path = find_cmd(ast->args[0], env);
-		env_tab = env_to_char_tab(env);
+		env_tab = env_to_envp(env);
 		execve(cmd_path, ast->args, env_tab);
 		perror("execve");
 		exit(127);
@@ -38,7 +38,7 @@ static void	exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
 	waitpid(pid, NULL, 0);
 }
 
-static void	exec_pipe_node(t_ast *ast, t_env *env, int input_fd)
+void	exec_pipe_node(t_ast *ast, t_env *env, int input_fd)
 {
 	int		fd[2];
 	pid_t	pid;

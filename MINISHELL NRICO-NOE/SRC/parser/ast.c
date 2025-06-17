@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:23 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/16 16:03:27 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/17 11:31:29 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 // Ex : cmd_line = "ls -l | grep .c | wc -l > out.txt"
 
-t_ast	*parse_line_to_ast(const char *cmd_line)
-{
+//t_ast	*parse_line_to_ast(const char *cmd_line)
+//{
 	// Étape 1 : split sur les pipes, gérant les quotes avec tes helpers
 	// --> ["ls -l", "grep .c", "wc -l > out.txt"]
 	// Étape 2 : pour chaque portion,
@@ -28,7 +28,7 @@ t_ast	*parse_line_to_ast(const char *cmd_line)
 	//    /    \
     //CMD("ls -l") CMD("grep .c")
 
-}
+//}
 /*
 À partir de la liste de tokens (créée par le lexer), construire une structure en arbre binaire représentant la logique de la ligne de commande.
 
@@ -43,14 +43,7 @@ Fonction principale : t_ast *parse_line_to_ast(t_token *tokens);
 Elle prend la liste chaînée de t_token et retourne l’AST.
 
 Il faut parser en suivant une priorité d'opérateurs, généralement :
-
-1. Pipe    → `|`
-2. Redirections → `>`, `<`, `>>`, `<<`
-3. Commandes (mots) → feuilles
-
-L’approche classique :
-
-    Trouver l’opérateur le plus prioritaire (le moins prioritaire visuellement)
+find_cmdllement)
 
     Découper la liste à cet opérateur (comme au centre d’un arbre)
 
@@ -139,8 +132,8 @@ ast->left / ast->right	Représente les sous-commandes avant/après un opérateur
 
 */
 
-#include "../../include/minishell.h"
 
+/*
 static char	**dup_args(char **args)
 {
 	int		count = 0;
@@ -159,7 +152,7 @@ static char	**dup_args(char **args)
 	}
 	copy[count] = NULL;
 	return (copy);
-}
+}*/
 
 t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child)
 {

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:30 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/16 16:25:18 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/17 14:46:13 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ C’est un bon point de départ, mais ce n’est pas encore un vrai parser, car 
     les quotes
 
     l’ordre d’exécution*/
-t_ast	*parse_line_to_ast(const char *input)
+/*t_ast	*parse_line_to_ast(const char *input)
 {
 	t_ast	*node;
 
@@ -45,14 +45,33 @@ t_ast	*parse_line_to_ast(const char *input)
 	node->left = NULL;
 	node->right = NULL;
 	return (node);
-}
+}*/
 
-void	parse_input(t_minishell *shell)
-{
+
 	// Exemples : découpe sur les pipes (à améliorer ensuite)
 	// ["ls -l", "grep .c"]
-	shell->ast = parse_line_to_ast(shell->input);
-}
+
+/*
+ * parse_input : Tokenize input, parse AST, puis éventuellement exécute.
+ * - Ne fait QUE parser (laisse la responsabilité de l’exécution ailleurs !)
+ */
+//void	parse_input(t_minishell *shell)
+//{
+	//if (!shell || !shell->input)
+	//	return;
+
+	// 1. Tokenization (optionnel si tu veux lexer d’abord)
+	// t_token *tokens = lexer(shell->input);
+	// shell->ast = parse_line_to_ast(tokens);
+
+	// 2. Version minimaliste : parser direct sur la string (sans lexer pour l’instant)
+	//shell->ast = parse_line_to_ast(shell->input);
+
+	// 3. Optionnel : debug AST
+	// print_ast(shell->ast, 0);
+//}
+
+
 /*
 
 Tu n'utilises plus la ligne brute (const char *input), mais la liste de tokens que le lexer a produit :
@@ -142,12 +161,12 @@ args	tableau de chaînes (char **) pour les commandes
 
 y a ca aussi #include "minishell.h"
 #include <stdio.h>
-
+*/
 static char **split_on_pipes(const char *input)
 {
 	return ft_split(input, '|');
 }
-
+/*
 void free_strtab(char **tab)
 {
 	int i = 0;
@@ -193,7 +212,7 @@ static t_ast *parse_redirection(char **args)
 	}
 	return cmd;
 }
-
+*/
 t_ast *parse_line_to_ast(const char *input)
 {
 	char **segments = split_on_pipes(input);
@@ -220,48 +239,15 @@ t_ast *parse_line_to_ast(const char *input)
 	return current;
 }
 
-void print_ast(t_ast *node, int level)
-{
-	if (!node)
-		return;
 
-	for (int i = 0; i < level; i++)
-		printf("    ");
-
-	switch (node->type)
-	{
-		case NODE_COMMAND:
-			printf("COMMAND:");
-			for (int i = 0; node->args && node->args[i]; i++)
-				printf(" %s", node->args[i]);
-			printf("\n");
-			break;
-		case NODE_PIPE:
-			printf("PIPE\n");
-			break;
-		case NODE_REDIR_OUT:
-			printf("> %s\n", node->filename);
-			break;
-		case NODE_REDIR_APPEND:
-			printf(">> %s\n", node->filename);
-			break;
-		case NODE_REDIR_IN:
-			printf("< %s\n", node->filename);
-			break;
-		case NODE_HEREDOC:
-			printf("<< %s\n", node->filename);
-			break;
-	}
-	print_ast(node->left, level + 1);
-	print_ast(node->right, level + 1);
-}
 
 void parse_input(t_minishell *shell)
 {
+	if (!shell || !shell->input)
+		return;
+	if (shell->ast)
+		free_ast(shell->ast); // optionnel si leaks
 	shell->ast = parse_line_to_ast(shell->input);
 	print_ast(shell->ast, 0);
 	execute_command(shell); // à définir dans executor.c
 }
-
-
-*/

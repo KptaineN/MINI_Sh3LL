@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/16 15:35:49 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/17 11:46:33 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void)argc;
 	(void)argv;
+	init_signals();
 	if (!start_minishell(&shell, envp))
 	{
 		ft_putendl_fd("Error initializing minishell\n", STDERR_FILENO);

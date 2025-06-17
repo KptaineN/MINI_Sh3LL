@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:27:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/16 16:13:59 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/17 13:31:57 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	free_args(char **args)
 	}
 	free(args);
 }
-
+/*
 void	parse_input(t_minishell *shell)
 {
 	// This function should parse the input and build the AST
@@ -37,7 +37,7 @@ void	parse_input(t_minishell *shell)
 		// Here you would typically call a function to build the AST
 		// shell->ast = build_ast(shell->input);
 	}
-}
+}*/
 
 void	free_ast(t_ast *node)
 {
