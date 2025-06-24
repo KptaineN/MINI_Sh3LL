@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:19 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 13:38:34 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:24:44 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,10 +87,10 @@ int	start_minishell(t_minishell *shell, char **envp)
 		return (0);
 	
 
-	t_shell *shell;
-		shell = malloc(sizeof(t_shell));
-		if (!shell)
-			return 0;
+	//t_shell *shell;
+	//	shell = malloc(sizeof(t_shell));
+	//	if (!shell)
+	//		return 0;
 	ft_memset(shell, 0, sizeof(t_shell));
 	
 	init_minishell(shell, envp);

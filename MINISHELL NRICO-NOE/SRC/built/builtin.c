@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 15:04:51 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:34:02 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,18 @@
 
 int is_builtin(const char *cmd) {
     // Ex: "cd", "echo", etc. À compléter
+	(void)cmd;  // silence warning if non utilisé
+     // TODO : renvoyer 1 si cmd est dans la liste des builtins
+     return (0);
     return 0;
 }
 int execute_builtin(t_ast *cmd, t_env *env) {
-	void(cmd)(t_ast *, t_env);
+	//void(cmd)(t_ast *, t_env);
     // À compléter selon ta logique
+	(void)cmd;  // silence warning
+    (void)env;  // silence warning
+     // TODO : appeler la bonne fonction builtin selon cmd->value
+
     return 0;
 }
 

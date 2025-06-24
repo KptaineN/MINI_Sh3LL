@@ -6,14 +6,14 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 13:54:38 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/24 14:03:28 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:41:29 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 
-static int	count_tokens(const char *str)//, int *sub_n)
+int	count_tokens(const char *str)//, int *sub_n)
 {
 	int		count;
 	int 	i;
@@ -107,7 +107,7 @@ char *find_c_needle(const char *str, char *needle, int size_needle)
 
 
 // Function to extract a single token
-static char	*extract_token(const char *str, int *start)
+char	*extract_token(const char *str, int *start)
 {
 	bool	in_single_quote;
 	bool	in_double_quote;
@@ -148,34 +148,32 @@ static char	*extract_token(const char *str, int *start)
 	return (token);
 }
 
-t_arr 	*custom_split(const char *str)
+t_arr *custom_split(const char *str)
 {
-	int		pos;
-	int		token_index;
-	char	*arg;
-	t_arr	*result;
-	if (!str)
-		return;
-	result = malloc(sizeof(t_arr));
-	if (!result)
-		return NULL;
-	result->len = count_tokens(str);
-	result->arr = malloc(sizeof(char *) * (result->len));
-	if (!result->arr)
-		return (free(result),NULL);
-	pos = 0;
-	token_index = 0;
-	while (token_index < result->len)
-	{
-		result->arr[token_index] = extract_token(str, &pos); //, &arr_token[token_index]);
-		if (!result->arr[token_index])
-		{
-			for (int i = 0; i < token_index; i++)
-				free(result->arr[i]);
-			free(result->arr);
-			free(result);
-			return NULL;
-		}
-		token_index++;
-	}
+    int pos = 0, token_index = 0;
+    t_arr *result;
+
+    if (!str)
+        return (NULL);
+    result = malloc(sizeof(t_arr));
+    if (!result)
+        return (NULL);
+    result->len = count_tokens(str);
+    result->arr = malloc(sizeof(char *) * result->len);
+    if (!result->arr)
+        return (free(result), NULL);
+    while (token_index < result->len)
+    {
+        result->arr[token_index] = extract_token(str, &pos);
+        if (!result->arr[token_index])
+        {
+            while (token_index--)
+                free(result->arr[token_index]);
+            free(result->arr);
+            free(result);
+            return (NULL);
+        }
+        token_index++;
+    }
+    return (result);
 }

@@ -123,5 +123,8 @@ int handle_pipe(void *shell, int token_idx);
 int handle_redirect_in(void *shell, int token_idx);
 int handle_redirect_out(void *shell, int token_idx);
 
+void    build_t_arr(t_arr **dst, char **arr_str, int len);
+size_t  ft_arrlen(char **arr);
+
 
 #endif
