@@ -3,6 +3,8 @@
 
 #include "minishell.h" // Include the main header for the shell
 
+typedef struct s_minishell t_minishell;
+
 // Libraries and headers
 /* ************************************************************************** *
 # include <stdio.h>             // printf, perror, etc.
@@ -125,6 +127,8 @@ int handle_redirect_out(void *shell, int token_idx);
 
 void    build_t_arr(t_arr **dst, char **arr_str, int len);
 size_t  ft_arrlen(char **arr);
-
+//void    parse_input(t_minishell *shell);
+t_ast   *init_redirection_node(t_node_type type, const char *filename, t_ast *child);
+void    parse_input(t_minishell *shell);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/24 15:15:30 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 16:06:10 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void print_prompt(t_minishell *shell);
 void execute_command(t_minishell *shell);
 
 // parser
-void parse_input(t_minishell *shell);
+//void parse_input(t_minishell *shell);
 
 // Divers utilitaires
 void handle_error(const char *message);

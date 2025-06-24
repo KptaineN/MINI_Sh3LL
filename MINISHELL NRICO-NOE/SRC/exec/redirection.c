@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:33 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 14:27:22 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 16:17:21 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void execute_simple_command(t_ast *ast, t_env *env)
  */
 t_ast *parse_redirection(char **args)
 {
-    t_ast *cmd = init_command_node(args);
+    t_ast *cmd = init_command_node(NODE_COMMAND ,args);
     if (!cmd)
         return NULL;
     int i = 0;
@@ -142,13 +142,5 @@ void free_strtab(char **tab)
     free(tab);
 }
 
-/*
- * Parse la ligne d'entrée pour créer l'AST en tenant compte des redirections et des pipes.
- */
 
-/*
-void parse_input(t_minishell *shell)
-{
-    shell->ast = parse_line_to_ast(shell->input);
-}*/
 

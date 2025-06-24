@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 12:22:16 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 16:17:20 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,19 +26,6 @@ char	*ft_strjoin_3(const char *a, const char *b, const char *c)
 	free(tmp);
 	return (res);
 }
-
-/*
-void	parse_input(t_minishell *shell)
-{
-	// This function should parse the input and build the AST
-	// For now, we will just print the input for debugging
-	if (shell->input)
-	{
-		printf("Parsing input: %s\n", shell->input);
-		// Here you would typically call a function to build the AST
-		// shell->ast = build_ast(shell->input);
-	}
-}*/
 
 void	handle_error(const char *message)
 {

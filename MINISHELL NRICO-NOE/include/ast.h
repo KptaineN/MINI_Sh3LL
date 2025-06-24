@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:22:47 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 11:41:13 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:54:47 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,15 @@ typedef struct s_ast
 
 // Fonctions de gestion de l'AST
 void				free_ast(t_ast *ast);
-t_ast	*init_command_node(char **args);
-t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child);
+//t_ast	*init_command_node(char **args);
+//t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child);
 t_ast	*init_ast_node(t_node_type type);
 
 
+t_ast *init_command_node(t_node_type type, char **args);
+
+
+t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child);
 
 
 // ... autres prototypes liés à l'AST

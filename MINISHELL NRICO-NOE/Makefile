@@ -35,6 +35,7 @@ SRC/parser/parsing.c \
 SRC/parser/tokenizer.c \
 SRC/parser/subtoken.c \
 SRC/parser/token_attribution.c \
+SRC/parser/parser.c \
 
 
 # SRC/builtins/echo.c SRC/parser/ast.c \SRC/parser/ast_helper.c \

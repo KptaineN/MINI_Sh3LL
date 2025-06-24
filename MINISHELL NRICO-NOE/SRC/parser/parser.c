@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:30 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 13:41:33 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 16:17:18 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 
 C’est un bon point de départ, mais ce n’est pas encore un vrai parser, car il ne prend pas en compte :
 
-    les pipes |
+    les pipes |parse_input
 
     les redirections <, >, >>, <<
 
@@ -271,11 +271,6 @@ void	parse_input(t_minishell *shell)
 
 	// Phase 3 : construction de l'AST à partir des tokens
 	shell->ast = parse_line_to_ast(shell);
-	if (!shell->ast)
-	{
-		ft_putendl_fd("parse error", STDERR_FILENO);
-		return;
-	}
 
 	print_ast(shell->ast, 0); // debug
 	execute_command(shell); // Exécution à partir de l’AST

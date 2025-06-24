@@ -6,12 +6,35 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 13:52:49 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/24 14:54:06 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:53:45 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "../../include/minishell.h"
+
+t_ast *init_command_node(t_node_type type, char **args)
+{
+    t_ast *node = malloc(sizeof(t_ast));
+    if (!node) return NULL;
+    node->type = type;
+    node->args = args;
+    node->filename = NULL;
+    node->left = node->right = NULL;
+    return node;
+}
+
+t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child)
+{
+    t_ast *node = malloc(sizeof(t_ast));
+    if (!node) return NULL;
+    node->type = type;
+    node->args = NULL;
+    node->filename = strdup(filename);
+    node->left = child;
+    node->right = NULL;
+    return node;
+}
 
 // display subtoken
 void print_all_parts(t_shell *shell)
