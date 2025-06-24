@@ -15,31 +15,59 @@ a faire aussi
 
 structure
 
+ 		  ├── from_pipex/
+                   └──  execute_pipe.c
+		   └── from_pipex.c
+      		   └── pipex_path.c
+	   
 		            minishell/
-            ├── builtins/       # → Tes builtins (echo, cd, exit, export, unset, env)
-            │   ├── echo.c
+            ├── built/       # → Tes builtins (echo, cd, exit, export, unset, env)
+            │   ├── builtin.c
+	    │   ├── echo.c
             │   ├── cd.c
             │   ├── exit.c
             │   ├── export.c
             │   ├── unset.c
             │   ├── env.c
             ├── parser/         # → Tokenisation, splitting, création AST
-            │   ├── lexer.c
-            │   ├── parser.c
-            │   ├── ast.c
+            |	|			 │   ├── lexer.c               \__ old_parser
+            |	|			 │   ├── ast.c / ast_helper.c  /
+            │   ├── parser.c				
+	    │   ├── parsing.c
+     	    │   ├── subtoken.c
+	    │   ├── token_attribution.c
+    	    │   ├── tokenizer.c
             ├── exec/           # → Exécution AST, pipeline, redirs
             │   ├── executor.c
-            │   ├── pipe_utils.c
+            │   ├── pipe_utils.c # -> dans from_pipex
             │   ├── redirection.c
             ├── env/            # → Gestion env chaîné, export, unset, etc.
             │   ├── env_list.c
             │   ├── export.c
+	    │   ├── unset.c
+     	    │   ├── utils_env.c
             ├── signals/
             │   └── signals.c
-            ├── utils/          # → ft_split, ft_strjoin_3, ft_free_split etc.
-            │   └── utils.c
-            ├── main.c
-            ├── minishell.h
+            ├── handle_utils/          # → ft_split, ft_strjoin_3, ft_free_split etc.
+            │   │   └── handler_cast_t_shell/
+	    |	|	 └── handler-1.c
+            |	|	 └── handler-2.c
+	    │   └── util-0.c
+	    │   └── util-1.c
+     	    │   └── util-2.c
+            │   └── util-3-free.c
+            ├── main/
+	    |	└── main_loop.c
+            |	└── main.c
+	    |	└── start_init.c
+     	    |
+            ├── Include
+	    |	└── minishell.h
+   	    |	└── ast.h
+            |	└── env.h
+	    |	└── parsing.h 	
+            |	└── LIBFT
+	    |	      └── libft.h
             ├── Makefile
 
 
