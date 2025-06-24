@@ -1,48 +1,6 @@
 
 #include "../../include/minishell.h"
-/*
-void print_ast(t_ast *node, int level)
-{
-    if (!node) return;
-    for (int i = 0; i < level; i++) printf("    ");
 
-    switch (node->type)
-    {
-        case NODE_COMMAND:
-            printf("COMMAND: ");
-            for (int i = 0; node->args && node->args[i]; i++)
-                printf("%s ", node->args[i]);
-            printf("\n");
-            break;
-        case NODE_PIPE:
-            printf("PIPE\n");
-            break;
-        case NODE_REDIR_OUT:
-            printf("> %s\n", node->filename);
-            break;
-        case NODE_REDIR_APPEND:
-            printf(">> %s\n", node->filename);
-            break;
-        case NODE_REDIR_IN:
-            printf("< %s\n", node->filename);
-            break;
-        case NODE_HEREDOC:
-            printf("<< %s\n", node->filename);
-            break;
-        case NODE_AND:
-            printf("&&\n");
-            break;
-        case NODE_OR:
-            printf("||\n");
-            break;
-        default:
-            printf("UNKNOWN NODE (%d)\n", node->type);
-            break;
-    }
-    print_ast(node->left, level + 1);
-    print_ast(node->right, level + 1);
-}
-*/
 
 void print_ast(t_ast *node, int level)
 {

@@ -6,19 +6,11 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 15:01:42 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 12:22:16 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-void ft_free_array(char **arr)
-{
-    int i = 0;
-    if (!arr) return;
-    while (arr[i]) free(arr[i++]);
-    free(arr);
-}
 
 
 // Assemble trois chaînes (ex: "bin", "/", "ls" -> "bin/ls")
@@ -35,17 +27,18 @@ char	*ft_strjoin_3(const char *a, const char *b, const char *c)
 	return (res);
 }
 
-void	ft_free_split(char **tab)
+/*
+void	parse_input(t_minishell *shell)
 {
-	int	i;
-
-	i = 0;
-	if (!tab)
-		return ;
-	while (tab[i])
-		free(tab[i++]);
-	free(tab);
-}
+	// This function should parse the input and build the AST
+	// For now, we will just print the input for debugging
+	if (shell->input)
+	{
+		printf("Parsing input: %s\n", shell->input);
+		// Here you would typically call a function to build the AST
+		// shell->ast = build_ast(shell->input);
+	}
+}*/
 
 void	handle_error(const char *message)
 {
@@ -53,65 +46,6 @@ void	handle_error(const char *message)
 	exit(EXIT_FAILURE);
 }
 
-
- //* Libère toute la mémoire de la structure minishell.
- //* À compléter selon l'évolution de ta structure.
-
-void	free_minishell(t_minishell *shell)
-{
-	if (!shell)
-		return;
-
-	// Libère la ligne d'entrée utilisateur
-	if (shell->input)
-		free(shell->input);
-
-	// Libère le tableau d'arguments (ft_free_array est un helper type free_split)
-	if (shell->args)
-		ft_free_array(shell->args);
-
-	// Libère l'AST
-	if (shell->ast)
-		free_ast(shell->ast);
-
-	// Libère la liste chaînée des variables d'environnement
-	if (shell->env)
-		free_env(shell->env);
-
-	// (OPTIONNEL selon évolution de la struct)
-	// if (shell->env_list)
-	//     free_env_list(shell->env_list);
-
-	// (OPTIONNEL plus tard) : libère l'historique ou d'autres ressources globales
-	// free_history(shell->history);
-
-	// (OPTIONNEL plus tard) : libère des fd ou autres buffers
-	// if (shell->some_fd != -1) close(shell->some_fd);
-
-	// (OPTIONNEL plus tard) : libère des structures temporaires
-	// if (shell->tmp_data) free_tmp_data(shell->tmp_data);
-/*
-	Quand tu ajouteras un nouveau champ à t_minishell, par exemple :
-
-    un buffer (char *buffer)
-
-    une nouvelle liste (t_list *jobs)
-
-    un tableau de file descriptors (int *fd_tab)
-
-Ajoute la ligne de libération dans free_minishell comme ceci :
-
-if (shell->buffer)
-	free(shell->buffer);
-
-if (shell->jobs)
-	free_job_list(shell->jobs);
-
-if (shell->fd_tab)
-	free(shell->fd_tab);
-*/
-	// ... ajoute ici tout ce que tu ajoutes dans la struct plus tard !
-}
 /*void handle_signal(int signal)
 {
 	if (signal == SIGINT)

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:30 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 14:46:13 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 13:41:33 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,15 +239,45 @@ t_ast *parse_line_to_ast(const char *input)
 	return current;
 }
 
+/*
+parse_line_to_ast() doit maintenant prendre en entrée les shell->parser.tokens et token_count, pas un char *input.
 
+Si tu veux que je t’aide à écrire le nouveau parse_line_to_ast(t_minishell *shell), je peux te le faire.
 
-void parse_input(t_minishell *shell)
+Pense à libérer parser.parsed_args et parser.tokens dans free_minishell
+*/
+void	parse_input(t_minishell *shell)
 {
 	if (!shell || !shell->input)
 		return;
+
+	// Nettoyage de l'ancien AST si besoin
 	if (shell->ast)
-		free_ast(shell->ast); // optionnel si leaks
-	shell->ast = parse_line_to_ast(shell->input);
-	print_ast(shell->ast, 0);
-	execute_command(shell); // à définir dans executor.c
+		free_ast(shell->ast);
+
+	// Nettoyage des anciens tokens / arrays si besoin
+	if (shell->parser.parsed_args)
+		free_t_arr(shell->parser.parsed_args); // à écrire
+	if (shell->parser.tokens)
+		free(shell->parser.tokens); // si besoin free all_tokens
+
+	// Phase 1 : split en "arguments" simples (respect des quotes)
+	shell->parser.parsed_args = custom_split(shell->input);
+	if (!shell->parser.parsed_args)
+		return;
+
+	// Phase 2 : attribution des types + sous-tokens
+	attribute_token_type(&shell->parser);
+
+	// Phase 3 : construction de l'AST à partir des tokens
+	shell->ast = parse_line_to_ast(shell);
+	if (!shell->ast)
+	{
+		ft_putendl_fd("parse error", STDERR_FILENO);
+		return;
+	}
+
+	print_ast(shell->ast, 0); // debug
+	execute_command(shell); // Exécution à partir de l’AST
 }
+
