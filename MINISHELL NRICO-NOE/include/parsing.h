@@ -85,6 +85,7 @@ typedef struct s_shell
 {
 	char			*input;
 	t_arr			*parsed_args;
+	int				token_count;
 	t_token			*tokens;
 	t_list			*env;
 	//t_cmd			*tree;

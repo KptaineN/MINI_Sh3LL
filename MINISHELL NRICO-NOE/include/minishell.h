@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/24 14:01:45 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:15:30 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ typedef struct s_minishell
 	int exit_status;
 	t_ast *ast; // Arbre syntaxique abstrait (AST)
 	t_env *env; // Liste chainée de l'environnement
+	
 } t_minishell;
 
 // Fonctions globales d'initialisation

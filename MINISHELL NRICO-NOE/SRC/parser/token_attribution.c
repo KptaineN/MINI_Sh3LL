@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 13:54:28 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/24 14:03:10 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/24 15:10:04 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,12 @@ int count_final_tokens(t_shell *shell)
 
 void attribute_token_type(t_shell *shell)
 {
- 	int t_arr_index;
+	int t_arr_index;
     int i = 0;
 	char **arr = shell->parsed_args->arr;
 	int len = shell->parsed_args->len;
-
+    t_token *token;
+    
 	while(i < len)
 	{
 		//OPERATOR
