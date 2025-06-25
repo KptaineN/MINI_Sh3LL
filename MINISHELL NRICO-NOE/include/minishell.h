@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/24 16:06:10 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 17:42:20 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,16 +72,14 @@ void free_minishell(t_minishell *shell);
 
 // Gestion du prompt et boucle utilisateur
 void print_prompt(t_minishell *shell);
-// void	parse_input(t_minishell *shell);
+
 void execute_command(t_minishell *shell);
 
-// parser
-//void parse_input(t_minishell *shell);
+
 
 // Divers utilitaires
 void handle_error(const char *message);
 
-// void	parse_input(t_minishell *shell);
 //  Function prototypes
 
 void handle_signal(int signal);
@@ -98,12 +96,12 @@ void handle_builtin(t_minishell *shell);
 void handle_external(t_minishell *shell);
 void handle_error(const char *message);
 void free_ast(t_ast *ast);
-void execute_ast(t_ast *ast, t_env *env);
+//void execute_ast(t_ast *ast, t_env *env);
 void execute_ast_pipeline(t_ast *ast, t_env *env, int input_fd);
 
-int is_builtin(const char *cmd);
+//int is_builtin(const char *cmd);
 // int		is_builtin(t_ast *ast);
-int execute_builtin(t_ast *cmd, t_env *env);
+//int execute_builtin(t_ast *cmd, t_env *env);
 // void	execute_builtin(t_minishell *shell, t_ast *ast);
 
 void execute_simple(t_ast *ast, t_env *env);
@@ -125,7 +123,11 @@ char *get_env_value(t_env *env, const char *name);
 char *ft_strjoin_3(const char *a, const char *b, const char *c);
 char *get_valid_path(char *cmd, t_env *envp);
 char *search_in_paths(char **paths, char *cmd);
-char *find_command_path(char *cmd, t_env *env);
+
+//char *find_command_path(char *cmd, t_env *env);
+char *find_command_path(char *cmd, t_minishell *shell);
+
+
 char *get_env_value(t_env *env, const char *name);
 // char	*ft_strjoin_3(const char *a, const char *b, const char *c);
 // char	*find_cmd(char *cmd, t_env *env);
@@ -157,6 +159,24 @@ void free_strtab(char **tab);
 //
 void print_ast(t_ast *node, int level);
 //
+
+int builtin_pwd(void);
+int builtin_cd(char **args, t_minishell *shell);
+int builtin_echo(char **args);
+void execute_command(t_minishell *shell);
+int execute_builtin(t_ast *ast, t_minishell *shell);
+
+int is_builtin(t_ast *ast);
+
+int execute_external(t_ast *ast, t_minishell *shell);
+void free_t_arr(t_arr *array);
+void free_tab(char **tab);
+char **env_to_envp(t_env *env); // à mettre dans minishell.h
+int env_len(t_env *env);
+void execute_ast(t_ast *node, t_minishell *shell);
+void	exit_shell(t_minishell *shell, int exit_code);
+int	builtin_exit(t_ast *node, t_minishell *shell);
+
 
 #endif // MINISHELL_H
 

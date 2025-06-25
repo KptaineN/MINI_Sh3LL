@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:41 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 15:03:04 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 17:44:02 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,14 @@ char *find_cmd(const char *cmd, t_env *env) {
 
 /*
  * Executes a simple command node (without redirections or pipes).
- */
+ *//*
 static void exec_simple_command(t_ast *node, t_env *env)
 {
 	char *cmd_path;
 
 	if (!node || node->type != NODE_COMMAND || !node->args)
 		exit(1);
-	cmd_path = find_command_path(node->args[0], env);
+	cmd_path = find_command_path(node->args[0], shell);
 	if (!cmd_path)
 	{
 		fprintf(stderr, "Command not found: %s\n", node->args[0]);
@@ -43,11 +43,79 @@ static void exec_simple_command(t_ast *node, t_env *env)
 	perror("execve");
 	exit(1);
 }
+static void exec_simple_command(t_ast *node, t_minishell *shell)
+{
+	char *cmd_path;
+	char **envp;
+
+	if (!node || node->type != NODE_COMMAND || !node->args)
+		exit(1);
+
+	cmd_path = find_command_path(node->args[0], shell);
+	if (!cmd_path)
+	{
+		fprintf(stderr, "Command not found: %s\n", node->args[0]);
+		exit(127);
+	}
+
+	envp = env_to_envp(shell->env); // convertit la liste chaînée en char **
+	if (!envp)
+	{
+		perror("env_to_envp");
+		free(cmd_path);
+		exit(1);
+	}
+
+	execve(cmd_path, node->args, envp);
+
+	perror("execve");
+	free_tab(envp);
+	free(cmd_path);
+	exit(1);
+}*/
+
+static void exec_simple_command(t_ast *node, t_minishell *shell)
+{
+	char *cmd_path;
+	char **envp;
+
+	if (!node || node->type != NODE_COMMAND || !node->args)
+		exit(1);
+
+	// 🟢 Remettre les signaux par défaut pour le child
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+
+	cmd_path = find_command_path(node->args[0], shell);
+	if (!cmd_path)
+	{
+		fprintf(stderr, "Command not found: %s\n", node->args[0]);
+		exit(127);
+	}
+
+	envp = env_to_envp(shell->env); // convertit la liste chaînée en char **
+	if (!envp)
+	{
+		perror("env_to_envp");
+		free(cmd_path);
+		exit(1);
+	}
+
+	execve(cmd_path, node->args, envp);
+
+	// Si execve échoue
+	perror("execve");
+	free_tab(envp);
+	free(cmd_path);
+	exit(1);
+}
+
+
 
 /*
  * Executes a redirection node.
  * Opens the file according to redirection type and duplicates the file descriptor.
- */
+ *//*
 static void exec_redirection(t_ast *node, t_env *env)
 {
 	int fd;
@@ -72,12 +140,41 @@ static void exec_redirection(t_ast *node, t_env *env)
 	close(fd);
 	execute_ast(node->left, env);
 	exit(1);
+}*/
+static void exec_redirection(t_ast *node, t_minishell *shell)
+{
+	int fd;
+
+	if (node->type == NODE_REDIR_OUT)
+		fd = open(node->filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	else if (node->type == NODE_REDIR_APPEND)
+		fd = open(node->filename, O_CREAT | O_WRONLY | O_APPEND, 0644);
+	else if (node->type == NODE_REDIR_IN)
+		fd = open(node->filename, O_RDONLY);
+	else
+		return;
+
+	if (fd < 0)
+	{
+		perror("open");
+		exit(1);
+	}
+
+	if (node->type == NODE_REDIR_OUT || node->type == NODE_REDIR_APPEND)
+		dup2(fd, STDOUT_FILENO);
+	else if (node->type == NODE_REDIR_IN)
+		dup2(fd, STDIN_FILENO);
+	close(fd);
+
+	execute_ast(node->left, shell); // ✅ on passe bien shell ici
+	exit(1);
 }
+
 
 /*
  * Executes a pipeline node.
  * It forks two processes; the first writes to the pipe, the second reads from it.
- */
+
 static void exec_pipe(t_ast *node, t_env *env)
 {
 	int     pipefd[2];
@@ -120,13 +217,60 @@ static void exec_pipe(t_ast *node, t_env *env)
 	close(pipefd[1]);
 	waitpid(pid1, NULL, 0);
 	waitpid(pid2, NULL, 0);
+}*/
+static void exec_pipe(t_ast *node, t_minishell *shell)
+{
+	int     pipefd[2];
+	pid_t   pid1, pid2;
+
+	if (pipe(pipefd) < 0)
+	{
+		perror("pipe");
+		exit(1);
+	}
+
+	pid1 = fork();
+	if (pid1 < 0)
+	{
+		perror("fork");
+		exit(1);
+	}
+	if (pid1 == 0)
+	{
+		close(pipefd[0]);
+		dup2(pipefd[1], STDOUT_FILENO);
+		close(pipefd[1]);
+		execute_ast(node->left, shell);
+		exit(1);
+	}
+
+	pid2 = fork();
+	if (pid2 < 0)
+	{
+		perror("fork");
+		exit(1);
+	}
+	if (pid2 == 0)
+	{
+		close(pipefd[1]);
+		dup2(pipefd[0], STDIN_FILENO);
+		close(pipefd[0]);
+		execute_ast(node->right, shell);
+		exit(1);
+	}
+
+	close(pipefd[0]);
+	close(pipefd[1]);
+	waitpid(pid1, NULL, 0);
+	waitpid(pid2, NULL, 0);
 }
+
 
 /*
  * Recursively executes an AST node.
  * This function handles command nodes, pipelines, and redirections.
  */
-void execute_ast(t_ast *node, t_env *env)
+void execute_ast(t_ast *node, t_minishell *shell)
 {
 	pid_t pid;
 
@@ -141,12 +285,12 @@ void execute_ast(t_ast *node, t_env *env)
 			exit(1);
 		}
 		if (pid == 0)
-			exec_simple_command(node, env);
+			exec_simple_command(node, shell);
 		else
 			waitpid(pid, NULL, 0);
 	}
 	else if (node->type == NODE_PIPE)
-		exec_pipe(node, env);
+		exec_pipe(node, shell);
 	else if (node->type == NODE_REDIR_IN || node->type == NODE_REDIR_OUT ||
 			 node->type == NODE_REDIR_APPEND)
 	{
@@ -157,7 +301,7 @@ void execute_ast(t_ast *node, t_env *env)
 			exit(1);
 		}
 		if (pid == 0)
-			exec_redirection(node, env);
+			exec_redirection(node, shell);
 		else
 			waitpid(pid, NULL, 0);
 	}
@@ -167,7 +311,7 @@ void execute_ast(t_ast *node, t_env *env)
  * The main entry point for executing a command.
  * If the AST represents a builtin, we execute it directly;
  * otherwise, we recursively execute the AST.
- */
+ *//*
 void execute_command(t_minishell *shell)
 {
 	if (!shell->ast)
@@ -178,4 +322,39 @@ void execute_command(t_minishell *shell)
 		//execute_builtin(shell, shell->ast);
 	else
 		execute_ast(shell->ast, shell->env);
+}*/
+void execute_command(t_minishell *shell)
+{
+	t_ast *node = shell->ast;
+
+	if (!node)
+		return;
+
+	if (is_builtin(node))
+		shell->exit_status = execute_builtin(node, shell);
+	else
+	{
+		pid_t pid = fork();
+		if (pid < 0)
+		{
+			perror("fork");
+			return;
+		}
+		if (pid == 0)
+		{
+			signal(SIGINT, SIG_DFL);   // Ctrl+C tue la commande
+			signal(SIGQUIT, SIG_DFL);  // Ctrl+quit produit "Quit (core dumped)"
+			exec_simple_command(node, shell); // ici tu passes bien le shell
+			exit(1); // sécurité si exec_simple_command ne fait pas exit
+		}
+		else
+		{
+			int status;
+			waitpid(pid, &status, 0);
+			// ✅ On peut extraire le code de sortie si besoin :
+			if (WIFEXITED(status))
+				shell->exit_status = WEXITSTATUS(status);
+		}
+	}
 }
+

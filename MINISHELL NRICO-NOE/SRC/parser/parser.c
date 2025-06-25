@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:30 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 16:17:18 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 16:54:15 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,9 +270,9 @@ void	parse_input(t_minishell *shell)
 	attribute_token_type(&shell->parser);
 
 	// Phase 3 : construction de l'AST à partir des tokens
-	shell->ast = parse_line_to_ast(shell);
+	shell->ast = parse_line_to_ast(shell->input);
 
-	print_ast(shell->ast, 0); // debug
+	//print_ast(shell->ast, 0); // debug
 	execute_command(shell); // Exécution à partir de l’AST
 }
 

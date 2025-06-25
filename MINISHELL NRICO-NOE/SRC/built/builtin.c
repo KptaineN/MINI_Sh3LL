@@ -6,21 +6,34 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 15:34:02 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 17:16:01 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 
-int is_builtin(const char *cmd) {
+/*int is_builtin(const char *cmd) {
     // Ex: "cd", "echo", etc. À compléter
 	(void)cmd;  // silence warning if non utilisé
      // TODO : renvoyer 1 si cmd est dans la liste des builtins
      return (0);
     return 0;
+}*/
+int is_builtin(t_ast *ast)
+{
+	if (!ast || !ast->args || !ast->args[0])
+		return (0);
+	return ((ft_strncmp(ast->args[0], "cd", 2) == 0 && ast->args[0][2] == '\0')
+		|| (ft_strncmp(ast->args[0], "echo", 4) == 0 && ast->args[0][4] == '\0')
+		|| (ft_strncmp(ast->args[0], "pwd", 3) == 0 && ast->args[0][3] == '\0')
+		|| (ft_strncmp(ast->args[0], "export", 6) == 0 && ast->args[0][6] == '\0')
+		|| (ft_strncmp(ast->args[0], "unset", 5) == 0 && ast->args[0][5] == '\0')
+		|| (ft_strncmp(ast->args[0], "env", 3) == 0 && ast->args[0][3] == '\0')
+		|| (ft_strncmp(ast->args[0], "exit", 4) == 0 && ast->args[0][4] == '\0'));
 }
-int execute_builtin(t_ast *cmd, t_env *env) {
+
+/*int execute_builtin(t_ast *cmd, t_env *env) {
 	//void(cmd)(t_ast *, t_env);
     // À compléter selon ta logique
 	(void)cmd;  // silence warning
@@ -28,9 +41,24 @@ int execute_builtin(t_ast *cmd, t_env *env) {
      // TODO : appeler la bonne fonction builtin selon cmd->value
 
     return 0;
+}*/
+int execute_builtin(t_ast *ast, t_minishell *shell)
+{
+	if (ft_strncmp(ast->args[0], "cd", 2) == 0 && ast->args[0][2] == '\0')
+		return (builtin_cd(ast->args, shell));
+	if (ft_strncmp(ast->args[0], "echo", 4) == 0 && ast->args[0][4] == '\0')
+		return (builtin_echo(ast->args));
+	if (ft_strncmp(ast->args[0], "pwd", 3) == 0 && ast->args[0][3] == '\0')
+		return (builtin_pwd());
+	if (ft_strncmp(ast->args[0], "exit", 4) == 0 && ast->args[0][4] == '\0')
+		return (builtin_exit(ast, shell));
+
+	// Ajoute les autres ensuite
+	return (1);
 }
 
- /*
+
+/*
 int	is_builtin(t_ast *ast)
 {
 	if (!ast || ast->type != NODE_COMMAND || !ast->args || !ast->args[0])

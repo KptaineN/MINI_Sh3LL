@@ -11,6 +11,9 @@ SRC = \
 SRC/main/main.c \
 SRC/main/main_loop.c \
 SRC/main/start_init.c \
+SRC/built/builtin.c \
+SRC/built/cd.c \
+SRC/built/echo.c \
 SRC/built/env.c \
 SRC/built/export.c \
 SRC/built/unset.c \
@@ -28,7 +31,6 @@ SRC/handle_utils/util-1.c \
 SRC/from_pipex/from_pipex.c \
 SRC/from_pipex/execute_pipe.c \
 SRC/from_pipex/pipex_path.c \
-SRC/built/builtin.c \
 SRC/handle_utils/handler_cast_t_shell/handler-1.c\
 SRC/handle_utils/handler_cast_t_shell/handler-2.c \
 SRC/parser/parsing.c \
@@ -36,10 +38,11 @@ SRC/parser/tokenizer.c \
 SRC/parser/subtoken.c \
 SRC/parser/token_attribution.c \
 SRC/parser/parser.c \
+SRC/old_parser/ast.c \
+SRC/built/exit.c
 
-
-# SRC/builtins/echo.c SRC/parser/ast.c \SRC/parser/ast_helper.c \
-# SRC/builtins/exit.c  SRC/exec/utils_exec.c \ SRC/parser/init_parser.c \
+# SRC/builtins/echo.c  \SRC/parser/ast_helper.c \ 
+ # SRC/exec/utils_exec.c \ SRC/parser/init_parser.c \
 # SRC/exec/pipeline.c SRC/parser/lexer.c \SRC/parser/parser.c \SRC/parser/print_utils.c \
 
 

@@ -6,11 +6,12 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:27:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 12:22:07 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 17:21:56 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
+
 
 
 void	free_args(char **args)
@@ -46,6 +47,35 @@ void	ft_free_split(char **tab)
 		free(tab[i++]);
 	free(tab);
 }
+
+void free_tab(char **tab)
+{
+	int i;
+
+	if (!tab)
+		return;
+	i = 0;
+	while (tab[i])
+	{
+		free(tab[i]);
+		i++;
+	}
+	free(tab);
+}
+
+void free_t_arr(t_arr *array)
+{
+	if (!array)
+		return;
+	if (array->arr)
+	{
+		for (int i = 0; i < array->len; i++)
+			free(array->arr[i]);
+		free(array->arr);
+	}
+	free(array);
+}
+
 
 void	free_ast(t_ast *node)
 {
@@ -124,4 +154,13 @@ if (shell->fd_tab)
 	free(shell->fd_tab);
  */
 	 // ... ajoute ici tout ce que tu ajoutes dans la struct plus tard !
+}
+
+
+// Fichier : exit_utils.c par exemple
+void	exit_shell(t_minishell *shell, int exit_code)
+{
+	free_minishell(shell);
+	rl_clear_history(); // readline
+	exit(exit_code);
 }

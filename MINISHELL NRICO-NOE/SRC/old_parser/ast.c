@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:23 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 11:31:29 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 16:53:40 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@ static char	**dup_args(char **args)
 	copy[count] = NULL;
 	return (copy);
 }*/
-
+/*
 t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child)
 {
 	t_ast *node;
@@ -167,7 +167,7 @@ t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *chil
 	node->left = child;
 	node->right = NULL;
 	return (node);
-}
+}*/
 
 
 t_ast	*init_ast_node(t_node_type type)

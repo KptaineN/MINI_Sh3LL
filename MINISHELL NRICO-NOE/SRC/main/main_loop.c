@@ -6,12 +6,12 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:16 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/16 15:38:01 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 17:37:26 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
+/*
 int	looping(t_minishell *shell)
 {
 	while (1)
@@ -25,14 +25,49 @@ int	looping(t_minishell *shell)
 		if (ft_strlen(shell->input) > 0)
 		{
 			add_history(shell->input);
-			parse_input(shell);     // À écrire : transforme en AST
-			execute_command(shell); // À écrire : exécute l’AST
+			//parse_input(shell);     // À écrire : transforme en AST
+			//execute_command(shell); // À écrire : exécute l’AST
 		}
 		free(shell->input);
 		shell->input = NULL;
 	}
 	return (0);
+}*/
+int	looping(t_minishell *shell)
+{
+while (1)
+{
+	shell->input = readline("ᕕ( ᐛ )ᕗ minishell$");
+	if (!shell->input)
+		{
+			write(1, "exit\n", 5);
+			exit_shell(shell, shell->exit_status);
+		}
+	if (ft_strlen(shell->input) > 0)
+	{
+		add_history(shell->input);
+
+		// BYPASS DU PARSING : AST fake minimal
+		t_ast *fake = malloc(sizeof(t_ast));
+		fake->type = NODE_COMMAND;
+		fake->args = ft_split(shell->input, ' '); // naïf
+		fake->filename = NULL;
+		fake->left = NULL;
+		fake->right = NULL;
+
+		shell->ast = fake;
+
+		execute_command(shell);
+
+		free_tab(fake->args); // à créer si besoin
+		free(fake);
+	}
+	free(shell->input);
+	shell->input = NULL;
 }
+return (0);
+}
+
 
 /*
 print_prompt : optionnel, tu peux mettre une couleur,

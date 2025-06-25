@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:19 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 15:24:44 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 16:01:10 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,6 @@ void	init_minishell(t_minishell *shell, char **envp)
 	if (!shell || !envp)
 		return ; // Check for NULL pointers
 	shell->env = init_env(envp);
-	// Initialize the environment linked list dans env_list
-	shell->args = NULL;
-	shell->input = NULL;
-	shell->exit_status = 0;
-	shell->ast = NULL; // Initialize the AST to NULL
-						// Initialize other components as needed
-						// For example, set up signal handlers,
-						// initialize data structures, etc.
 	init_all_t_arr(&shell->parser);
 }
 
@@ -91,7 +83,7 @@ int	start_minishell(t_minishell *shell, char **envp)
 	//	shell = malloc(sizeof(t_shell));
 	//	if (!shell)
 	//		return 0;
-	ft_memset(shell, 0, sizeof(t_shell));
+	ft_memset(shell, 0, sizeof(t_minishell));
 	
 	init_minishell(shell, envp);
 	looping(shell);

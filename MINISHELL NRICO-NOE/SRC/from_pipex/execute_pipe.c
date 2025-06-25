@@ -6,17 +6,17 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:32:25 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 12:11:07 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 16:04:06 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
+void exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
 {
-	pid_t	pid;
-	char	*cmd_path;
-	char	**env_tab;
+	pid_t pid;
+	char *cmd_path;
+	char **env_tab;
 
 	pid = fork();
 	if (pid == 0)
@@ -38,10 +38,10 @@ void	exec_cmd_node(t_ast *ast, t_env *env, int input_fd)
 	waitpid(pid, NULL, 0);
 }
 
-void	exec_pipe_node(t_ast *ast, t_env *env, int input_fd)
+void exec_pipe_node(t_ast *ast, t_env *env, int input_fd)
 {
-	int		fd[2];
-	pid_t	pid;
+	int fd[2];
+	pid_t pid;
 
 	pipe(fd);
 	pid = fork();
@@ -60,7 +60,7 @@ void	exec_pipe_node(t_ast *ast, t_env *env, int input_fd)
 	waitpid(pid, NULL, 0);
 }
 
-void	execute_ast_pipeline(t_ast *ast, t_env *env, int input_fd)
+void execute_ast_pipeline(t_ast *ast, t_env *env, int input_fd)
 {
 	if (ast->type == NODE_COMMAND)
 		exec_cmd_node(ast, env, input_fd);

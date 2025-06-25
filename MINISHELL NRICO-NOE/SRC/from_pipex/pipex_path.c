@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:32:48 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 14:10:30 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 16:25:27 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,15 @@ char	*search_in_paths(char **paths, char *cmd)
 	}
 	return (ft_free_split(paths), NULL);
 }
+// SRC/from_pipex/find_command_path.c
+char *find_command_path(char *cmd, t_minishell *shell)
+{
+	(void)shell;
+	return ft_strdup(cmd); // Béta : retourne le nom direct
+}
 
-char	*find_command_path(char *cmd, t_env *env)
+
+/*char	*find_command_path(char *cmd, t_env *env)
 {
     char	*path_env;
     char	**paths;
@@ -80,5 +87,5 @@ char	*find_command_path(char *cmd, t_env *env)
     if (!paths)
         return (NULL);
     return (search_in_paths(paths, cmd));
-}
+}*/
 

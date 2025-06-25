@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:29 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 14:09:22 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/25 16:58:12 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,19 @@
 
 #include <stdlib.h>
 
+int env_len(t_env *env)
+{
+	int count = 0;
 
+	while (env)
+	{
+		count++;
+		env = env->next;
+	}
+	return count;
+}
+
+/*
 char	**env_to_envp(t_env *env)
 {
     t_env	*curr;
@@ -41,10 +53,11 @@ char	**env_to_envp(t_env *env)
     }
     envp[i] = NULL;
     return (envp);
-}
+}*/
 
 // parse la string "KEY=VALUE" en t_env
 // Dans ton create_env (ou équivalent) :
+/*
 t_env	*create_env(char *env_str)
 {
 	t_env	*node;
@@ -72,7 +85,43 @@ t_env	*create_env(char *env_str)
 	node->value = ft_strdup(equal + 1);
 	node->next = NULL;
 	return (node);
+}*/
+t_env	*create_env(char *env_str)
+{
+	t_env	*node;
+	char	*equal;
+	size_t	key_len;
+
+	node = malloc(sizeof(t_env));
+	if (!node)
+		return (NULL);
+	equal = ft_strchr(env_str, '=');
+	if (!equal)
+	{
+		free(node);
+		return (NULL);
+	}
+	key_len = equal - env_str;
+	node->key = malloc(key_len + 1);
+	if (!node->key)
+	{
+		free(node);
+		return (NULL);
+	}
+	ft_memcpy(node->key, env_str, key_len);
+	node->key[key_len] = '\0'; // ajout du null terminator manuellement
+
+	node->value = ft_strdup(equal + 1);
+	if (!node->value)
+	{
+		free(node->key);
+		free(node);
+		return (NULL);
+	}
+	node->next = NULL;
+	return (node);
 }
+
 
 
 // construit toute la liste à partir de envp
