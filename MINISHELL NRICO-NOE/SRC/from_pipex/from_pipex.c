@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:32:42 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 12:07:00 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/26 08:29:24 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ char	*pwd_path(char *cmd, t_env *env)
 	pwd = get_env_value(env, "PWD");
 	if (!pwd)
 		return (NULL);
-	full_path = ft_strjoin_3(pwd, "/", cmd);
+	full_path = ft_strjoin3(pwd, "/", cmd, 1);
 	if (full_path && access(full_path, X_OK) == 0)
 		return (full_path);
 	free(full_path);

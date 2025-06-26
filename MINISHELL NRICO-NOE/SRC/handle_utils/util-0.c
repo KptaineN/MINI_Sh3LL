@@ -6,13 +6,13 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/24 16:17:20 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/26 08:23:23 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-
+/*
 // Assemble trois chaînes (ex: "bin", "/", "ls" -> "bin/ls")
 char	*ft_strjoin_3(const char *a, const char *b, const char *c)
 {
@@ -26,6 +26,34 @@ char	*ft_strjoin_3(const char *a, const char *b, const char *c)
 	free(tmp);
 	return (res);
 }
+
+char	*ft_tripljoinstring(char *s1, char *s2, char *s3)
+{
+	char	*tmp = ft_strjoin(s1, s2);
+	char	*res = ft_strjoin(tmp, s3);
+	free(s1);
+	free(tmp);
+	return (res);
+}*/
+// Concatène a + b + c. Si free_a est 1, libère 'a' après usage.
+// Utile pour accumuler dynamiquement (ex: res = join3_and_free(res, x, y, 1))
+char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a)
+{
+	char	*tmp;
+	char	*res;
+
+	if (!a || !b || !c)
+		return (NULL);
+	tmp = ft_strjoin(a, b);
+	if (!tmp)
+		return (NULL);
+	res = ft_strjoin(tmp, c);
+	free(tmp);
+	if (free_a)
+		free(a);
+	return (res);
+}
+
 
 void	handle_error(const char *message)
 {

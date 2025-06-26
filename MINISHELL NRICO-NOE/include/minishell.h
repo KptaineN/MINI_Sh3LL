@@ -6,12 +6,15 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/25 17:42:20 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/26 09:33:42 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 #define MINISHELL_H
+
+#define _POSIX_C_SOURCE 200809L
+
 
 #include "LIBFT/libft.h"
 #include "ast.h"
@@ -27,7 +30,6 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
 
 // use in mini.h
 // ************************************************************************** */
@@ -75,6 +77,7 @@ void print_prompt(t_minishell *shell);
 
 void execute_command(t_minishell *shell);
 
+char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a);
 
 
 // Divers utilitaires
@@ -120,7 +123,7 @@ void ft_free_array(char **array);
 // void	ft_free_split(char **ft_split);
 char *get_env_value(t_env *env, const char *name);
 // char	*find_cmd(char *cmd, t_env *env);
-char *ft_strjoin_3(const char *a, const char *b, const char *c);
+//char *ft_strjoin_3(const char *a, const char *b, const char *c);
 char *get_valid_path(char *cmd, t_env *envp);
 char *search_in_paths(char **paths, char *cmd);
 
@@ -162,7 +165,7 @@ void print_ast(t_ast *node, int level);
 
 int builtin_pwd(void);
 int builtin_cd(char **args, t_minishell *shell);
-int builtin_echo(char **args);
+int builtin_echo(char **args, t_minishell *sh);
 void execute_command(t_minishell *shell);
 int execute_builtin(t_ast *ast, t_minishell *shell);
 
@@ -176,6 +179,9 @@ int env_len(t_env *env);
 void execute_ast(t_ast *node, t_minishell *shell);
 void	exit_shell(t_minishell *shell, int exit_code);
 int	builtin_exit(t_ast *node, t_minishell *shell);
+
+char	*replace_exit_code(const char *input, int exit_code);
+char *replace_variables(const char *arg, t_minishell *shell);
 
 
 #endif // MINISHELL_H

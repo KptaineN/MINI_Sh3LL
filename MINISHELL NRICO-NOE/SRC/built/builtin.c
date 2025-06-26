@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/25 17:16:01 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/26 09:09:04 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int execute_builtin(t_ast *ast, t_minishell *shell)
 	if (ft_strncmp(ast->args[0], "cd", 2) == 0 && ast->args[0][2] == '\0')
 		return (builtin_cd(ast->args, shell));
 	if (ft_strncmp(ast->args[0], "echo", 4) == 0 && ast->args[0][4] == '\0')
-		return (builtin_echo(ast->args));
+		return (builtin_echo(ast->args, shell));
 	if (ft_strncmp(ast->args[0], "pwd", 3) == 0 && ast->args[0][3] == '\0')
 		return (builtin_pwd());
 	if (ft_strncmp(ast->args[0], "exit", 4) == 0 && ast->args[0][4] == '\0')

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:32:48 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/25 16:25:27 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/06/26 08:29:48 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ char	*search_in_paths(char **paths, char *cmd)
 	i = -1;
 	while (paths[++i])
 	{
-		full_path = ft_strjoin_3(paths[i], "/", cmd);
+		full_path = ft_strjoin3(paths[i], "/", cmd, 1);
 		if (!full_path)
 			return (ft_free_split(paths), NULL);
 		if (access(full_path, X_OK) == 0)

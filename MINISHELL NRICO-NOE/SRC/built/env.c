@@ -41,7 +41,7 @@ char **env_to_envp(t_env *env)
 
 	while (env)
 	{
-		envp[i] = ft_strjoin_3(env->key, "=", env->value);
+		envp[i] = ft_strjoin3(env->key, "=", env->value, 1); // "VAR=VALUE"
 		if (!envp[i])
 		{
 			// libère les précédents
