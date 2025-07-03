@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:16 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/26 09:33:26 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/03 04:46:19 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ Organisation modulaire : tu peux ensuite faire évoluer parse_input et execute
 /*** 1) Lecture de l’input ***/
 char *read_user_input(void)
 {
-    char *input = readline("ᕕ( ᐛ )ᕗ minishell$");
+    char *input = readline("ᕕ( ᐛ )ᕗ minishell$ ");
     if (!input)
         write(1, "exit\n", 5);
     return (input);
@@ -233,7 +233,7 @@ int looping(t_minishell *shell)
         // 1) lecture
         input = read_user_input();
         if (!input)
-            exit_shell(shell, shell->exit_status);
+            break;  // EOF (CTRL+D)
 
         if (*input == '\0')
         {
@@ -259,13 +259,24 @@ int looping(t_minishell *shell)
             continue;
         }
 
-        // 4) AST factice + exécution
-        ast = create_fake_ast(step2);
-        if (ast && ast->args)
-            execute_command(shell);
-
-        // 5) cleanup
-        cleanup_after_exec(input, step2, ast);
+		ast = create_fake_ast(step2);
+		if (!ast)
+		{
+			free(step2);
+			free(input);
+			continue;
+		}
+		
+		// ❶ on stocke l'AST dans le shell
+		shell->ast = ast;
+		
+		// ❷ on exécute
+		execute_command(shell);
+		
+		// ❸ on nettoie après exécution
+		cleanup_after_exec(input, step2, ast);
+		// (ici cleanup doit free(ast->args), free(ast), free(step2), free(input))
+		
     }
     return (0);
 }

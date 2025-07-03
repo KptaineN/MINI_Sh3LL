@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:19 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/25 16:01:10 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/03 01:31:03 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,5 +91,6 @@ int	start_minishell(t_minishell *shell, char **envp)
 	//	you can add any additional initialization steps needed for your minishell
 	// Additional initialization steps can be added here
 	// For example, setting up signal handlers, initializing the AST, etc.
+	free_minishell(shell);
 	return (1); // Return 1 on success
 }

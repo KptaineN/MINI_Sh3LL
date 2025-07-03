@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:27:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/25 17:21:56 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/03 01:56:20 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,19 +111,35 @@ void	clean_exit(char **cmd_args, char *msg, int code)
  void	free_minishell(t_minishell *shell)
 {
 	if (!shell)
-		return;
- // Libère la ligne d'entrée utilisateur
-	if (shell->input)
-		free(shell->input);
- // Libère le tableau d'arguments (ft_free_array est un helper type free_split)
-	if (shell->args)
-		ft_free_array(shell->args);
-	 // Libère l'AST
-	if (shell->ast)
-		free_ast(shell->ast);
+        return;
+    // Libère la ligne d'entrée utilisateur
+    // input et args sont déjà libérés dans cleanup_after_exec
+    // S'il reste un input en cas d'erreur, free ici :
+    if (shell->input)
+        free(shell->input);
+		// Libère le tableau d'arguments (ft_free_array est un helper type free_split)
+    if (shell->args)
+        ft_free_array(shell->args);
+
+    // AST : peut être NULL si déjà nettoyée 
+	// Libère l'AST
+    if (shell->ast)
+    {
+        free_ast(shell->ast);
+        shell->ast = NULL;
+    }
+
+    // Env : idem, free ici et nullifier
 	 // Libère la liste chaînée des variables d'environnement
-	if (shell->env)
-		free_env(shell->env);
+
+    if (shell->env)
+    {
+        free_env(shell->env);
+        shell->env = NULL;
+    }
+
+    // Tout autre champ à libérer…
+
 	 // (OPTIONNEL selon évolution de la struct)
 	 // if (shell->env_list)
 	 //     free_env_list(shell->env_list);
@@ -161,6 +177,6 @@ if (shell->fd_tab)
 void	exit_shell(t_minishell *shell, int exit_code)
 {
 	free_minishell(shell);
-	rl_clear_history(); // readline
+	rl_clear_history(); // nettoie readline
 	exit(exit_code);
 }

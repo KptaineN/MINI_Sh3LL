@@ -126,3 +126,106 @@ char	*replace_exit_code(const char *input, int exit_code)
 	free(code_str);
 	return (tmp);
 }*/
+/*
+
+#include <limits.h>   // pour PATH_MAX
+#include <unistd.h>   // pour chdir(), getcwd()
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+// Prototype d’une fonction utilitaire à écrire :
+//   si la clé existe, remplace sa valeur, sinon l’ajoute.
+// Tu peux l’appeler update_env(shell->env, key, value);
+int update_env_var(t_env **env, const char *key, const char *value)
+{
+    t_env *node = *env;
+
+    // Cherche la clé existante
+    while (node)
+    {
+        if (strcmp(node->key, key) == 0)
+        {
+            // remplace sans leak
+            free(node->value);
+            node->value = strdup(value);
+            return (node->value ? 0 : -1);
+        }
+        node = node->next;
+    }
+
+    // Si pas trouvée, on ajoute en tête
+    t_env *new = malloc(sizeof(*new));
+    if (!new) return -1;
+    new->key   = strdup(key);
+    new->value = strdup(value);
+    if (!new->key || !new->value)
+    {
+        free(new->key);
+        free(new->value);
+        free(new);
+        return -1;
+    }
+    new->next = *env;
+    *env      = new;
+    return 0;
+}
+
+
+int builtin_cd(char **args, t_minishell *shell)
+{
+    char old_pwd[PATH_MAX];
+    char new_pwd[PATH_MAX];
+    char *target;
+
+    // 1) Ancien PWD
+    if (getcwd(old_pwd, sizeof(old_pwd)) == NULL)
+    {
+        perror("getcwd");
+        shell->exit_status = 1;
+        return 1;
+    }
+
+    // 2) Choix du répertoire cible
+    if (!args[1] || args[1][0] == '\0')
+        target = getenv("HOME");  // ou find_env_value(shell->env, "HOME")
+    else if (strcmp(args[1], "-") == 0)
+        target = getenv("OLDPWD"); // idem : à récupérer dans shell->env
+    else
+        target = args[1];
+
+    if (!target)
+    {
+        fprintf(stderr, "cd: HOME not set\n");
+        shell->exit_status = 1;
+        return 1;
+    }
+
+    // 3) Changement
+    if (chdir(target) != 0)
+    {
+        if (errno == ENOENT)
+            fprintf(stderr, "cd: no such file or directory: %s\n", target);
+        else if (errno == EACCES)
+            fprintf(stderr, "cd: permission denied: %s\n", target);
+        else
+            perror("cd");
+        shell->exit_status = 1;
+        return 1;
+    }
+
+    // 4) Nouveau PWD
+    if (getcwd(new_pwd, sizeof(new_pwd)) == NULL)
+    {
+        perror("getcwd");
+        shell->exit_status = 1;
+        return 1;
+    }
+
+    // 5) Mettre à jour OLDPWD puis PWD dans l’env de minishell
+    update_env_var(&shell->env, "OLDPWD", old_pwd);
+    update_env_var(&shell->env, "PWD",     new_pwd);
+
+    shell->exit_status = 0;
+    return 0;
+}*/

@@ -125,7 +125,7 @@ static char *find_env_value(t_env *env, const char *key)
 static char *get_special_var(const char *key)
 {
     if (ft_strncmp(key, "NRICO", ft_strlen("NRICO") + 1) == 0)
-        return NULL;
+        return ft_strdup("le 2 eme meilleur dev de la galaxie 🚀");;
     if (ft_strncmp(key, "NOE", ft_strlen("NOE") + 1) == 0)
         return ft_strdup("le meilleur dev de la galaxie 🚀");
     return NULL;
@@ -136,6 +136,7 @@ static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
 {
     int  k = *pos + 1;
     char *key;
+    char *val_env;
     char *val;
 
     if (arg[k] == '?')
@@ -149,13 +150,20 @@ static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
     int len = 0;
     while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
         len++;
+    if (len == 0)
+    {
+         // clé vide → on ne touche pas à res, on avance d’1
+        *pos = k;
+        return NULL;
+    }
     key = ft_substr(arg, k, len);
 
     /* d’abord dans l’env */
-    val = find_env_value(sh->env, key);
-
+    val_env = find_env_value(sh->env, key);
+    if (val_env)
+        val = ft_strdup(val_env);
     /* sinon, test “spécial” */
-    if (!val)
+    else
         val = get_special_var(key);
 
     free(key);
@@ -184,7 +192,7 @@ char *replace_variables(const char *arg, t_minishell *sh)
 {
     int     i = 0, j = 0;
     int     in_sq = 0, in_dq = 0;
-    char    *res = malloc(ft_strlen(arg) * 2 + 1);
+    char    *res = malloc(ft_strlen(arg) * 50 + 1);
 
     if (!res)
         return (NULL);
@@ -195,7 +203,7 @@ char *replace_variables(const char *arg, t_minishell *sh)
         else if (arg[i] == '"' && !in_sq)
             in_dq = !in_dq, i++;
         else if (arg[i] == '$' && !in_sq)
-            j += handle_dollar(&res[j], arg, &i, sh), i++;
+            j += handle_dollar(&res[j], arg, &i, sh);
         else
             res[j++] = arg[i++];
     }
@@ -223,17 +231,20 @@ char *remove_quotes(const char *arg)
     return (res);
 }
 
-/*** builtin_echo final ***/
+/*** builtin_echo final ***//*
 int builtin_echo(char **args, t_minishell *sh)
 {
     int     i = 1;
-    int     nl = 1;
+    int     no_newline = 0;
     char    *tmp;
     char    *out;
 
-    if (args[1] && ft_strncmp(args[1], "-n", 3) == 0)
-        nl = 0, i++;
-    while (args[i])
+    while (args[i] && ft_strcmp(args[i], "-n") == 0) // 1. Détection option -n (POSIX autorise plusieurs -n consécutifs)
+    {
+        no_newline = 1;
+        i++;
+    }
+    while (args[i])  // 2. Affichage des arguments, séparés par un espace
     {
         tmp = replace_variables(args[i], sh);
         out = remove_quotes(tmp);
@@ -242,15 +253,48 @@ int builtin_echo(char **args, t_minishell *sh)
         printf("%s", out);
         free(out);
         if (args[i + 1])
-            printf(" ");
+            ft_putchar(' ');
         i++;
     }
-    if (nl)
-        printf("\n");
+    if (!no_newline)    // 3. Saut de ligne si pas d’option -n
+        write(1, "\n", 1);
     sh->exit_status = 0;
     return (0);
-}
+}*/
 
+int builtin_echo(char **args, t_minishell *sh)
+{
+    int  i       = 1;
+    bool no_nl   = false;
+
+    // 2) Détection stricte de -n
+    while (args[i] && ft_strcmp(args[i], "-n") == 0) {
+        no_nl = true;
+        i++;
+    }
+
+    // 3) Affichage des arguments (expansion + suppression de quotes)
+    bool first = true;
+    while (args[i])
+    {
+        if (!first)
+            write(1, " ", 1);
+        first = false;
+        char *tmp = replace_variables(args[i], sh);
+        char *out = remove_quotes(tmp);
+        free(tmp);
+        write(1, out, ft_strlen(out));
+        free(out);
+        i++;
+    }
+
+    // 4) Saut de ligne si on n'a pas vu -n
+    if (!no_nl)
+        write(1, "\n", 1);
+
+    sh->exit_status = 0;
+    return 0;
+}
 
 
 int builtin_pwd(void)

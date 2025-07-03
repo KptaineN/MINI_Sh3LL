@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/06/26 09:33:42 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/03 03:35:52 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ void print_prompt(t_minishell *shell);
 void execute_command(t_minishell *shell);
 
 char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a);
+
+int  builtin_export(char **args, t_minishell *shell);
 
 
 // Divers utilitaires

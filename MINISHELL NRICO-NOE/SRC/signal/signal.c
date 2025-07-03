@@ -43,22 +43,7 @@ void	handle_sigquit(int sig)
 	// mais pour minishell, on n'affiche rien sur SIGQUIT dans le shell parent.
 }
 
-/*void	init_signals(void)
-{
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
 
-	sa_int.sa_handler = &handle_sigint;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-
-	sa_quit.sa_handler = &handle_sigquit;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-
-	sigaction(SIGINT, &sa_int, NULL);   // Ctrl+C
-	sigaction(SIGQUIT, &sa_quit, NULL); // Ctrl+
-}*/
 void	init_signals(void)
 {
 	struct sigaction	sa_int;
