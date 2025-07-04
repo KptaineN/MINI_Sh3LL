@@ -39,7 +39,8 @@ SRC/parser/subtoken.c \
 SRC/parser/token_attribution.c \
 SRC/parser/parser.c \
 SRC/old_parser/ast.c \
-SRC/built/exit.c
+SRC/built/exit.c \
+
 
 # SRC/builtins/echo.c  \SRC/parser/ast_helper.c \ 
  # SRC/exec/utils_exec.c \ SRC/parser/init_parser.c \

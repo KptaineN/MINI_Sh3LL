@@ -1,7 +1,6 @@
-/* builtin_export.c */
+#include "../../include/minishell.h"
 
-#include "../../include/minishell.h"   // contient les définitions de t_minishell, t_env
-// Récupère le nombre de variables dans la liste.
+
 static size_t env_count(t_minishell *shell)
 {
     size_t count = 0;
@@ -21,18 +20,23 @@ static char **env_to_array(t_minishell *shell)
     char **arr = malloc((n + 1) * sizeof(char*));
     if (!arr)
         return NULL;
-
     t_env *env_ptr = shell->env;
     size_t i = 0;
     while (env_ptr)
     {
-        size_t klen = strlen(env_ptr->key);
-        size_t vlen = env_ptr->value ? strlen(env_ptr->value) : 0;
+        size_t klen = ft_strlen(env_ptr->key);
+        size_t vlen = 0;
+        if (env_ptr->value)
+            vlen = ft_strlen(env_ptr->value);
         char *entry = malloc(klen + vlen + 2); // pour '=' et '\0'
         if (!entry)
         {
-            for (size_t j = 0; j < i; j++)
+            size_t j = 0;
+            while (j < i)
+            {
                 free(arr[j]);
+                j++;
+            }
             free(arr);
             return NULL;
         }
@@ -51,34 +55,6 @@ static char **env_to_array(t_minishell *shell)
     return arr;
 }
 
-// Compare KEY names lex ordre, ignore values
-static int cmp_env(const void *a, const void *b)
-{
-    const char *ea = *(const char **)a;
-    const char *eb = *(const char **)b;
-    const char *eq_a = ft_strchr(ea, '=');
-    const char *eq_b = ft_strchr(eb, '=');
-    size_t na;
-    if (eq_a)
-        na = (size_t)(eq_a - ea);
-    else
-        na = strlen(ea);
-    size_t nb;
-    if (eq_b)
-        nb = (size_t)(eq_b - eb);
-    else
-        nb = strlen(eb);
-    size_t n;
-    if (na < nb)
-        n = na;
-    else
-        n = nb;
-    int cmp = ft_strncmp(ea, eb, n);
-    if (cmp != 0)
-        return cmp;
-    return (int)(na - nb);
-}
-
 static void print_export_arr(char **arr)
 {
     size_t i = 0;
@@ -92,7 +68,7 @@ static void print_export_arr(char **arr)
         else
         {
             *eq = '\0';
-            printf(" (ಠ_ಠ)=ε/̵͇̿̿/’̿’̿-%s=\"%s\"\n", arr[i], eq + 1);
+            printf(" (ಠ_ಠ)=ε/̵͇̿̿/'̿'̿-%s=\"%s\"\n", arr[i], eq + 1);
             *eq = '=';
         }
         i++;
@@ -111,27 +87,139 @@ static void free_export_arr(char **arr)
     free(arr);
 }
 
-// builtin_export sans options : liste triée
+// Vérifie si un nom de variable est valide
+static int is_valid_identifier(const char *name)
+{
+    if (!name || !*name)
+        return 0;
+    
+    // Doit commencer par une lettre ou underscore
+    if (!ft_isalpha(*name) && *name != '_')
+        return 0;
+    
+    // Le reste doit être alphanumérique ou underscore
+    for (int i = 1; name[i]; i++)
+    {
+        if (!ft_isalnum(name[i]) && name[i] != '_')
+            return 0;
+    }
+    return 1;
+}
+
+// Trouve une variable d'environnement
+static t_env *find_env_var(t_minishell *shell, const char *key)
+{
+    t_env *env = shell->env;
+    while (env)
+    {
+        if (ft_strcmp(env->key, key) == 0)
+            return env;
+        env = env->next;
+    }
+    return NULL;
+}
+
+// Ajoute ou modifie une variable d'environnement
+static int set_env_var(t_minishell *shell, const char *key, const char *value)
+{
+    t_env *existing = find_env_var(shell, key);
+    
+    if (existing)
+    {
+        // Modifie la valeur existante
+        if (existing->value)
+            free(existing->value);
+        if (value)
+            existing->value = ft_strdup(value);
+        else
+            existing->value = NULL;
+        return 0;
+        }
+        else
+        {
+        // Crée une nouvelle variable
+        t_env *new_env = malloc(sizeof(t_env));
+        if (!new_env)
+            return 1;
+        
+        new_env->key = ft_strdup(key);
+        if (value)
+            new_env->value = ft_strdup(value);
+        else
+            new_env->value = NULL;
+        new_env->next = shell->env;
+        shell->env = new_env;
+        return 0;
+        }
+}
+
+// builtin_export avec gestion des arguments
 int builtin_export(char **args, t_minishell *shell)
 {
-    (void)args;
-    size_t n = 0;
-    char **arr = env_to_array(shell);
-    if (!arr)
+    // Si pas d'arguments, affiche toutes les variables
+    if (!args[1])
     {
-        shell->exit_status = 1;
-        return 1;
+        char **arr = env_to_array(shell);
+        if (!arr)
+        {
+            shell->exit_status = 1;
+            return 1;
+        }
+        
+        size_t n = 0;
+        while (arr[n])
+            n++;
+        
+        ft_bubble_str_sort(arr);
+        print_export_arr(arr);
+        free_export_arr(arr);
+        shell->exit_status = 0;
+        return 0;
     }
-    // compte
-    while (arr[n])
-        n++;
-    // tri
-    qsort(arr, n, sizeof(char*), cmp_env);
-    // affichage
-    print_export_arr(arr);
-    // cleanup
-    free_export_arr(arr);
-
-    shell->exit_status = 0;
-    return 0;
+    
+    // Traite chaque argument - NE PAS AFFICHER
+    int error = 0;
+    int i = 1;
+    while (args[i])
+    {
+        char *eq = ft_strchr(args[i], '=');
+        
+        if (eq)
+        {
+            // Cas KEY=VALUE
+            *eq = '\0';
+            if (!is_valid_identifier(args[i]))
+            {
+                printf("minishell: export: `%s': not a valid identifier\n", args[i]);
+                *eq = '=';
+                error = 1;
+            }
+            else
+            {
+                if (set_env_var(shell, args[i], eq + 1) != 0)
+                    error = 1;
+            }
+            *eq = '=';
+        }
+        else
+        {
+            // Cas KEY seulement
+            if (!is_valid_identifier(args[i]))
+            {
+                printf("minishell: export: `%s': not a valid identifier\n", args[i]);
+                error = 1;
+            }
+            // Vérifie si la variable existe déjà
+            t_env *existing = find_env_var(shell, args[i]);
+            if (!existing)
+            {
+                // Crée une variable sans valeur
+                if (set_env_var(shell, args[i], NULL) != 0)
+                    error = 1;
+            }
+        }
+        i++;
+    }
+    shell->exit_status = error;
+    return error;
 }

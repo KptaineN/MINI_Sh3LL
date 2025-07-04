@@ -1,102 +1,5 @@
 #include "../../include/minishell.h"
 
-/*
-int builtin_echo(char **args)
-{
-    int i = 1;
-
-    if (args[1] && ft_strncmp(args[1], "-n", 2) == 0)
-        i++;
-
-    while (args[i])
-    {
-        printf("%s", args[i]);
-        if (args[i + 1])
-            printf(" ");
-        i++;
-    }
-    if (!args[1] || ft_strncmp(args[1], "-n", 2) != 0)
-        printf("\n");
-    return (0);
-}*/
-/*
-char	*remove_quotes(const char *arg)
-{
-	int		i = 0, j = 0;
-	char	quote = 0;
-	char	*res = malloc(ft_strlen(arg) + 1);
-
-	if (!res)
-		return (NULL);
-
-	while (arg[i])
-	{
-		if ((arg[i] == '\'' || arg[i] == '"') && quote == 0)
-			quote = arg[i];
-		else if (arg[i] == quote)
-			quote = 0;
-		else
-			res[j++] = arg[i];
-		i++;
-	}
-	res[j] = '\0';
-	return (res);
-}
-
-
-int builtin_echo(char **args, t_minishell *shell)
-{
-	int i = 1;
-	int newline = 1;
-	char *processed;
-
-	if (args[1] && ft_strncmp(args[1], "-n", 3) == 0)
-	{
-		newline = 0;
-		i++;
-	}
-	while (args[i])
-	{
-		// Étape 1 : remplacer les variables comme $? ou $USER
-		processed = replace_variables(args[i], shell);
-		if (!processed)
-			processed = ft_strdup("");
-
-		// Étape 2 : enlever les quotes (tout en gardant le texte)
-		char *final = remove_quotes(processed);
-		free(processed);
-
-		printf("%s", final);
-		free(final);
-
-		if (args[i + 1])
-			printf(" ");
-		i++;
-	}
-
-	if (newline)
-		printf("\n");
-    shell->exit_status = 0;
-	return (0);
-}*/
-
-
-/*** Helpers pour quotes ***/
-static int is_quote_char(char c)
-{
-    return (c == '"' || c == '\'');
-}
-
-static void update_quote_state(char c, char *qs)
-{
-    if (is_quote_char(c))
-    {
-        if (*qs == 0)
-            *qs = c;
-        else if (*qs == c)
-            *qs = 0;
-    }
-}
 
 /*** Helpers pour env ***/
 static char *find_env_value(t_env *env, const char *key)
@@ -180,87 +83,91 @@ static int handle_dollar(char *res, const char *arg, int *i, t_minishell *sh)
     val = get_dollar_value(arg, i, sh);
     if (val)
     {
-        nb = ft_strlcpy(res, val, ft_strlen(val) + 1);
+        ft_strcpy(res, val);
+        nb = ft_strlen(val);
         free(val);
     }
     return nb;
 }
 
 
-/*** Remplacement des variables ***/
+// Fonction corrigée pour replace_variables
 char *replace_variables(const char *arg, t_minishell *sh)
 {
-    int     i = 0, j = 0;
-    int     in_sq = 0, in_dq = 0;
-    char    *res = malloc(ft_strlen(arg) * 50 + 1);
-
-    if (!res)
-        return (NULL);
+    int  i = 0, j = 0;
+    bool in_sq = false, in_dq = false;
+    // on alloue un buffer généreux
+    char *res = malloc(ft_strlen(arg) * 50 + 1);
+    if (!res) return NULL;
+    
+    while (arg[i])
+    {
+        // ouverture/fermeture de quotes
+        if (arg[i] == '\'' && !in_dq)
+        {
+            in_sq = !in_sq;
+            res[j++] = arg[i++]; // On copie la quote
+        }
+        else if (arg[i] == '"' && !in_sq)
+        {
+            in_dq = !in_dq;
+            res[j++] = arg[i++]; // On copie la quote
+        }
+        // cas d'un '$' hors quotes simples
+        else if (arg[i] == '$' && !in_sq)
+        {
+            int written = handle_dollar(&res[j], arg, &i, sh);
+            if (written > 0)
+            {
+                // on a développé une variable
+                j += written;
+            }
+            else
+            {
+                // pas de variable valide → on copie le '$' tel quel
+                res[j++] = arg[i++];
+            }
+        }
+        else
+        {
+            // caractère normal (ou '$' dans simple quote)
+            res[j++] = arg[i++];
+        }
+    }
+    res[j] = '\0';
+    return res;
+}
+char *remove_quotes(const char *arg)
+{
+    size_t i = 0, j = 0;
+    bool   in_sq = false, in_dq = false;
+    char  *res = malloc(ft_strlen(arg) + 1);
+    if (!res) return NULL;
+    
     while (arg[i])
     {
         if (arg[i] == '\'' && !in_dq)
-            in_sq = !in_sq, i++;
+        {
+            // Cette quote simple est un délimiteur (pas dans des doubles quotes)
+            in_sq = !in_sq;
+            i++; // On l'ignore (délimiteur)
+        }
         else if (arg[i] == '"' && !in_sq)
-            in_dq = !in_dq, i++;
-        else if (arg[i] == '$' && !in_sq)
-            j += handle_dollar(&res[j], arg, &i, sh);
+        {
+            // Cette quote double est un délimiteur (pas dans des simples quotes)
+            in_dq = !in_dq;
+            i++; // On l'ignore (délimiteur)
+        }
         else
+        {
+            // Tout autre caractère, y compris les quotes qui ne sont PAS des délimiteurs
             res[j++] = arg[i++];
+        }
     }
     res[j] = '\0';
-    return (res);
+    return res;
 }
 
-/*** Suppression des quotes ***/
-char *remove_quotes(const char *arg)
-{
-    int     i = 0, j = 0;
-    char    qs = 0;
-    char    *res = malloc(ft_strlen(arg) + 1);
-
-    if (!res)
-        return (NULL);
-    while (arg[i])
-    {
-        update_quote_state(arg[i], &qs);
-        if (!is_quote_char(arg[i]))
-            res[j++] = arg[i];
-        i++;
-    }
-    res[j] = '\0';
-    return (res);
-}
-
-/*** builtin_echo final ***//*
-int builtin_echo(char **args, t_minishell *sh)
-{
-    int     i = 1;
-    int     no_newline = 0;
-    char    *tmp;
-    char    *out;
-
-    while (args[i] && ft_strcmp(args[i], "-n") == 0) // 1. Détection option -n (POSIX autorise plusieurs -n consécutifs)
-    {
-        no_newline = 1;
-        i++;
-    }
-    while (args[i])  // 2. Affichage des arguments, séparés par un espace
-    {
-        tmp = replace_variables(args[i], sh);
-        out = remove_quotes(tmp);
-        free(tmp);
-
-        printf("%s", out);
-        free(out);
-        if (args[i + 1])
-            ft_putchar(' ');
-        i++;
-    }
-    if (!no_newline)    // 3. Saut de ligne si pas d’option -n
-        write(1, "\n", 1);
-    sh->exit_status = 0;
-    return (0);
-}*/
 
 int builtin_echo(char **args, t_minishell *sh)
 {
@@ -280,8 +187,11 @@ int builtin_echo(char **args, t_minishell *sh)
         if (!first)
             write(1, " ", 1);
         first = false;
+        //printf("DEBUG argument original: '%s'\n", args[i]);
         char *tmp = replace_variables(args[i], sh);
+       // printf("DEBUG après replace_variables: '%s'\n", tmp);
         char *out = remove_quotes(tmp);
+       // printf("DEBUG après remove_quotes: '%s'\n", out);
         free(tmp);
         write(1, out, ft_strlen(out));
         free(out);
@@ -294,17 +204,4 @@ int builtin_echo(char **args, t_minishell *sh)
 
     sh->exit_status = 0;
     return 0;
-}
-
-
-int builtin_pwd(void)
-{
-	char cwd[1024];
-	if (getcwd(cwd, sizeof(cwd)))
-	{
-		printf("%s\n", cwd);
-		return (0);
-	}
-	perror("pwd");
-	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/07/03 03:35:52 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/04 02:14:44 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,10 @@ int	builtin_exit(t_ast *node, t_minishell *shell);
 
 char	*replace_exit_code(const char *input, int exit_code);
 char *replace_variables(const char *arg, t_minishell *shell);
-
+int builtin_unset(char **args, t_minishell *shell);
+int builtin_env(char **args, t_minishell *shell);
+bool	is_n_option(const char *arg);
+char	*expand_argument(const char *arg, t_minishell *sh);
 
 #endif // MINISHELL_H
 

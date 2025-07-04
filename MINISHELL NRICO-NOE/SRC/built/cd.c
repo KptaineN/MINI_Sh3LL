@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:57 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/03 04:10:12 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/04 01:54:30 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,4 +160,17 @@ int builtin_cd(char **args, t_minishell *shell)
         return (shell->exit_status = 1);
     }
     return (shell->exit_status = 0);
+}
+
+
+int builtin_pwd(void)
+{
+	char cwd[1024];
+	if (getcwd(cwd, sizeof(cwd)))
+	{
+		printf("%s\n", cwd);
+		return (0);
+	}
+	perror("pwd");
+	return (1);
 }
