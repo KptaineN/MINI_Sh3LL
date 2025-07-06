@@ -71,9 +71,8 @@ Donc les pointeur pointe a apres les quotes, et chaque partie est catégorisé c
 
 void init_idx(t_shell *shell)
 {
-	shell->smaller = -1;
-	shell->bigger = -1;
-	shell->append = -1;
+	shell->fd_in = -1;
+	shell->fd_out = -1;
 	shell->doc = -1;
 	shell->fd_in  = STDIN_FILENO;
 	shell->fd_out = STDOUT_FILENO;

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/01 15:17:07 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/06 12:38:27 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,39 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 	free(temp);
 	return idx;
 }
+// "<<",">>","&&","||","|","<",">"
+//   0    1   2     3  	4   5   6
+static void file_access_redirection(t_shell *shell,void **arr, int i, int oper)
+{
+	char *file;
+	int fd;
+	if (!(oper == 1 || oper > 4))
+		return ; // NOT REDIRECTION
+	
+	if (i < shell->n_tokens)
+		return; // ERROR NO ARG FOR REDIR
+	file = (char *)arr[i+1];
+
+	if (access(file, F_OK) != 0) // >> > <
+	{	
+		if (!oper == 1 && !oper == 6) //create file
+			return;	// ERROR Existance
+		fd = open(file, O_CREAT, 0644);
+		if (fd<0)
+			return; //ERROR creating file
+		close(fd);
+	}
+	if ((oper == 1 || oper == 6) && access(file, W_OK) != 0) // >> >
+		return ; // ERROR PERMISSION WRITE
+	if (oper == 5 && access(file, R_OK) != 0)
+		return ; // ERROR PERMISSION READ
+
+	if ((oper == 1 || oper == 6) && shell->fd_in == -1)
+	{
+		
+	}
+
+}
 
 void attribute_token_type(t_shell *shell)
 {
@@ -169,6 +202,7 @@ void attribute_token_type(t_shell *shell)
 	int idx_token = 0;
 	void **arr = shell->parsed_args->arr;
 	t_token *token;
+	char *tmp;
 
 	shell->n_tokens = count_tokens(shell);
 	shell->tokens = malloc(sizeof(t_token)*shell->n_tokens);
@@ -184,16 +218,15 @@ void attribute_token_type(t_shell *shell)
 		t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
 		if (t_arr_index != -1)
 		{
-			if (t_arr_index == 4)
-				shell->oper++;
-			if (t_arr_index == 5)
-				shell->smaller = idx_token;
-			else if (t_arr_index == 6)
-				shell->bigger = idx_token;
-			else if (t_arr_index == 0)
-				shell->doc= idx_token;
-			else if (t_arr_index == 1)
-				shell->append = idx_token;
+	
+			
+			if (shell->fd_in != -1) //< << 
+			{	
+			}
+			if (shell->fd_out != -1)
+			{
+
+			}
 
 			// Use the corresponding type from the operator_types array
 			//token->u.oper_handlers = shell->oper_handlers[];

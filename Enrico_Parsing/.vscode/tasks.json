@@ -11,9 +11,9 @@
                 "-Wextra",
                 "-Werror",
                 "-g",
-                "${workspaceFolder}/Enrico_Parsing/**/*.c",
+                "${workspaceFolder}/*.c",
                 "-o",
-                "${workspaceFolder}/Enrico_Parsing/minishell"
+                "${workspaceFolder}/minishell"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

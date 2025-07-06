@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/02 13:47:24 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/06 11:45:36 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void launch_process(t_shell *shell)
     int idx = 0;
     int tidx;
     t_token * token;
-    int *pipes[2] = malloc(sizeof(int [2])*shell->n_cmd); 
+    int (*pipes)[2] = malloc(sizeof(*pipes)* shell->n_cmd);
     if (!pipes)
         return;
     token = shell->tokens;
