@@ -11,19 +11,9 @@
                 "-Wextra",
                 "-Werror",
                 "-g",
-                "${workspaceFolder}/main.c",
-                "${workspaceFolder}/costum_split.c",
-                "${workspaceFolder}/t_list.c",
-                "${workspaceFolder}/t_arr.c",
-                "${workspaceFolder}/path.c",
-                "${workspaceFolder}/tool_lexer.c",
-                "${workspaceFolder}/lexer.c",
-                "${workspaceFolder}/cmd.c",
-                "${workspaceFolder}/oper_handlers_func.c",
-                "${workspaceFolder}/builtin_func.c",
-                "${workspaceFolder}/display.c",
+                "${workspaceFolder}/Enrico_Parsing/**/*.c",
                 "-o",
-                "${workspaceFolder}/main"
+                "${workspaceFolder}/Enrico_Parsing/minishell"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
