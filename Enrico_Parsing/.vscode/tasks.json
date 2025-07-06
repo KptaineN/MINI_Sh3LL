@@ -1,0 +1,39 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc build active file",
+            "command": "/usr/bin/gcc",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-g",
+                "${workspaceFolder}/main.c",
+                "${workspaceFolder}/costum_split.c",
+                "${workspaceFolder}/t_list.c",
+                "${workspaceFolder}/t_arr.c",
+                "${workspaceFolder}/path.c",
+                "${workspaceFolder}/tool_lexer.c",
+                "${workspaceFolder}/lexer.c",
+                "${workspaceFolder}/cmd.c",
+                "${workspaceFolder}/oper_handlers_func.c",
+                "${workspaceFolder}/builtin_func.c",
+                "${workspaceFolder}/display.c",
+                "-o",
+                "${workspaceFolder}/main"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build all source files together"
+        }
+    ]
+}

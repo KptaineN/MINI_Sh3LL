@@ -1,0 +1,11 @@
+-rw-r--r--  1 Paprika users  1601 Jun 28 07:41 builtin_func.c
+-rw-r--r--  1 Paprika users  1086 Jun 29 09:36 cmd.c
+-rw-r--r--  1 Paprika users  3943 Jun 29 09:39 costum_split.c
+-rw-r--r--  1 Paprika users  1824 Jun 29 10:35 display.c
+-rw-r--r--  1 Paprika users  5711 Jun 29 10:09 lexer.c
+-rw-r--r--  1 Paprika users  2304 Jun 29 10:25 main.c
+-rw-r--r--  1 Paprika users  1380 Jun 20 10:28 oper_handlers_func.c
+-rw-r--r--  1 Paprika users  2023 Jun 26 15:16 path.c
+-rw-r--r--  1 Paprika users  4145 Jun 29 10:41 t_arr.c
+-rw-r--r--  1 Paprika users  1536 Jun 26 15:03 t_list.c
+-rw-r--r--  1 Paprika users  3498 Jun 29 10:09 tool_lexer.c
