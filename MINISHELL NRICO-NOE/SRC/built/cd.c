@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:57 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/04 01:54:30 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/07 13:32:01 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,7 @@ int builtin_cd(char **args, t_minishell *shell)
 int builtin_pwd(void)
 {
 	char cwd[1024];
+    
 	if (getcwd(cwd, sizeof(cwd)))
 	{
 		printf("%s\n", cwd);

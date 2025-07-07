@@ -61,7 +61,7 @@ void print_ast(t_ast *node, int level)
 	return node;
 }*/
 
-t_ast *init_command_node(char **args)
+/*t_ast *init_command_node(char **args)
 {
 	t_ast *node = init_ast_node(NODE_COMMAND);
 	if (!node) return NULL;
@@ -74,7 +74,7 @@ t_ast *init_command_node(char **args)
 		node->args[i] = ft_strdup(args[i]);
 	node->args[count] = NULL;
 	return node;
-}
+}*/
 /*
 t_ast *init_redirection_node(t_node_type type, const char *filename, t_ast *child)
 {
