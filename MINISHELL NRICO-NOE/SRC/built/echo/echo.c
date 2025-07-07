@@ -1,30 +1,18 @@
 #include "../../include/minishell.h"
 
-
 /*** Helpers pour env ***/
-static char *find_env_value(t_env *env, const char *key)
-{
-    while (env)
-    {
-        if (ft_strncmp(env->key, key, ft_strlen(key) + 1) == 0)
-            return (env->value);
-        env = env->next;
-    }
-    return (NULL);
-}
 
-    
 
-/*** Gestion $... ***/
+/*** Gestion $...
 // remplace $?, $VAR, touche perso $N
-/*** Récupère la valeur associée à $… ***/
+// récupère la valeur associée à $…
 
 
-/*** Renvoie une chaîne allouée pour les variables “spéciales” ***/
-/* - si key == "NOE"    → la touche perso
- * - si key == "ENRICO" → on ne fait rien (on renvoie NULL) 
- * - sinon             → NULL
- */
+// Renvoie une chaîne allouée pour les variables “spéciales”
+//- si key == "NOE"    → la touche perso
+ // - si key == "ENRICO" → on ne fait rien (on renvoie NULL)
+ // - sinon             → NULL
+
 static char *get_special_var(const char *key)
 {
     if (ft_strncmp(key, "NRICO", ft_strlen("NRICO") + 1) == 0)
@@ -34,7 +22,8 @@ static char *get_special_var(const char *key)
     return NULL;
 }
 
-/*** Récupère la valeur après $… ***/
+//Récupère la valeur après $…
+//
 static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
 {
     int  k = *pos + 1;
@@ -49,7 +38,7 @@ static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
         return val;
     }
 
-    /* on lit l’identifiant [A-Za-z0-9_] */
+    //on lit l’identifiant [A-Za-z0-9_]
     int len = 0;
     while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
         len++;
@@ -61,11 +50,152 @@ static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
     }
     key = ft_substr(arg, k, len);
 
-    /* d’abord dans l’env */
+    // d’abord dans l’env
     val_env = find_env_value(sh->env, key);
     if (val_env)
         val = ft_strdup(val_env);
-    /* sinon, test “spécial” */
+    / sinon, test “spécial”
+    else
+        val = get_special_var(key);
+
+    free(key);
+    *pos = k + len;
+    return val;
+}*/
+
+/*
+    int len = 0;
+    while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
+        len++;
+    if (len == 0)
+    {
+        *pos = k;
+        return NULL;
+    }
+    key = ft_substr(arg, k, len);
+    val_env = find_env_value(sh->env, key);
+    if (val_env)
+        val = ft_strdup(val_env);
+    else
+        val = get_special_var(key);
+    free(key);
+    *pos = k + len;
+    return val;
+*/
+
+#include "echo.h"
+
+char *remove_quotes(const char *arg);
+
+static bool is_n_flag(const char *arg)
+{
+    return ft_strcmp(arg, "-n") == 0;
+}
+
+static void print_echo_args(char **args, int start, t_minishell *sh)
+{
+    bool first = true;
+
+    for (int i = start; args[i]; i++)
+    {
+        if (!first)
+            write(1, " ", 1);
+        first = false;
+
+        char *tmp = replace_variables(args[i], sh);
+        char *out = remove_quotes(tmp);
+        free(tmp);
+
+        write(1, out, ft_strlen(out));
+        free(out);
+    }
+}
+
+int builtin_echo(char **args, t_minishell *sh)
+{
+    int i = 1;
+    bool no_nl = false;
+
+    while (args[i] && is_n_flag(args[i]))
+    {
+        no_nl = true;
+        i++;
+    }
+
+    print_echo_args(args, i, sh);
+
+    if (!no_nl)
+        write(1, "\n", 1);
+
+    sh->exit_status = 0;
+    return 0;
+}
+
+/*
+static char *find_env_value(t_env *env, const char *key)
+{
+    while (env)
+    {
+        if (ft_strncmp(env->key, key, ft_strlen(key) + 1) == 0)
+            return (env->value);
+        env = env->next;
+    }
+    return (NULL);
+}
+
+
+
+// Gestion $...
+// remplace $?, $VAR, touche perso $N
+// Récupère la valeur associée à $…
+
+
+// Renvoie une chaîne allouée pour les variables “spéciales”
+// - si key == "NOE"    → la touche perso
+ * - si key == "ENRICO" → on ne fait rien (on renvoie NULL)
+ * - sinon             → NULL
+
+static char *get_special_var(const char *key)
+{
+    if (ft_strncmp(key, "NRICO", ft_strlen("NRICO") + 1) == 0)
+        return ft_strdup("le 2 eme meilleur dev de la galaxie 🚀");;
+    if (ft_strncmp(key, "NOE", ft_strlen("NOE") + 1) == 0)
+        return ft_strdup("le meilleur dev de la galaxie 🚀");
+    return NULL;
+}
+
+// Récupère la valeur après $… **
+static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
+{
+    int  k = *pos + 1;
+    char *key;
+    char *val_env;
+    char *val;
+
+    if (arg[k] == '?')
+    {
+        val = ft_itoa(sh->exit_status);
+        *pos = k + 1;
+        return val;
+    }
+
+    //on lit l’identifiant [A-Za-z0-9_]
+    int len = 0;
+    while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
+        len++;
+    if (len == 0)
+    {
+         // clé vide → on ne touche pas à res, on avance d’1
+        *pos = k;
+        return NULL;
+    }
+    key = ft_substr(arg, k, len);
+
+    // d’abord dans l’env
+    val_env = find_env_value(sh->env, key);
+    if (val_env)
+        val = ft_strdup(val_env);
+    // sinon, test “spécial”
     else
         val = get_special_var(key);
 
@@ -74,7 +204,7 @@ static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
     return val;
 }
 
-/*** Gestion $... ***/
+** Gestion $... *
 static int handle_dollar(char *res, const char *arg, int *i, t_minishell *sh)
 {
     char *val;
@@ -99,7 +229,7 @@ char *replace_variables(const char *arg, t_minishell *sh)
     // on alloue un buffer généreux
     char *res = malloc(ft_strlen(arg) * 50 + 1);
     if (!res) return NULL;
-    
+
     while (arg[i])
     {
         // ouverture/fermeture de quotes
@@ -136,14 +266,15 @@ char *replace_variables(const char *arg, t_minishell *sh)
     }
     res[j] = '\0';
     return res;
-}
+}*/
 char *remove_quotes(const char *arg)
 {
     size_t i = 0, j = 0;
-    bool   in_sq = false, in_dq = false;
-    char  *res = malloc(ft_strlen(arg) + 1);
-    if (!res) return NULL;
-    
+    bool in_sq = false, in_dq = false;
+    char *res = malloc(ft_strlen(arg) + 1);
+    if (!res)
+        return NULL;
+
     while (arg[i])
     {
         if (arg[i] == '\'' && !in_dq)
@@ -168,7 +299,7 @@ char *remove_quotes(const char *arg)
     return res;
 }
 
-
+/*
 int builtin_echo(char **args, t_minishell *sh)
 {
     int  i       = 1;
@@ -198,10 +329,9 @@ int builtin_echo(char **args, t_minishell *sh)
         i++;
     }
 
-    // 4) Saut de ligne si on n'a pas vu -n
     if (!no_nl)
         write(1, "\n", 1);
 
     sh->exit_status = 0;
     return 0;
-}
+}*/

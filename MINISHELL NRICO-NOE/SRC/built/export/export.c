@@ -1,7 +1,7 @@
 #include "../../include/minishell.h"
 
 /*
- size_t env_count(t_minishell *shell)
+static size_t env_count(t_minishell *shell)
 {
     size_t count = 0;
     t_env *env = shell->env;
@@ -13,7 +13,7 @@
     return count;
 }
 // Libère partiellement le tableau d'entrées
-void free_entries(char **arr, size_t count)
+static void free_entries(char **arr, size_t count)
 {
     size_t i = 0;
     while (i < count)
@@ -25,7 +25,7 @@ void free_entries(char **arr, size_t count)
 }
 
 // Crée une chaîne "KEY=VALUE" pour une entrée d'environnement
-char *create_env_entry(t_env *env)
+static char *create_env_entry(t_env *env)
 {
     size_t klen = ft_strlen(env->key);
     size_t vlen = env->value ? ft_strlen(env->value) : 0;
@@ -46,7 +46,7 @@ char *create_env_entry(t_env *env)
 }
 
 // Remplit un tableau de chaînes "KEY=VALUE"
- char **env_to_array(t_minishell *shell)
+static char **env_to_array(t_minishell *shell)
 {
     size_t n = env_count(shell);
     char **arr = malloc((n + 1) * sizeof(char *));
@@ -69,7 +69,7 @@ char *create_env_entry(t_env *env)
     return arr;
 }
 
- void print_export_arr(char **arr)
+static void print_export_arr(char **arr)
 {
     size_t i = 0;
     while (arr[i])
@@ -90,7 +90,7 @@ char *create_env_entry(t_env *env)
 }
 
 // Libère le tableau
- void free_export_arr(char **arr)
+static void free_export_arr(char **arr)
 {
     size_t i = 0;
     while (arr[i])
@@ -102,7 +102,7 @@ char *create_env_entry(t_env *env)
 }
 
 // Vérifie si un nom de variable est valide
- int is_valid_identifier(const char *name)
+static int is_valid_identifier(const char *name)
 {
     int i = 0;
     if (!name || !*name)
@@ -124,7 +124,7 @@ char *create_env_entry(t_env *env)
 }
 
 // Trouve une variable d'environnement
-t_env *find_env_var(t_minishell *shell, const char *key)
+static t_env *find_env_var(t_minishell *shell, const char *key)
 {
     t_env *env = shell->env;
     while (env)
@@ -136,7 +136,7 @@ t_env *find_env_var(t_minishell *shell, const char *key)
     return NULL;
 }
 // Met à jour la valeur d'une variable d'environnement existante
- int update_env_var(t_env *env, const char *value)
+static int update_env_var(t_env *env, const char *value)
 {
     if (env->value)
         free(env->value);
@@ -148,7 +148,7 @@ t_env *find_env_var(t_minishell *shell, const char *key)
 }
 
 // Crée une nouvelle variable d'environnement et l'ajoute à la liste du shell
- int create_env_var(t_minishell *shell, const char *key, const char *value)
+static int create_env_var(t_minishell *shell, const char *key, const char *value)
 {
     t_env *new_env = malloc(sizeof(t_env));
     if (!new_env)
@@ -165,7 +165,7 @@ t_env *find_env_var(t_minishell *shell, const char *key)
 }
 
 // Ajoute ou modifie une variable d'environnement
-int set_env_var(t_minishell *shell, const char *key, const char *value)
+static int set_env_var(t_minishell *shell, const char *key, const char *value)
 {
     t_env *existing = find_env_var(shell, key);
     
@@ -175,7 +175,7 @@ int set_env_var(t_minishell *shell, const char *key, const char *value)
     return create_env_var(shell, key, value);
 }
 // Traite un argument du format KEY=VALUE
-int handle_arg_with_assignment(char *arg, t_minishell *shell)
+static int handle_arg_with_assignment(char *arg, t_minishell *shell)
 {
     char *eq = ft_strchr(arg, '=');
     int ret = 0;
@@ -201,7 +201,7 @@ int handle_arg_with_assignment(char *arg, t_minishell *shell)
 }
 
 // Traite un argument contenant seulement la clé (KEY)
- int handle_arg_without_assignment(char *arg, t_minishell *shell)
+static int handle_arg_without_assignment(char *arg, t_minishell *shell)
 {
     int ret = 0;
 
@@ -222,7 +222,7 @@ int handle_arg_with_assignment(char *arg, t_minishell *shell)
     return ret;
 }
 // Traite le cas où aucun argument n'est fourni
- int export_no_arguments(t_minishell *shell)
+static int export_no_arguments(t_minishell *shell)
 {
     char **arr = env_to_array(shell);
     if (!arr)
@@ -240,13 +240,13 @@ int handle_arg_with_assignment(char *arg, t_minishell *shell)
 }
 
 // Traite un seul argument de l'export
- int process_export_argument(char *arg, t_minishell *shell)
+static int process_export_argument(char *arg, t_minishell *shell)
 {
     if (ft_strchr(arg, '='))
         return handle_arg_with_assignment(arg, shell);
     else
         return handle_arg_without_assignment(arg, shell);
-}
+}*/
 
 // builtin_export avec gestion des arguments, fracturé en sous-fonctions
 int builtin_export(char **args, t_minishell *shell)
@@ -264,4 +264,4 @@ int builtin_export(char **args, t_minishell *shell)
     }
     shell->exit_status = error;
     return error;
-}*/
+}

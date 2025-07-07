@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:57 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/07 13:32:01 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/07 16:10:11 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,8 @@ int builtin_cd(char **args, t_minishell *shell)
     target = cd_choose_target(args, shell);
     if (!target)
     {
-        fprintf(stderr, "cd: HOME/OLDPWD not set\n");
+        errno = ENOENT; // Simule l'absence de HOME/OLDPWD
+        perror("cd: HOME/OLDPWD not set");
         return (shell->exit_status = 1);
     }
     if (cd_do_chdir(target) < 0)

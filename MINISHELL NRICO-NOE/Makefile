@@ -7,7 +7,7 @@ PROJECT_DIR  := .
 SRC_DIR      := $(PROJECT_DIR)/SRC
 INC_DIR      := $(PROJECT_DIR)/include
 # Subdirectories under SRC (omit Enrico_Parsing entirely)
-SUBDIRS      := built env exec from_pipex handle_utils handle_utils/handler_cast_t_shell handle_utils/handler_operator main old_parser parser signal
+SUBDIRS      := built env exec from_pipex handle_utils handle_utils/handler_cast_t_shell handle_utils/handler_operator main old_parser parser signal built/echo built/export
 # Include libft under include
 LIBFT_INC    := $(INC_DIR)/LIBFT
 LIBFT_DIR    := $(INC_DIR)/LIBFT

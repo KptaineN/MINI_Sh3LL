@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/07/04 02:14:44 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/07 16:51:10 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 #include "ast.h"
 #include "env.h"
 #include "parsing.h"
+#include "../SRC/built/echo/echo.h"
+#include "../SRC/built/export/export.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <readline/history.h>
