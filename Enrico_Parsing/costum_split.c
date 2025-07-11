@@ -56,24 +56,29 @@ ex: "ls -la > grep "Noe!" file.txt"
 
 gere les cas ou: "\"hello\'mamman\'\"" -> "hello\'mamman\'" (expansion apres pour toi)
 */
-static int	count_arg(const char *str)//, int *sub_n)
+static int	count_arg(const char *str, t_shell *shell)//, int *sub_n)
 {
 	int		count;
 	bool	in_single_quote;
 	bool	in_double_quote;
 	bool	in_word;
+	int idx_oper;
 	//t_quote_type current_quote = QUOTE_NONE;
 	
 	count = 0;
 	in_single_quote = false;
 	in_double_quote = false;
 	in_word = false;
-	for (int i = 0; str[i]; i++)
+	int i = 0;
+	while(str[i])
 	{
+		char c = str[i];
+		(void) c;
+		idx_oper = is_in_t_arr_dic_str(shell->oper, (char *)&str[i]);
 		if (str[i] == '\'' && !in_double_quote && escape_check(str,i))
 			in_single_quote = !in_single_quote;
 		else if (str[i] == '"' && !in_single_quote && escape_check(str,i))
-			in_double_quote = !in_double_quote;
+			in_double_quote = !in_double_quote;	
 		else if (str[i] == ' ' && !in_single_quote && !in_double_quote)
 		{
 			if (in_word)
@@ -82,8 +87,17 @@ static int	count_arg(const char *str)//, int *sub_n)
 				count++;
 			}
 		}
+		else if (idx_oper != -1 && !in_single_quote && !in_double_quote)
+		{						// is a oper
+			in_word = false;
+			count+=1+(i != 0);
+			i+=strlen((char *)((t_dic *)shell->oper->arr[idx_oper])->key)-1;
+		}
 		else if (!in_word)
+		{	
 			in_word = true;
+		}
+		i++;
 	}
 	if (in_word)
 		count++;
@@ -91,7 +105,7 @@ static int	count_arg(const char *str)//, int *sub_n)
 }
 
 // Function to extract a single token
-static char	*extract_arg(const char *str, int *start)
+static char	*extract_arg(const char *str, int *start, t_shell *shell)
 {
 	bool	in_single_quote;
 	bool	in_double_quote;
@@ -99,6 +113,9 @@ static char	*extract_arg(const char *str, int *start)
 	int		token_end;
 	int		token_len;
 	char	*token;
+
+	int idx_oper_one;
+	int oper_ad = 0;
 
 	in_single_quote = false;
 	in_double_quote = false;
@@ -111,18 +128,37 @@ static char	*extract_arg(const char *str, int *start)
 		return (NULL);
 	token_end = token_start;
 	// Find the end of the token
+	const char * tmp;
+	tmp = (char *)shell->oper->arr[6];
+	(void)tmp;
 	while (str[token_end])
-	{
+	{	
 		char c = str[token_end];
 		if (str[token_end] == '\'' && !in_double_quote && escape_check(str,token_end))
 			in_single_quote = !in_single_quote;
 		else if (str[token_end] == '"' && !in_single_quote && escape_check(str,token_end))
 			in_double_quote = !in_double_quote;
-		else if (str[token_end] == ' ' && !in_single_quote && !in_double_quote)
-			break ;
+		else if (!in_single_quote && !in_double_quote)
+		{
+			if (str[token_end] == ' ')
+				break ;
+			idx_oper_one = is_in_t_arr_dic_str(shell->oper, &str[token_end]);
+			if (idx_oper_one != -1)
+			{	
+				oper_ad = strlen((const char *)((t_dic *)shell->oper->arr[idx_oper_one])->key);
+				break;
+			}
+			if (str[token_end+1] != 0 && is_in_t_arr_dic_str(shell->oper, &str[token_end+1]) != -1)
+			{	
+				oper_ad = 1;
+				break;
+			}
+		}
 		token_end++;
 		(void)c;
 	}
+	tmp = (const char *)shell->oper->arr[6];
+	(void)tmp;
 	/*  A implementer le quote> et la terminaison
 	➜  ~ echo 'so"
 		quote> sdf"
@@ -136,9 +172,11 @@ static char	*extract_arg(const char *str, int *start)
 	//if (in_double_quote || in_single_quote)
 	//	;
 	
+	token_end+=oper_ad;
 	*start = token_end;
 	// Allocate and copy the token
 	token_len = token_end - token_start;
+
 	token = malloc(token_len + 1);
 	if (!token)
 		return (NULL);
@@ -161,17 +199,19 @@ cat<system.log>rep.txt
 	\"Mamman\'echo\'Papa\" 		
 	\"%USER\"and\’$USER\’		
 */
-t_arr 	*custom_split(const char *str)
+t_arr 	*custom_split(const char *str, t_shell * shell)
 {
 	int		pos;
 	int		token_index;
 	t_arr	*result;
+
+	
 	if (!str)
 		return NULL;
 	result = malloc(sizeof(t_arr));
 	if (!result)
 		return NULL;
-	result->len = count_arg(str); //have to implemente the <quote> if " or ' not closed
+	result->len = count_arg(str, shell); //have to implemente the <quote> if " or ' not closed
 	result->arr = malloc(sizeof(char *) * (result->len));
 	if (!result->arr)
 		return (free(result),NULL);
@@ -179,7 +219,7 @@ t_arr 	*custom_split(const char *str)
 	token_index = 0;
 	while (token_index < result->len)
 	{
-		result->arr[token_index] = extract_arg(str, &pos); //, &arr_token[token_index]);
+		result->arr[token_index] = extract_arg(str, &pos, shell); //, &arr_token[token_index]);
 		if (!result->arr[token_index])
 		{
 			for (int i = 0; i < token_index; i++)

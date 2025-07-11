@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:01:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/26 15:03:46 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/10 10:42:24 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,37 @@ t_list	*set_linked_path(char **env)
 		i++;
 	}
 	return (head);
+}
+
+static int count_linked(t_list *node)
+{
+	int count = 1;
+	t_list *first = node;
+	if (!node)
+		return 0;
+	node = node->next;
+	while (node != first)
+	{
+		count++;
+		node = node->next ; 
+	}
+	return count;
+}
+
+char **linked_to_array_string(t_list *node)
+{
+	t_list *first = node;
+	int len = count_linked(node);
+	char **arr = malloc(sizeof(char *)*(len+1));
+	arr[len] = 0;
+	int i = 0;
+
+	while(i<len)
+	{
+		arr[i] = node->content;
+		node = node->next;
+		i++;
+	}
+	node = first;
+	return arr;
 }

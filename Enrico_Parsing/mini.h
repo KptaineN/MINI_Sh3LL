@@ -88,10 +88,10 @@ typedef struct s_shell
 	char			*input;
 	t_arr			*parsed_args;
 	int				n_tokens;
-	int				n_pipe;
-	int 			n_oper;
 	int 			n_cmd;
 	t_token			*tokens;
+	t_list			*cmd_tail;
+	t_list			*cmd_head;
 	t_list			*env;
 	int				smaller;	// <
 	int				bigger;		// >
@@ -102,8 +102,6 @@ typedef struct s_shell
 	//t_cmd			*tree;
 	t_arr			*bcmd;
 	t_arr			*oper;
-	t_list			*pipes;
-	t_list			*head_p;
 	//int             (**oper_handlers)(void *, int);		//voir init_oper_handlers
 }					t_shell;
 
@@ -111,11 +109,12 @@ typedef struct s_shell
 t_list	*ft_lstnew(void *content);
 void	ft_lstadd_back(t_list **lst, t_list *new);
 t_list	*set_linked_path(char **env);
+char **linked_to_array_string(t_list *node);
 
 //t_arr
 size_t t_arrlen(void **arr);
-int is_in_t_arr_str(t_arr *arr, char *arg);
-int is_in_t_arr_dic_str(t_arr *arr, char *arg);
+int is_in_t_arr_str(t_arr *arr, const char *arg);
+int is_in_t_arr_dic_str(t_arr *arr, const char *arg);
 void build_t_arr_str(t_arr **dst, char **arr_str, int len);
 void init_all_t_arr(t_shell *shell);
 
@@ -125,7 +124,7 @@ char *find_command_path(char *cmd, t_list *env);
 //costum split
 char *ft_strdup(const char *s1); // get rid later
 bool escape_check(const char *str ,int idx);
-t_arr 	*custom_split(const char *str);
+t_arr 	*custom_split(const char *str, t_shell * shell);
 
 //lexer tools
 int find_c_nonescaped(const char *str, char *needle, int size_needle);
@@ -135,6 +134,12 @@ int count_tokens(t_shell *shell);
 //lexer
 void attribute_subtoken_type(t_token *token);
 void attribute_token_type(t_shell *shell);
+
+//launch
+int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd);
+int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd);
+void launch_process(t_shell *shell);
+void one_command(t_shell *shell);
 
 //cmd
 bool is_command(char *str, t_list *env);

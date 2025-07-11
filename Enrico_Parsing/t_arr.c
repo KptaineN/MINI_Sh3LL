@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:08:28 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/01 15:48:48 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/10 11:35:14 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ size_t t_arrlen(void **arr)
 	return (-1) not found
 	return (%d != -1) idx of the one found in the array bcmd->arr
 */  
-int is_in_t_arr_str(t_arr *arr, char *arg)
+int is_in_t_arr_str(t_arr *arr, const char *arg)
 {
     int i = 0;
     while (i < arr->len)
@@ -48,19 +48,28 @@ int is_in_t_arr_str(t_arr *arr, char *arg)
 	return (-1) not found
 	return (%d != -1) idx of the one found in the array
 */  
-int is_in_t_arr_dic_str(t_arr *arr, char *arg)
+int is_in_t_arr_dic_str(t_arr *arr, const char *arg)
 {
     int i = 0;
     t_dic *dic;
+    int len_key;
+    int len_arg;
     
     if (!arr || !arg)
         return (-1);
-        
+    
+    len_arg = 1 + (arg[1]!= 0);
     while (i < arr->len)
     {
         dic = (t_dic *)arr->arr[i];
-        if (dic && dic->key && strcmp((char *)dic->key, arg) == 0)
-            return (i);
+        char *str = dic->key;
+        (void)str;
+        len_key = strlen(dic->key);
+        if (len_key<=len_arg)
+        {
+            if (dic && dic->key && strncmp((char *)dic->key, arg, len_key) == 0)
+                return (i);
+        }
         i++;
     }
     return (-1);
@@ -127,8 +136,8 @@ void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
 // initialise the builtins and operators
 void init_all_t_arr(t_shell *shell)
 {
-	char *all_operators[] = {"<<",">>","&&","||","|","<",">",NULL};
-	char *all_builtins[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit", NULL};
+	char *all_operators[] = {"<<",">>","&&","||","|","<",">"};
+	char *all_builtins[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
     int (*operator_handlers[])(void *, int) = {
 		handle_heredoc,     // "<<"
 		handle_append,      // ">>"
@@ -149,6 +158,6 @@ void init_all_t_arr(t_shell *shell)
         NULL
     };
 
-	build_t_arr_dic_str(&shell->oper, all_operators, (void **)operator_handlers,t_arrlen((void **)all_operators));
-    build_t_arr_dic_str(&shell->bcmd, all_builtins,  (void **)builtin_handlers,t_arrlen((void **)all_builtins));
+	build_t_arr_dic_str(&shell->oper, all_operators, (void **)operator_handlers,sizeof(all_operators)/sizeof(char *));
+    build_t_arr_dic_str(&shell->bcmd, all_builtins,  (void **)builtin_handlers,sizeof(all_builtins)/sizeof(char *));
 }

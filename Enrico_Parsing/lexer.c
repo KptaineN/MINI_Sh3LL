@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/06 12:38:27 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/10 13:35:54 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,39 +161,79 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 	free(temp);
 	return idx;
 }
+
 // "<<",">>","&&","||","|","<",">"
 //   0    1   2     3  	4   5   6
-static void file_access_redirection(t_shell *shell,void **arr, int i, int oper)
+static void file_access_redirection(t_shell *shell,void **arr, int t_arr_index, int i)
 {
-	char *file;
-	int fd;
-	if (!(oper == 1 || oper > 4))
-		return ; // NOT REDIRECTION
-	
-	if (i < shell->n_tokens)
-		return; // ERROR NO ARG FOR REDIR
-	file = (char *)arr[i+1];
-
-	if (access(file, F_OK) != 0) // >> > <
-	{	
-		if (!oper == 1 && !oper == 6) //create file
-			return;	// ERROR Existance
-		fd = open(file, O_CREAT, 0644);
-		if (fd<0)
-			return; //ERROR creating file
-		close(fd);
-	}
-	if ((oper == 1 || oper == 6) && access(file, W_OK) != 0) // >> >
-		return ; // ERROR PERMISSION WRITE
-	if (oper == 5 && access(file, R_OK) != 0)
-		return ; // ERROR PERMISSION READ
-
-	if ((oper == 1 || oper == 6) && shell->fd_in == -1)
+	if (i+1 >= shell->n_tokens)
+		perror("Argument manquant pour l'opérateur"); // ERROR
+	if (t_arr_index == 5)
 	{
-		
+		if (shell->fd_in != -1) //<5 
+		{
+			shell->fd_in = open(arr[i+1], O_RDONLY);
+			if (!shell->fd_in)
+			 	perror("Erreur lors de l'ouverture en lecture"); // ERROR NOT OPENING;
+		}
+		else
+		{
+			if (access(arr[i+1], O_RDONLY) < 0)
+				perror("ERROR ACCESS"); // ERROR NOT OPENING;
+		}
+		return;
 	}
 
+	if (shell->fd_out != -1) // 1>> 6>  
+	{
+		if (t_arr_index == 1)
+		{
+			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR | O_APPEND, 0644);
+			if (!shell->fd_out)
+				perror("Erreur lors de l'ouverture en écriture (append)"); // ERROR SPACE
+		}
+		else if (t_arr_index == 6)
+		{
+			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR, 0644);
+			if (!shell->fd_out)
+				perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
+		}
+		return;
+	}
+	if (t_arr_index == 1)
+	{
+		if (access(arr[i+1] , O_CREAT | O_RDWR | O_APPEND | O_TRUNC) < 0)
+			perror("Erreur lors de l'ouverture en écriture (append)"); // ERROR SPACE
+	}
+	else if (t_arr_index == 6)
+	{
+		if (access(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC) < 0)
+			perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
+	}
 }
+
+static void add_cmd(t_shell *shell, t_token *token)
+{
+	t_list *tmp;
+ 	tmp = malloc(sizeof(t_list));
+	if (!tmp)
+			return; // ERROR
+	
+	
+	if (!shell->cmd_head)
+	{	
+		shell->cmd_head = tmp;
+		shell->cmd_tail = tmp;
+	}
+	else
+	{
+		shell->cmd_tail->next = tmp;
+		shell->cmd_tail = tmp;
+	}
+	tmp->content = (void *)token;
+	tmp->next = NULL;
+}
+
 
 void attribute_token_type(t_shell *shell)
 {
@@ -202,68 +242,72 @@ void attribute_token_type(t_shell *shell)
 	int idx_token = 0;
 	void **arr = shell->parsed_args->arr;
 	t_token *token;
-	char *tmp;
-
+	bool c;
+	
 	shell->n_tokens = count_tokens(shell);
 	shell->tokens = malloc(sizeof(t_token)*shell->n_tokens);
 	if (!shell->tokens)
-		return;
+		perror("Erreur d'allocation pour les tokens");
 
 	while(i < shell->n_tokens)
 	{
+		c = 0;
 		token = &shell->tokens[idx_token];
 		token->type = TOKEN_WORD;
 		token->value = arr[i];
+		
 		//OPERATOR
 		t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
 		if (t_arr_index != -1)
 		{
-	
-			
-			if (shell->fd_in != -1) //< << 
-			{	
-			}
-			if (shell->fd_out != -1)
-			{
-
-			}
-
+			c = 1;
+			if (t_arr_index == 1 || t_arr_index == 5 || t_arr_index == 6)
+				file_access_redirection(shell,arr,t_arr_index,i);
+			else if (t_arr_index == 0) // << doctype
+				return; //IMPLEMENT !!!
+		
 			// Use the corresponding type from the operator_types array
 			//token->u.oper_handlers = shell->oper_handlers[];
 			token->type = TOKEN_OPER;
 			//token->u.cmd_args_parts = shell->oper;
-			return;
 		}
 		//BCMD 
-		t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
-		if (t_arr_index != -1)
+		if (c == 0)
 		{
-			shell->n_cmd++;
-			token->type = TOKEN_BCMD;
-			i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
+			t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
+			if (t_arr_index != -1)
+			{
+				c= 1;
+				token->type = TOKEN_BCMD;
+				i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
+			}
 		}
-		token->value = find_command_path(token->value, shell->env);
-		if (token->value)
+		if (c == 0)
 		{
-			shell->n_cmd++;
-			token->type = TOKEN_CMD;
-			i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
-			/*
-	_		call args_cmd to get the amount 
-			set the all_parts: cmd + args
-			*/
+			token->value = find_command_path(token->value, shell->env); //CMD
+			if (token->value)
+			{
+				c = 1;
+				token->type = TOKEN_CMD;
+				i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
+				/*
+		_		call args_cmd to get the amount 
+				set the all_parts: cmd + args
+				*/
+			}
+			else
+				token->value = arr[i];
 		}
-		else
-		{	
-			free(token->value);
-			token->value = arr[i];
-		}
-		
 		//Word token
 		if (token->type == TOKEN_WORD)
 		{
 			token->u.all_parts.n_parts = count_subtokens(token->value);
 			attribute_subtoken_type(token);
+		}
+		if (token->type != TOKEN_OPER)
+		{	
+			add_cmd(shell,token);
+			shell->n_cmd++;
 		}
 		i++;
 		idx_token++;

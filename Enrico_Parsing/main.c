@@ -82,7 +82,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
-	const char *arg = "\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
+	const char *arg = "errors.err>errors.err>>errors.err";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
 	t_shell *shell;
 	shell = malloc(sizeof(t_shell));
 	if (!shell)
@@ -96,11 +96,13 @@ int	main(int argc, char **argv, char **envp)
 	init_all_t_arr(shell);
 	print_dic(shell->oper);
 
-	shell->parsed_args = custom_split(arg);
+	shell->parsed_args = custom_split(arg, shell);
 
 	attribute_token_type(shell);
-
 	print_all_parts(shell);
+
+	launch_process(shell);
+	
 
     return (0);
 }

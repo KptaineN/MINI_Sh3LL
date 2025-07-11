@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/29 10:35:35 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/10 13:39:40 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void print_all_parts(t_shell *shell)
 		{	
 			if (n == shell->n_tokens)
 				return;
+			printf("%s\n", token->value);
 			continue;
 		}
 		n_parts = token->u.all_parts.n_parts;
@@ -36,13 +37,14 @@ void print_all_parts(t_shell *shell)
 		while(idx_parts<n_parts)
 		{
 			subtoken = &parts[idx_parts];
-			printf("val {%.*s} \t type {%s} \n", subtoken->len,subtoken->p, types[subtoken->type]);
+			printf("val {%.*s} \t type {%s}", subtoken->len,subtoken->p, types[subtoken->type]);
 			idx_parts++;
 		}
 		if (n == shell->n_tokens)
 			return;
 		printf("\n");
 	}
+	printf("\n");
 }
 
 // Print dictionary-like array in the form key=value

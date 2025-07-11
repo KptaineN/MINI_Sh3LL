@@ -14,7 +14,8 @@ SRCS = 	main.c \
 		cmd.c \
 		oper_handlers_func.c \
 		builtin_func.c \
-		display.c
+		display.c \
+		launch.c
 
 
 # Object files
