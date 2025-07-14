@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/10 13:35:54 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/14 16:20:05 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,54 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 	return idx;
 }
 
+static void handle_heredoc(t_shell *shell, void **arr, int i)
+{
+  
+    // Close previous fd_in to avoid leaks
+    if (shell->fd_in != -1 && shell->fd_in != STDIN_FILENO)
+        close(shell->fd_in);
+
+    char *delimiter = arr[i + 1];
+    int hd_pipe[2];
+    if (pipe(hd_pipe) < 0) {
+        perror("pipe");
+        return;
+    }
+
+    // Check if delimiter is quoted (use your subtoken logic)
+    bool is_quoted = false; // Simplify: assume unquoted for basic version
+    t_subtoken_conainter container;
+    container.n_parts = count_subtokens(delimiter);
+    subtoken_of_cmd(&container, delimiter);
+    for (int j = 0; j < container.n_parts; j++) {
+        if (container.parts[j].type == QUOTE_SINGLE || container.parts[j].type == QUOTE_DOUBLE) {
+            is_quoted = true;
+            break;
+        }
+    }
+    free(container.parts); // Clean up
+
+    // Read input until delimiter
+    char *line;
+    while ((line = readline("> "))) { // Requires readline.h
+        if (strcmp(line, delimiter) == 0) {
+            free(line);
+            break;
+        }
+        // If not quoted, expand $variables (implement later with your subtoken logic)
+        if (!is_quoted) {
+            // Placeholder: Add variable expansion if needed
+        }
+        // Write line + newline to pipe
+        write(hd_pipe[1], line, strlen(line));
+        write(hd_pipe[1], "\n", 1);
+        free(line);
+    }
+
+    close(hd_pipe[1]); // Close write end
+    shell->fd_in = hd_pipe[0]; // Set read end as input
+}
+
 // "<<",">>","&&","||","|","<",">"
 //   0    1   2     3  	4   5   6
 static void file_access_redirection(t_shell *shell,void **arr, int t_arr_index, int i)
@@ -183,29 +231,28 @@ static void file_access_redirection(t_shell *shell,void **arr, int t_arr_index, 
 		}
 		return;
 	}
+	if (t_arr_index == 0 && shell->fd_out != -1) //<< //HEREDOC
+	{
+		
+	}
 
 	if (shell->fd_out != -1) // 1>> 6>  
 	{
-		if (t_arr_index == 1)
+		if (t_arr_index == 1) 
 		{
-			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR | O_APPEND, 0644);
+			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC | O_APPEND, 0644);
 			if (!shell->fd_out)
-				perror("Erreur lors de l'ouverture en écriture (append)"); // ERROR SPACE
+				perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
 		}
 		else if (t_arr_index == 6)
 		{
-			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR, 0644);
+			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC , 0644);
 			if (!shell->fd_out)
 				perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
 		}
 		return;
 	}
-	if (t_arr_index == 1)
-	{
-		if (access(arr[i+1] , O_CREAT | O_RDWR | O_APPEND | O_TRUNC) < 0)
-			perror("Erreur lors de l'ouverture en écriture (append)"); // ERROR SPACE
-	}
-	else if (t_arr_index == 6)
+	if (t_arr_index == 6)
 	{
 		if (access(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC) < 0)
 			perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
