@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/10 13:42:22 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/14 14:36:08 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
 {
     (void) curr_cmd;
     if (shell->fd_out == -1)
-        shell->fd_in = STDOUT_FILENO;
+        shell->fd_out = STDOUT_FILENO;
 
     int pid;
     pid = fork();
@@ -61,11 +61,10 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
         close(prev_pipe[1]);
     
         dup2(shell->fd_out, STDOUT_FILENO);
-        close(shell->fd_in);
+        close(shell->fd_out);
         // Execute
         exit(1);
     }
-    
     close(prev_pipe[0]);
     close(prev_pipe[1]);
     if (shell->fd_out != STDOUT_FILENO)
@@ -77,6 +76,10 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
 void one_command(t_shell *shell)
 {
     int pid = fork();
+    if (shell->fd_in == -1)
+        shell->fd_in = STDIN_FILENO;
+    if (shell->fd_out == -1)
+        shell->fd_out = STDOUT_FILENO;
     if (pid < 0)
     {
         perror("fork");
@@ -90,11 +93,9 @@ void one_command(t_shell *shell)
         close(shell->fd_in);
         dup2(shell->fd_out, STDOUT_FILENO);
         close(shell->fd_out);
-        
-        
         // Execute command here
         // execve(...);
-        return;
+        exit(1);
     }
     waitpid(pid,NULL,0);
 }
@@ -103,7 +104,7 @@ void launch_process(t_shell *shell)
 {
     int i;
     int *pid;
-    int prev_pipe[2];
+    int prev_pipe[2] = {-1,-1};
     int curr_pipe[2];
     t_list *curr_cmd = shell->cmd_head;
 
@@ -118,14 +119,10 @@ void launch_process(t_shell *shell)
         return;
     i = 0;
     if(pipe(curr_pipe) < 0)
-            return; //ERROR
+        perror("pipe");
     pid[i++] = start_cmd(shell, prev_pipe,curr_pipe,curr_cmd);
     while(curr_cmd->next != NULL)
     {
-
-        if(pipe(curr_pipe) < 0)
-            return; //ERROR
-
         pid[i] = fork();
         if (pid[i] < 0)
             perror("Forks");
@@ -140,7 +137,7 @@ void launch_process(t_shell *shell)
             close(curr_pipe[0]);
             close(curr_pipe[1]);
             // execute
-            return;
+            exit(1);
         }
         else
         {
@@ -148,15 +145,16 @@ void launch_process(t_shell *shell)
             close(prev_pipe[1]);
             prev_pipe[0] = curr_pipe[0];
             prev_pipe[1] = curr_pipe[1];
+            if(pipe(curr_pipe) < 0)
+                perror("pipe"); //ERROR
         }
         curr_cmd = curr_cmd->next;
         i++;
     }
-    if(pipe(curr_pipe) < 0)
-            return; //ERROR
     pid[i++] = end_cmd(shell, prev_pipe,curr_cmd);
     while(i--)
         waitpid(pid[i], NULL, 0);
+    free(pid);
 }
 
 
