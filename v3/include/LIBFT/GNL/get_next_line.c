@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft.h"
 #include "get_next_line.h"
 
 static char	*read_fd(const int fd, char *line)
@@ -31,9 +30,9 @@ static char	*read_fd(const int fd, char *line)
 			break ;
 		buffer[bread] = '\0';
 		if (!line)
-			line = ftt_strdup("");
-		line = ftt_strjoin(line, buffer);
-		if (ftt_strchr(buffer, '\n'))
+			line = get_strdup("");
+		line = get_strjoin(line, buffer);
+		if (get_strchr(buffer, '\n'))
 			break ;
 	}
 	free(buffer);
@@ -48,9 +47,9 @@ static char	*get_line(char *nline)
 	i = 0;
 	while (nline[i] != '\0' && nline[i] != '\n')
 		i++;
-	if (nline[i] == '\0' || nline[i + 1] == '\0')
+	if (nline[i] == '\0')
 		return (NULL);
-	new_line = ftt_substr(nline, i + 1, ftt_strlen(nline) - (i + 1));
+	new_line = get_substr(nline, i + 1, get_strlen(nline) - (i + 1));
 	if (!new_line)
 		return (NULL);
 	nline[i + 1] = '\0';
@@ -59,23 +58,23 @@ static char	*get_line(char *nline)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
+	static char	*stash[1024];
 	char		*nline;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
-	nline = read_fd(fd, stash);
+	nline = read_fd(fd, stash[fd]);
 	if (!nline)
 	{
-		free(stash);
-		stash = NULL;
+		free(stash[fd]);
+		stash[fd] = NULL;
 		return (NULL);
 	}
-	stash = get_line(nline);
-	if (stash && *stash == '\0')
+	stash[fd] = get_line(nline);
+	if (stash[fd] && *stash[fd] == '\0')
 	{
-		free(stash);
-		stash = NULL;
+		free(stash[fd]);
+		stash[fd] = NULL;
 	}
 	return (nline);
 }

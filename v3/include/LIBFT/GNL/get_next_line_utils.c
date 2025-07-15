@@ -10,10 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../libft.h" 
-#include "get_next_line.h"
+#include "get_next_line.h" 
 
-char	*ftt_strchr(const char *str, int c)
+char	*get_strchr(const char *str, int c)
 {
 	while (*str)
 	{
@@ -30,14 +29,14 @@ char	*ftt_strchr(const char *str, int c)
 	return (NULL);
 }
 
-char	*ftt_strdup(const char *s)
+char	*get_strdup(const char *s)
 {
 	char	*dest;
 	size_t	i;
 
 	if (!s)
 		return (NULL);
-	dest = (char *) malloc(ftt_strlen(s) + 1);
+	dest = (char *) malloc(get_strlen(s) + 1);
 	if (!dest)
 		return (NULL);
 	i = 0;
@@ -50,7 +49,7 @@ char	*ftt_strdup(const char *s)
 	return (dest);
 }
 
-int	ftt_strlen(const char *str)
+int	get_strlen(const char *str)
 {
 	int	i;
 
@@ -60,7 +59,7 @@ int	ftt_strlen(const char *str)
 	return (i);
 }
 
-char	*ftt_strjoin(char *s1, char *s2)
+char	*get_strjoin(char *s1, char *s2)
 {
 	char	*str;
 	size_t	i;
@@ -69,10 +68,10 @@ char	*ftt_strjoin(char *s1, char *s2)
 	if (!s1 && !s2)
 		return (NULL);
 	if (!s1)
-		return (ftt_strdup(s2));
+		return (get_strdup(s2));
 	if (!s2)
-		return (ftt_strdup(s1));
-	str = malloc(ftt_strlen(s1) + ftt_strlen(s2) + 1);
+		return (get_strdup(s1));
+	str = malloc(get_strlen(s1) + get_strlen(s2) + 1);
 	if (!str)
 		return (NULL);
 	i = -1;
@@ -86,14 +85,14 @@ char	*ftt_strjoin(char *s1, char *s2)
 	return (str);
 }
 
-char	*ftt_substr(char const *s, unsigned int start, size_t len)
+char	*get_substr(char const *s, unsigned int start, size_t len)
 {
 	size_t	i;
 	size_t	j;
 	char	*str;
 
-	if (start >= (unsigned int)ftt_strlen(s))
-		return (ft_strdup(""));
+	if (start >= (unsigned int)get_strlen(s))
+		return (get_strdup(""));
 	str = (char *)malloc(sizeof(*s) * (len + 1));
 	if (!str)
 		return (free(str), NULL);

@@ -55,9 +55,12 @@ SRCS = ft_isalpha.c \
        ft_strndup.c \
        ft_bubble_str_sort.c \
        GNL/get_next_line.c \
+       GNL/get_next_line_utils.c \
+       GNL/get_next_line_utils.c \
        PRINTF/ft_printf.c \
        PRINTF/ft_print_num.c \
        PRINTF/ft_print_pointer.c \
+       PRINTF/ft_print_f.c \
 
 
 OBJS = ${SRCS:.c=.o}

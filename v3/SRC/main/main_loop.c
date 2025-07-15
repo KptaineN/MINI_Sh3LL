@@ -19,6 +19,21 @@ char *read_user_input(void)
     char *input = readline("ᕕ( ᐛ )ᕗ minishell$ ");
     if (!input)
         write(1, "exit\n", 5);
+
+    /*
+    ** Exemple d'utilisation de get_next_line pour lire plusieurs lignes
+    ** et concaténer à l'entrée initiale 
+	util pour dquote
+	char *line;
+	while ((line = get_next_line(STDIN_FILENO))) {
+	    char *tmp = ft_strjoin(input, "\n");
+	    char *new = ft_strjoin(tmp, line);
+	    free(tmp);
+	    free(input);
+	    free(line);
+	    input = new;
+	}*/
+ 
     return (input);
 }
 

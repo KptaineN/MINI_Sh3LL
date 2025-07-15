@@ -10,13 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIBFT_H
+# ifndef LIBFT_H
 # define LIBFT_H
 
 # include <stddef.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+
+# include "GNL/get_next_line.h"
+# include "PRINTF/ft_printf.h"
 
 long	ft_atol(const char *str);
 int		ft_isspace(int c);
