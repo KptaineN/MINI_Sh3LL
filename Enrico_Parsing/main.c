@@ -1,3 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/18 16:45:24 by eganassi          #+#    #+#             */
+/*   Updated: 2025/07/18 18:43:26 by eganassi         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
 #include "mini.h"
 
 
@@ -82,7 +95,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
-	const char *arg = "errors.err>errors.err>>errors.err";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
+	const char *arg = "cat << EOF World";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
 	t_shell *shell;
 	shell = malloc(sizeof(t_shell));
 	if (!shell)

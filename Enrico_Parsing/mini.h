@@ -46,7 +46,7 @@ typedef enum e_toktype
 	TOKEN_WORD,
 	TOKEN_BCMD,
 	TOKEN_CMD,
-	TOKEN_OPER
+TOKEN_OPER
 }					t_toktype;
 
 typedef enum e_quote_type
@@ -75,12 +75,8 @@ typedef struct s_token
 {
 	char			type;
 	char			*value; 	// if command, then here is the path
-	union	u_sub 
-	{
-		int         			(*oper_handlers)(void *, int);	//operator
-		t_subtoken_conainter	all_parts;						//word
-		t_subtoken_conainter	*cmd_args_parts;				//cmd
-	} u;
+	t_subtoken_conainter	*cmd_args_parts;				//cmd
+	int n_parts;
 }					t_token;
 
 typedef struct s_shell
@@ -126,6 +122,10 @@ char *ft_strdup(const char *s1); // get rid later
 bool escape_check(const char *str ,int idx);
 t_arr 	*custom_split(const char *str, t_shell * shell);
 
+//operator
+void file_access_redirection(t_shell *shell, int t_arr_index, int i);
+void handle_heredoc(t_shell *shell, int i);
+
 //lexer tools
 int find_c_nonescaped(const char *str, char *needle, int size_needle);
 int count_subtokens(const char *str);
@@ -144,15 +144,6 @@ void one_command(t_shell *shell);
 //cmd
 bool is_command(char *str, t_list *env);
 
-// oper handlers function
-int handle_heredoc(void *shell, int token_idx);
-int handle_append(void *shell, int token_idx);
-int handle_and(void *shell, int token_idx);
-int handle_or(void *shell, int token_idx);
-int handle_pipe(void *shell, int token_idx);
-int handle_redirect_in(void *shell, int token_idx);
-int handle_redirect_out(void *shell, int token_idx);
-
 // builtin func
 int ft_export(void *shell, int token_idx);
 int ft_unset(void *shell, int token_idx);
@@ -166,6 +157,9 @@ int ft_cd(void *shell, int token_idx);
 //display
 void print_all_parts(t_shell *shell);
 void	print_dic(t_arr *arr);
+
+//free_section
+void ft_free(void **thing);
 
 
 #endif

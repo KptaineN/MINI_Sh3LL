@@ -90,7 +90,7 @@ static int	count_arg(const char *str, t_shell *shell)//, int *sub_n)
 		else if (idx_oper != -1 && !in_single_quote && !in_double_quote)
 		{						// is a oper
 			in_word = false;
-			count+=1+(i != 0);
+			count++;
 			i+=strlen((char *)((t_dic *)shell->oper->arr[idx_oper])->key)-1;
 		}
 		else if (!in_word)
@@ -210,11 +210,14 @@ t_arr 	*custom_split(const char *str, t_shell * shell)
 		return NULL;
 	result = malloc(sizeof(t_arr));
 	if (!result)
-		return NULL;
+		perror("Malloc");
 	result->len = count_arg(str, shell); //have to implemente the <quote> if " or ' not closed
 	result->arr = malloc(sizeof(char *) * (result->len));
 	if (!result->arr)
-		return (free(result),NULL);
+	{
+		free(result);
+		perror("Malloc");
+	}
 	pos = 0;
 	token_index = 0;
 	while (token_index < result->len)
@@ -226,7 +229,7 @@ t_arr 	*custom_split(const char *str, t_shell * shell)
 				free(result->arr[i]);
 			free(result->arr);
 			free(result);
-			return NULL;
+			perror("Erreur d'allocation pour les tokens");
 		}
 		printf("str %d:\t%s\n",token_index, (char *)result->arr[token_index]); //debug_print
 		token_index++;

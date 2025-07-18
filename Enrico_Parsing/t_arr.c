@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:08:28 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/10 11:35:14 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/16 09:38:38 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,13 +139,13 @@ void init_all_t_arr(t_shell *shell)
 	char *all_operators[] = {"<<",">>","&&","||","|","<",">"};
 	char *all_builtins[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
     int (*operator_handlers[])(void *, int) = {
-		handle_heredoc,     // "<<"
-		handle_append,      // ">>"
-		handle_and,         // "&&"
-		handle_or,          // "||"
-		handle_pipe,        // "|"
-		handle_redirect_in, // "<"
-		handle_redirect_out // ">"
+		NULL,     // "<<"
+		NULL,      // ">>"
+		NULL,         // "&&"
+		NULL,          // "||"
+		NULL,        // "|"
+		NULL, // "<"
+		NULL // ">"
 	};
     int (*builtin_handlers[])(void *, int) = {
         ft_echo,

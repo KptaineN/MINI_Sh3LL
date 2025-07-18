@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/10 13:39:40 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/18 18:47:13 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,35 +16,38 @@
 void print_all_parts(t_shell *shell)
 {
 	int n = 0;
-	int n_parts;
-	t_subtoken *parts;
+	t_subtoken_conainter *container_parts;
+	t_subtoken *sub_container_parts;
+	
 	t_token *token;
-	while(1)
+	while(n < shell->n_tokens)
 	{
-		token = &shell->tokens[n++];
-		if (token->type != TOKEN_WORD)
+		token = &shell->tokens[n];
+		if (token->type != TOKEN_CMD)
 		{	
-			if (n == shell->n_tokens)
-				return;
 			printf("%s\n", token->value);
+			n++;
 			continue;
-		}
-		n_parts = token->u.all_parts.n_parts;
-		parts = token->u.all_parts.parts;
+		}		
 		int idx_parts = 0;
-		t_subtoken *subtoken;
+		int idx_subparts;
+
 		char *types[] ={"no quote", "single quote", "double quote"};
-		while(idx_parts<n_parts)
+		while(idx_parts<token->n_parts)
 		{
-			subtoken = &parts[idx_parts];
-			printf("val {%.*s} \t type {%s}", subtoken->len,subtoken->p, types[subtoken->type]);
+			container_parts = &token->cmd_args_parts[idx_parts];
+			idx_subparts = 0;
+			while (idx_subparts<container_parts->n_parts)
+			{
+				sub_container_parts = container_parts->parts;
+				printf("val {%.*s} \t type {%s} \t", sub_container_parts->len,sub_container_parts->p, types[sub_container_parts->type]);
+				idx_subparts++;
+			}
+			printf("\n");
 			idx_parts++;
 		}
-		if (n == shell->n_tokens)
-			return;
-		printf("\n");
+		n++;
 	}
-	printf("\n");
 }
 
 // Print dictionary-like array in the form key=value

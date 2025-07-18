@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:24:17 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/29 10:09:03 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/18 18:00:26 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,33 +87,33 @@ int count_tokens(t_shell *shell)
     int i = 0;
     void **arr = shell->parsed_args->arr;
     int len = shell->parsed_args->len;
-    
+    int idx_oper;
+
     while (i < len)
-    {
-        // Check if current token is an operator
-        if (is_in_t_arr_dic_str(shell->oper, arr[i]) != -1)
-        {
-            count++;
-            i++;
-        }
-        // Check if current token is a builtin or command
-        else if (is_in_t_arr_dic_str(shell->bcmd, arr[i]) != -1 || is_command(arr[i],shell->env))
-        {
-            count++; // Count the command as one token
-            i++;
-            // Skip all arguments that follow until we hit an operator or another command
-            while (i < len && is_in_t_arr_dic_str(shell->oper, arr[i]) == -1 && 
-                   is_in_t_arr_dic_str(shell->bcmd, arr[i]) == -1 && !is_command(arr[i], shell->env))
-            {
-                i++;
-            }
-        }
-        else
-        {
-            // Standalone word (shouldn't happen in well-formed input, but handle it)
-            count++;
-            i++;
-        }
-    }
+    {       
+		while (1)
+		{	
+			if (i == len)
+				return count+(!count && i>1); // case: << EOF, commands 0, but cat << EOF, commands 1 
+			idx_oper = is_in_t_arr_dic_str(shell->oper, arr[i]);
+			if (idx_oper != -1)
+			{
+				if (idx_oper < 2 || idx_oper > 4)
+				{
+					file_access_redirection(shell, idx_oper, i);
+					ft_free((void**)&shell->parsed_args->arr[i++]);
+					if (i != len)
+						ft_free((void**)&shell->parsed_args->arr[i]);	
+				}
+				else				
+				{
+					i++;
+					break;
+				}
+			}
+			i++;
+		}
+		count++;
+	}
     return count;
 }

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 16:20:05 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/18 18:34:28 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,14 @@
 	Ici on attribu les sous types
 	*array de pointeur de taille n_partie
 */
+/*
 void attribute_subtoken_type(t_token *token)
 {
 	const char *subtoken;
 	int idx_tail;
 	t_subtoken *parts;	
-	int n_parts = token->u.all_parts.n_parts;
-	token->u.all_parts.parts = malloc(sizeof(t_subtoken)*n_parts);
+	int n_parts = token->n_parts;
+	token.parts = malloc(sizeof(t_subtoken)*n_parts);
 	if (!token->u.all_parts.parts)
 		return;
 	subtoken = token->value;
@@ -55,7 +56,7 @@ void attribute_subtoken_type(t_token *token)
 		//	subtoken+=2;
 		i++;
 	}
-}
+}*/
 
 /*
 main loop
@@ -70,22 +71,23 @@ loop
 static int count_args_cmd(t_shell *shell, int i)
 {
 	int n_args = 0;
-	int curr;
-	char *temp;
 	char **arr = (char **)shell->parsed_args->arr;
-	curr = i+1;
+	int len = shell->parsed_args->len;
+	
+	int idx_oper;
 
-
-	while (curr<shell->n_tokens && is_in_t_arr_str(shell->oper, arr[curr]) == -1 && is_in_t_arr_str(shell->oper, arr[curr]) == -1)
+	while (1)
 	{
-		temp = find_command_path(arr[curr], shell->env);
-		if (temp)
+		if (i==len)
+			break;
+		if (arr[i] != NULL)
 		{
-			free(temp);
-			return n_args;
+			idx_oper = is_in_t_arr_str(shell->oper, arr[i]);
+			if (idx_oper != -1)
+				return n_args;
+			n_args++;
 		}
-		n_args++;
-		curr++;
+		i++;
 	}
 	return n_args;
 }
@@ -139,125 +141,25 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 	t_arr *arr_arg = shell->parsed_args;
 	char *curr_arg;
 	int idx_container = 0;
-	char *temp;
-	cmd_token->u.cmd_args_parts = malloc(sizeof(t_subtoken_conainter *)*len);
-	arr_container = cmd_token->u.cmd_args_parts;
+	cmd_token->cmd_args_parts = malloc(sizeof(t_subtoken_conainter *)*len);
+	arr_container = cmd_token->cmd_args_parts;
 	if (!arr_container)
 		return -1;
-	
-	idx++;
-	while(idx<len)
+
+	while(idx_container<len)
 	{
 		curr_arg = arr_arg->arr[idx];
-		temp = find_command_path(curr_arg, shell->env);
-		if (temp && is_in_t_arr_dic_str(shell->oper,curr_arg) == -1 && is_in_t_arr_str(shell->oper, curr_arg) == -1)
-			break;
-		
-		arr_container[idx_container].n_parts = count_subtokens(curr_arg);
-		subtoken_of_cmd(&arr_container[idx_container], curr_arg);
-
+		if (curr_arg != NULL)
+		{
+			arr_container[idx_container].n_parts = count_subtokens(curr_arg);
+			subtoken_of_cmd(&arr_container[idx_container++], curr_arg);
+		}
 		idx++;
 	}
-	free(temp);
+	cmd_token->n_parts = len;
 	return idx;
 }
 
-static void handle_heredoc(t_shell *shell, void **arr, int i)
-{
-  
-    // Close previous fd_in to avoid leaks
-    if (shell->fd_in != -1 && shell->fd_in != STDIN_FILENO)
-        close(shell->fd_in);
-
-    char *delimiter = arr[i + 1];
-    int hd_pipe[2];
-    if (pipe(hd_pipe) < 0) {
-        perror("pipe");
-        return;
-    }
-
-    // Check if delimiter is quoted (use your subtoken logic)
-    bool is_quoted = false; // Simplify: assume unquoted for basic version
-    t_subtoken_conainter container;
-    container.n_parts = count_subtokens(delimiter);
-    subtoken_of_cmd(&container, delimiter);
-    for (int j = 0; j < container.n_parts; j++) {
-        if (container.parts[j].type == QUOTE_SINGLE || container.parts[j].type == QUOTE_DOUBLE) {
-            is_quoted = true;
-            break;
-        }
-    }
-    free(container.parts); // Clean up
-
-    // Read input until delimiter
-    char *line;
-    while ((line = readline("> "))) { // Requires readline.h
-        if (strcmp(line, delimiter) == 0) {
-            free(line);
-            break;
-        }
-        // If not quoted, expand $variables (implement later with your subtoken logic)
-        if (!is_quoted) {
-            // Placeholder: Add variable expansion if needed
-        }
-        // Write line + newline to pipe
-        write(hd_pipe[1], line, strlen(line));
-        write(hd_pipe[1], "\n", 1);
-        free(line);
-    }
-
-    close(hd_pipe[1]); // Close write end
-    shell->fd_in = hd_pipe[0]; // Set read end as input
-}
-
-// "<<",">>","&&","||","|","<",">"
-//   0    1   2     3  	4   5   6
-static void file_access_redirection(t_shell *shell,void **arr, int t_arr_index, int i)
-{
-	if (i+1 >= shell->n_tokens)
-		perror("Argument manquant pour l'opérateur"); // ERROR
-	if (t_arr_index == 5)
-	{
-		if (shell->fd_in != -1) //<5 
-		{
-			shell->fd_in = open(arr[i+1], O_RDONLY);
-			if (!shell->fd_in)
-			 	perror("Erreur lors de l'ouverture en lecture"); // ERROR NOT OPENING;
-		}
-		else
-		{
-			if (access(arr[i+1], O_RDONLY) < 0)
-				perror("ERROR ACCESS"); // ERROR NOT OPENING;
-		}
-		return;
-	}
-	if (t_arr_index == 0 && shell->fd_out != -1) //<< //HEREDOC
-	{
-		
-	}
-
-	if (shell->fd_out != -1) // 1>> 6>  
-	{
-		if (t_arr_index == 1) 
-		{
-			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC | O_APPEND, 0644);
-			if (!shell->fd_out)
-				perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
-		}
-		else if (t_arr_index == 6)
-		{
-			shell->fd_out = open(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC , 0644);
-			if (!shell->fd_out)
-				perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
-		}
-		return;
-	}
-	if (t_arr_index == 6)
-	{
-		if (access(arr[i+1] , O_CREAT | O_RDWR | O_TRUNC) < 0)
-			perror("Erreur lors de l'ouverture en écriture (troncated)"); // ERROR SPACE
-	}
-}
 
 static void add_cmd(t_shell *shell, t_token *token)
 {
@@ -289,74 +191,48 @@ void attribute_token_type(t_shell *shell)
 	int idx_token = 0;
 	void **arr = shell->parsed_args->arr;
 	t_token *token;
-	bool c;
 	
 	shell->n_tokens = count_tokens(shell);
-	shell->tokens = malloc(sizeof(t_token)*shell->n_tokens);
-	if (!shell->tokens)
-		perror("Erreur d'allocation pour les tokens");
-
+	if (shell->n_tokens != 0)
+	{
+		shell->tokens = malloc(sizeof(t_token)*shell->n_tokens);
+		if (!shell->tokens)
+			perror("Erreur d'allocation pour les tokens");
+	}
 	while(i < shell->n_tokens)
 	{
-		c = 0;
-		token = &shell->tokens[idx_token];
-		token->type = TOKEN_WORD;
-		token->value = arr[i];
-		
-		//OPERATOR
-		t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
-		if (t_arr_index != -1)
+		if (arr[i] != NULL)
 		{
-			c = 1;
-			if (t_arr_index == 1 || t_arr_index == 5 || t_arr_index == 6)
-				file_access_redirection(shell,arr,t_arr_index,i);
-			else if (t_arr_index == 0) // << doctype
-				return; //IMPLEMENT !!!
-		
-			// Use the corresponding type from the operator_types array
-			//token->u.oper_handlers = shell->oper_handlers[];
-			token->type = TOKEN_OPER;
-			//token->u.cmd_args_parts = shell->oper;
-		}
-		//BCMD 
-		if (c == 0)
-		{
-			t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
+			token = &shell->tokens[idx_token];
+			token->type = TOKEN_WORD;
+			token->value = arr[i];
+			
+			//OPERATOR //les <> << >> sont deja gere par count_tokens, faudrait subdiviser (pour le bonus) les le parse pour subdiviser les tokens
+			t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
 			if (t_arr_index != -1)
+				token->type = TOKEN_OPER;
+			//BCMD 
+			if (token->type == TOKEN_WORD)
 			{
-				c= 1;
-				token->type = TOKEN_BCMD;
-				i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
+				t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
+				if (t_arr_index != -1)
+				{
+					token->type = TOKEN_BCMD;
+					i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
+				}
 			}
-		}
-		if (c == 0)
-		{
-			token->value = find_command_path(token->value, shell->env); //CMD
-			if (token->value)
+			if (token->type == TOKEN_WORD)
 			{
-				c = 1;
 				token->type = TOKEN_CMD;
 				i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
-				/*
-		_		call args_cmd to get the amount 
-				set the all_parts: cmd + args
-				*/
 			}
-			else
-				token->value = arr[i];
+			if (token->type != TOKEN_OPER)
+			{	
+				add_cmd(shell,token);
+				shell->n_cmd++;
+			}
+			i++;
 		}
-		//Word token
-		if (token->type == TOKEN_WORD)
-		{
-			token->u.all_parts.n_parts = count_subtokens(token->value);
-			attribute_subtoken_type(token);
-		}
-		if (token->type != TOKEN_OPER)
-		{	
-			add_cmd(shell,token);
-			shell->n_cmd++;
-		}
-		i++;
 		idx_token++;
 	}
 }
