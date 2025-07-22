@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:45:24 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/18 18:43:26 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/20 15:51:09 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ void init_idx(t_shell *shell)
 {
 	shell->fd_in = -1;
 	shell->fd_out = -1;
-	shell->doc = -1;
 	shell->fd_in  = STDIN_FILENO;
 	shell->fd_out = STDOUT_FILENO;
 }
@@ -95,7 +94,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
-	const char *arg = "cat << EOF World";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
+	const char *arg = "echo \"$PATH\"hel'$PATH' ";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
 	t_shell *shell;
 	shell = malloc(sizeof(t_shell));
 	if (!shell)
@@ -113,10 +112,11 @@ int	main(int argc, char **argv, char **envp)
 
 	attribute_token_type(shell);
 	print_all_parts(shell);
-
+	char **exp_cmd = expand_cmd(shell->tokens, shell->env);
+	(void) exp_cmd;
 	launch_process(shell);
 	
-
+	printf("\nlast line\n");
     return (0);
 }
 	

@@ -157,8 +157,6 @@ static char	*extract_arg(const char *str, int *start, t_shell *shell)
 		token_end++;
 		(void)c;
 	}
-	tmp = (const char *)shell->oper->arr[6];
-	(void)tmp;
 	/*  A implementer le quote> et la terminaison
 	➜  ~ echo 'so"
 		quote> sdf"

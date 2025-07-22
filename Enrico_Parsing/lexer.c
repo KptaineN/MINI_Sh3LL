@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/18 18:34:28 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/20 16:22:10 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,13 +109,13 @@ void subtoken_of_cmd(t_subtoken_conainter *container, char *arg)
 	{
 		if (head[idx] == '\'' && escape_check(head,idx))
 		{	
-			head++;
+			idx++;
 			parts[i].type = QUOTE_SINGLE;
 			idx_tail = find_c_nonescaped(&head[idx],"\'", 1);
 		}
 		else if (head[idx] == '\"' && escape_check(head,idx))
 		{	
-			head++;
+			idx++;
 			parts[i].type = QUOTE_DOUBLE;
 			idx_tail = find_c_nonescaped(&head[idx],"\"", 1);
 		}
@@ -124,9 +124,10 @@ void subtoken_of_cmd(t_subtoken_conainter *container, char *arg)
 			parts[i].type = QUOTE_NONE;
 			idx_tail = find_c_nonescaped(&head[idx],"\"\'",2);
 		}
-		parts[i].len = idx_tail+1;
-		parts[i].p = (char *)head;
-		idx+= idx_tail;
+		parts[i].len = idx_tail;
+		parts[i].p = (char *)&head[idx];
+		//printf("%.*s\n", idx_tail, &head[idx]);
+		idx+= idx_tail+(parts[i].type != QUOTE_NONE);
 		//if (parts[i].type != QUOTE_NONE)
 		//	head+=2;
 		i++;

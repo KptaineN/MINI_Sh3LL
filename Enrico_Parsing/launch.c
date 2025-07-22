@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 14:36:08 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/19 09:36:04 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,12 +74,12 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
 }
 
 void one_command(t_shell *shell)
-{
-    int pid = fork();
+{ 
     if (shell->fd_in == -1)
         shell->fd_in = STDIN_FILENO;
     if (shell->fd_out == -1)
         shell->fd_out = STDOUT_FILENO;
+    int pid = fork();    
     if (pid < 0)
     {
         perror("fork");
@@ -88,13 +88,11 @@ void one_command(t_shell *shell)
     
     if (pid == 0)
     {
-    
         dup2(shell->fd_in, STDIN_FILENO);
         close(shell->fd_in);
         dup2(shell->fd_out, STDOUT_FILENO);
         close(shell->fd_out);
         // Execute command here
-        // execve(...);
         exit(1);
     }
     waitpid(pid,NULL,0);

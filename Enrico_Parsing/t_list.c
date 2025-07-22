@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:01:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/10 10:42:24 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/19 10:11:23 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_list	*ft_lstnew(void *content)
 
 	new = malloc(sizeof(t_list));
 	if (!new)
-		return (NULL);
+		perror("MALLOC in ft_lstnew");
 	new->content = content;
 	new->next = NULL;
 	return (new);
@@ -40,6 +40,23 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 		tmp = tmp->next;
 	tmp->next = new;
 }
+
+void	push_lst(t_list **tail, void *content)
+{
+	t_list *new;
+
+	if (!*tail)
+		return ;
+	new = malloc(sizeof(t_list));
+	if (!new)
+		perror("MALLOC push_list");
+	
+	(*tail)->next = new;
+	(*tail) = (*tail)->next; 
+	new->content = content;
+	new->next = NULL;
+}
+
 
 t_list	*set_linked_path(char **env)
 {

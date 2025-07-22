@@ -81,7 +81,6 @@ typedef struct s_token
 
 typedef struct s_shell
 {
-	char			*input;
 	t_arr			*parsed_args;
 	int				n_tokens;
 	int 			n_cmd;
@@ -89,10 +88,6 @@ typedef struct s_shell
 	t_list			*cmd_tail;
 	t_list			*cmd_head;
 	t_list			*env;
-	int				smaller;	// <
-	int				bigger;		// >
-	int				append;		// >>
-	int				doc;		// here doc
 	int				fd_in;
 	int				fd_out;
 	//t_cmd			*tree;
@@ -101,11 +96,15 @@ typedef struct s_shell
 	//int             (**oper_handlers)(void *, int);		//voir init_oper_handlers
 }					t_shell;
 
+//str_utils
+char *ft_strdup_count(const char *s, int *count);
+
 //t_list
 t_list	*ft_lstnew(void *content);
 void	ft_lstadd_back(t_list **lst, t_list *new);
 t_list	*set_linked_path(char **env);
 char **linked_to_array_string(t_list *node);
+void	push_lst(t_list **tail, void *content);
 
 //t_arr
 size_t t_arrlen(void **arr);
@@ -116,6 +115,7 @@ void init_all_t_arr(t_shell *shell);
 
 //path
 char *find_command_path(char *cmd, t_list *env);
+char **expand_cmd(t_token *token, t_list *env);
 
 //costum split
 char *ft_strdup(const char *s1); // get rid later

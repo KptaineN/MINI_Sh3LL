@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/18 18:47:13 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/20 16:17:25 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void print_all_parts(t_shell *shell)
 			idx_subparts = 0;
 			while (idx_subparts<container_parts->n_parts)
 			{
-				sub_container_parts = container_parts->parts;
+				sub_container_parts = &container_parts->parts[idx_subparts];
 				printf("val {%.*s} \t type {%s} \t", sub_container_parts->len,sub_container_parts->p, types[sub_container_parts->type]);
 				idx_subparts++;
 			}
