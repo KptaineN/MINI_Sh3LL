@@ -93,18 +93,24 @@ typedef struct s_shell
 	//t_cmd			*tree;
 	t_arr			*bcmd;
 	t_arr			*oper;
+	pid_t			*pids;
 	//int             (**oper_handlers)(void *, int);		//voir init_oper_handlers
 }					t_shell;
 
 //str_utils
 char *ft_strdup_count(const char *s, int *count);
+//void ft_swap(void *a, void *b);
+char *ft_itoa_inplace(char *s, int n);
 
 //t_list
 t_list	*ft_lstnew(void *content);
 void	ft_lstadd_back(t_list **lst, t_list *new);
+void ft_lstadd_front(t_list **lst, void *content);
 t_list	*set_linked_path(char **env);
 char **linked_to_array_string(t_list *node);
 void	push_lst(t_list **tail, void *content);
+t_list *search_lst(t_list *lst, const char *target);
+void replace_or_add(t_list **lst, const char *old, const char *new);
 
 //t_arr
 size_t t_arrlen(void **arr);
@@ -116,6 +122,8 @@ void init_all_t_arr(t_shell *shell);
 //path
 char *find_command_path(char *cmd, t_list *env);
 char **expand_cmd(t_token *token, t_list *env);
+char	*get_value_env(t_list *env, char *value, int len);
+void execute(t_shell *shell, t_token *cmd);
 
 //costum split
 char *ft_strdup(const char *s1); // get rid later
@@ -157,6 +165,7 @@ int ft_cd(void *shell, int token_idx);
 //display
 void print_all_parts(t_shell *shell);
 void	print_dic(t_arr *arr);
+void printStringArray(const char *cmd, const char *arr[]);
 
 //free_section
 void ft_free(void **thing);

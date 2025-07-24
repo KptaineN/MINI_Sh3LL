@@ -1,14 +1,14 @@
 #include "mini.h"
 
 // Helper function to get PATH from environment
-static char	*get_value_env(t_list *env, char *value, int len)
+char	*get_value_env(t_list *env, char *value, int len)
 {
 	t_list	*temp;
 	temp = env;
 	while (1)
 	{
-		if (strncmp(temp->content, value, len) == 0 && *(char* )(temp->content+4) == '=')
-			return (temp->content + 5); // Skip "PATH="
+		if (strncmp(temp->content, value, len) == 0 && *(char* )(temp->content+len) == '=')
+			return (temp->content + len +1); // Skip "value="
 		temp = temp->next;
 		if (temp == env)
 			return (NULL);
@@ -104,21 +104,29 @@ char	*find_command_path(char *cmd, t_list *env)
 	return (NULL);
 }
 
-
-void expand_variable(t_subtoken *b, int *k, t_list **curr, int *count, t_list *env)
+int count_exp_len(t_subtoken *b,int *k)
 {
-    int var_len = 0;
-
-    if (isalpha(b->p[*k + 1]) || b->p[*k + 1] == '_') {
+	int var_len = 0;
+	if (isalpha(b->p[*k + 1]) || b->p[*k + 1] == '_') {
         var_len = 1;
         while (*k + 1 + var_len < b->len &&
                (isalnum(b->p[*k + 1 + var_len]) || b->p[*k + 1 + var_len] == '_')) {
             var_len++;
         }
+	}
+	return var_len;
+}
+
+void expand_variable(t_subtoken *b, int *k, t_list **curr, int *count, t_list *env)
+{
+    int var_len;
+	var_len=count_exp_len(b,k);
+	if (var_len>0)
+	{
 		char *value = get_value_env(env , (char *)&b->p[(*k)+1], var_len);
         push_lst(curr,ft_strdup_count (value,count));
 		*k += var_len;
-	}	
+	}
 }
 
 void expand_str(t_subtoken *b, t_list *env, int *count, t_list **curr)
@@ -132,7 +140,7 @@ void expand_str(t_subtoken *b, t_list *env, int *count, t_list **curr)
 				push_lst(curr, ft_strdup_count("$", count));
 			else if (b->p[k + 1] == '$')
 			{
-				push_lst(curr, ft_strdup_count("9999", count));
+				push_lst(curr,strdup(get_value_env(env,"PID",3)));
 				k++;
 			}
 			else
@@ -171,14 +179,16 @@ char *build_expansion(t_subtoken_conainter *a,int count, t_list **add_head)
 			{
 				if (b->p[k] == '$')
 				{
-					strncpy(&new[i],head->content,b->len);
+					strcpy(&new[i],head->content);
+					i+=strlen(head->content);
 					tmp = head;
 					head = head->next;
 					free(tmp->content);
 					free(tmp);
-					if (k+1<b->len && b->p[k+1] != '$')
+					if (k+1<b->len && b->p[k+1] == '$')
 						k++;
-					i+=b->len;
+					else
+						k+=count_exp_len(b,&k);
 				}
 				else
 					new[i++] = b->p[k];
@@ -187,13 +197,13 @@ char *build_expansion(t_subtoken_conainter *a,int count, t_list **add_head)
 		}	
 		j++;
 	}
-	new[k] = 0;
+	new[i] = 0;
 	return new;
 }
 
 char *expand_container(t_subtoken_conainter *a, t_list **head, t_list *env)
 {
-	t_list **curr = head;
+	t_list *curr = *head;
 	int j = 0;
 	t_subtoken *b;
 	int count = 0;
@@ -204,12 +214,12 @@ char *expand_container(t_subtoken_conainter *a, t_list **head, t_list *env)
 		if (b->type == QUOTE_SINGLE) 	//no expansion
 			count+=b->len;
 		else							//expansion
-			expand_str(b,env,&count,curr);
-		if (*curr && (*curr)->content)
-			printf("%s\n", (char *)(*curr)->content);
+			expand_str(b,env,&count,&curr);
+		//if (curr && (curr)->content)
+		//	printf("%s\n", (char *)(curr)->content);
 		j++;
 	}
-	return build_expansion(a,count,&(*head));
+	return build_expansion(a,count,&((*head)->next));
 }
 
 
@@ -218,7 +228,7 @@ char **expand_cmd(t_token *token, t_list *env)
 	int i;
 	t_subtoken_conainter *a;
 	t_list *head = ft_lstnew(NULL);
-	char **res = malloc(sizeof(char *)*(token->n_parts+1));
+	char **res = malloc(sizeof(char *)*(token->n_parts)); //omits first
 	if (!res)
 		perror("MALLOC expand_cmd");
 
@@ -231,15 +241,21 @@ char **expand_cmd(t_token *token, t_list *env)
 	while(i<token->n_parts) // container
 	{
 		a = &token->cmd_args_parts[i];
-		res[i++] = expand_container(a,&head,env); 
+		res[i] = expand_container(a,&head,env); 
+		//printf("%s\n", res[i]);
+		i++;
 	}
 	res[i] = NULL;
 	return res;
 }
-/*
+
+
+
 void execute(t_shell *shell, t_token *cmd)
 {
-
-
-
-}*/
+	char **args = expand_cmd(cmd,shell->env);
+	//char **env = linked_to_array_string(shell->env);
+	if (!args)
+		perror("malloc res and env execute()");
+	execv(find_command_path(cmd->value,shell->env), (char **const) args);
+}

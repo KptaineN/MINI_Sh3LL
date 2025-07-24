@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/20 16:17:25 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/22 09:20:31 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,3 +65,12 @@ void print_dic(t_arr *dic)
 	}
 }
 
+void printStringArray(const char *cmd, const char *arr[]) {
+    printf("%s: ", cmd);
+    for (int i = 0; arr[i]!=NULL ; i++) {
+        if (arr[i] != NULL) {
+            printf("%s\t", arr[i]);
+        }
+    }
+    printf("\n");
+}

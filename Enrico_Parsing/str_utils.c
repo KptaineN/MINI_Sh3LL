@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 10:43:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/20 16:32:12 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/24 19:05:51 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,4 +28,59 @@ char *ft_strdup_count(const char *s, int *count)
     strncpy(dup,s,len);
     (*count)+=len; // Increment the counter
     return (dup);
+}
+
+//void ft_swap(void *a, void *b)
+//{
+//    void *tp;
+//    tp = a;
+//    b = a;
+//    b = tp;
+//}
+
+char *ft_itoa_inplace(char *s, int n)
+{
+    char *start = s;
+    char *ptr;
+    int digits = 0;
+    int temp;
+
+    if (!s)
+        return NULL;
+
+    // Handle zero
+    if (n == 0)
+    {
+        s[0] = '0';
+        s[1] = '\0';
+        return s;
+    }
+
+    // Handle negative numbers
+    if (n < 0)
+    {
+        n = -n;
+        *s++ = '-'; // Write sign directly
+    }
+
+    // Count digits and move to end position
+    temp = n;
+    while (temp > 0)
+    {
+        digits++;
+        temp /= 10;
+    }
+    ptr = s + digits - 1; // Last digit position
+
+    // Write digits in reverse order
+    while (n > 0)
+    {
+        *ptr-- = (n % 10) + '0'; // Write digit
+        n /= 10;
+    }
+
+    // Null-terminate
+    *(s + digits) = '\0';
+
+    return start;
 }
