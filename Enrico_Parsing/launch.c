@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/24 20:06:38 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/25 16:22:03 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,8 @@ void add_pid_env(t_shell *shell, int fd)
 {
     pid_t received_pid;
     char s[20]; //PID= + sizeof(pid_t) =
-    if (read(fd, s, 4) != 4)
+    if (read(fd, s, 20) > 0)
         perror("add_pid_func");   
-    if (read(fd, &received_pid, sizeof(received_pid)) < 0)
-        perror("add_pid_func");
     ft_itoa_inplace(&s[4], (int) received_pid);
     replace_or_add(&shell->env,"PID=", (const char *)s);
 }
@@ -33,9 +31,12 @@ void send_pid(int fd, int pid)
 
 int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd)
 {
+
     if (shell->fd_in == -1)
         shell->fd_in = STDIN_FILENO;
-
+    int fd_pid[2];
+    if (pipe(fd_pid) == -1)
+        perror("fd_pid");
     int pid;
     pid = fork();
     if (pid < 0)
@@ -43,20 +44,24 @@ int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd)
     
     if (pid == 0)
     {
-        add_pid_env(shell,curr_pipe[0]);
+        add_pid_env(shell,fd_pid[0]);
         dup2(shell->fd_in, STDIN_FILENO);
         close(shell->fd_in);
         dup2(curr_pipe[1], STDOUT_FILENO);
         close(curr_pipe[0]);
         close(curr_pipe[1]);
+        close(fd_pid[0]);
+        close(fd_pid[1]);
         execute(shell,curr_cmd->content);
         exit(1);
     }
 
     if (shell->fd_in != STDIN_FILENO)
             close(shell->fd_in);
-    send_pid(curr_pipe[1],pid);
-    close(curr_pipe[1]); 
+    send_pid(fd_pid[1],pid);
+    close(curr_pipe[1]);
+    close(fd_pid[0]);
+    close(fd_pid[1]);
     prev_pipe[0] = curr_pipe[0];
     prev_pipe[1] = curr_pipe[1];
     curr_cmd = curr_cmd->next;
@@ -69,6 +74,9 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
     (void) curr_cmd;
     if (shell->fd_out == -1)
         shell->fd_out = STDOUT_FILENO;
+    int fd_pid[2];
+    if (pipe(fd_pid) == -1)
+        perror("fd_pid");
 
     int pid;
     pid = fork();
@@ -76,7 +84,9 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
         perror("Forks");
     if (pid == 0)
     {
-        add_pid_env(shell,prev_pipe[0]);
+        add_pid_env(shell,fd_pid[0]);
+        close(fd_pid[0]);
+        close(fd_pid[1]);
         dup2(prev_pipe[0], STDIN_FILENO);
         close(prev_pipe[0]);
         close(prev_pipe[1]);
@@ -86,8 +96,10 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
         // Execute
         exit(1);
     }
+    send_pid(fd_pid[1],pid);
+    close(fd_pid[0]);
+    close(fd_pid[1]);
     close(prev_pipe[0]);
-    send_pid(prev_pipe[1],pid);
     close(prev_pipe[1]);
     if (shell->fd_out != STDOUT_FILENO)
         close(shell->fd_out);
@@ -103,11 +115,13 @@ void one_command(t_shell *shell)
     if (shell->fd_out == -1)
         shell->fd_out = STDOUT_FILENO;
     int fd[2];
+    int fd_pid[2];
 
-    if (pipe(fd) == -1) {
+    if (pipe(fd) == -1 || pipe(fd_pid) == -1) {
         perror("pipe failed");
     }
     
+
     int pid = fork();    
     if (pid < 0)
     {
@@ -120,9 +134,11 @@ void one_command(t_shell *shell)
         int d; //debug
         scanf("%d", &d); // debug
         
-        close(fd[1]);  
-        add_pid_env(shell,fd[0]);
+        close(fd[1]);
+        close(fd_pid[0]);  
+        add_pid_env(shell,fd_pid[0]);
         close(fd[0]);
+        close(fd_pid[0]);
 
         dup2(shell->fd_in, STDIN_FILENO);
         close(shell->fd_in);
@@ -133,8 +149,11 @@ void one_command(t_shell *shell)
     }
     else
     close(fd[0]);  // Close read end
-    send_pid(fd[1],pid);
+    close(fd_pid[0]);
+    send_pid(fd_pid[1], pid);
     close(fd[1]);  // Close write end
+    close(fd_pid[1]);
+
     waitpid(pid,NULL,0);
 }
 
@@ -144,6 +163,7 @@ void launch_process(t_shell *shell)
     int *pid;
     int prev_pipe[2] = {-1,-1};
     int curr_pipe[2];
+    int fd_pid[2];
     t_list *curr_cmd = shell->cmd_head;
 
     if (shell->n_cmd == 1)
@@ -161,17 +181,21 @@ void launch_process(t_shell *shell)
     pid[i++] = start_cmd(shell, prev_pipe,curr_pipe,curr_cmd);
     while(curr_cmd->next != NULL)
     {
+        if (pipe(fd_pid) == -1)
+            perror("fd_pid");
         pid[i] = fork();
         if (pid[i] < 0)
             perror("Forks");
-        
         if (pid[i] == 0)
         {
-            add_pid_env(shell,prev_pipe[0]);
+            add_pid_env(shell,fd_pid[0]);
             dup2(prev_pipe[0], STDIN_FILENO);
             close(prev_pipe[0]);
             close(prev_pipe[1]);
-                    
+            close(fd_pid[0]);
+            close(fd_pid[1]);
+
+
             dup2(curr_pipe[1], STDOUT_FILENO);
             close(curr_pipe[0]);
             close(curr_pipe[1]);
@@ -180,12 +204,15 @@ void launch_process(t_shell *shell)
         }
         else
         {
+            send_pid(fd_pid[1], (int) pid[i]);
+            close(fd_pid[0]);
+            close(fd_pid[1]);
+
             close(prev_pipe[0]);
-            send_pid(prev_pipe[1], (int) pid[i]);
             close(prev_pipe[1]);
             prev_pipe[0] = curr_pipe[0];
             prev_pipe[1] = curr_pipe[1];
-            if(pipe(curr_pipe) < 0)
+            if(pipe(curr_pipe) == -1)
                 perror("pipe"); //ERROR
         }
         curr_cmd = curr_cmd->next;

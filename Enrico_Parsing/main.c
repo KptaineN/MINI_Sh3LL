@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 16:45:24 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/24 20:18:25 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/25 15:40:24 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	(void)argc;
 	(void)argv;
-	const char *arg = "echo $$";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
+	const char *arg = "ls -l | grep \".c\"";//"echo<system.log"; //"\"so \\\"hima\\\"ma\\\" bru\\\"";//"ls -la";
 	t_shell *shell;
 	shell = malloc(sizeof(t_shell));
 	if (!shell)
@@ -120,9 +120,10 @@ int	main(int argc, char **argv, char **envp)
 
 	//execv(find_command_path("ls", shell->env), (char *[]){"ls", NULL});	
 	//test execute add path pid
-	replace_or_add(&shell->env,"P=","PID=4242");
-	execute(shell,shell->cmd_head->content);
-	//launch_process(shell);
+	//replace_or_add(&shell->env,"P=","PID=4242");
+	//execute(shell,shell->cmd_head->content);
+	
+	launch_process(shell);
 	
 	printf("\nlast line\n");
     return (0);

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/20 16:22:10 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/25 16:12:55 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,13 +75,14 @@ static int count_args_cmd(t_shell *shell, int i)
 	int len = shell->parsed_args->len;
 	
 	int idx_oper;
-
+	print_dic(shell->oper);
 	while (1)
 	{
 		if (i==len)
 			break;
 		if (arr[i] != NULL)
 		{
+			printf("arg%d %s\n", i, arr[i]);
 			idx_oper = is_in_t_arr_str(shell->oper, arr[i]);
 			if (idx_oper != -1)
 				return n_args;
@@ -158,7 +159,7 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 		idx++;
 	}
 	cmd_token->n_parts = len;
-	return idx;
+	return idx-1;
 }
 
 
@@ -200,7 +201,7 @@ void attribute_token_type(t_shell *shell)
 		if (!shell->tokens)
 			perror("Erreur d'allocation pour les tokens");
 	}
-	while(i < shell->n_tokens)
+	while(idx_token < shell->n_tokens)
 	{
 		if (arr[i] != NULL)
 		{
@@ -217,14 +218,9 @@ void attribute_token_type(t_shell *shell)
 			{
 				t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
 				if (t_arr_index != -1)
-				{
 					token->type = TOKEN_BCMD;
-					i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
-				}
-			}
-			if (token->type == TOKEN_WORD)
-			{
-				token->type = TOKEN_CMD;
+				else
+					token->type = TOKEN_CMD;
 				i = attribute_cmd_subtokens(shell,token, i, count_args_cmd(shell,i));
 			}
 			if (token->type != TOKEN_OPER)

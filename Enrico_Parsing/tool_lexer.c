@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:24:17 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/18 18:00:26 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/25 15:53:28 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,18 +83,17 @@ int count_subtokens(const char *str)
 
 int count_tokens(t_shell *shell)
 {
-    int count = 0;
+    int count = 1;
     int i = 0;
     void **arr = shell->parsed_args->arr;
     int len = shell->parsed_args->len;
     int idx_oper;
-
-    while (i < len)
-    {       
-		while (1)
+	if (len == 0)
+		return 0;
+	while(i<len)
+	{
+		while (i<len)
 		{	
-			if (i == len)
-				return count+(!count && i>1); // case: << EOF, commands 0, but cat << EOF, commands 1 
 			idx_oper = is_in_t_arr_dic_str(shell->oper, arr[i]);
 			if (idx_oper != -1)
 			{
@@ -107,13 +106,13 @@ int count_tokens(t_shell *shell)
 				}
 				else				
 				{
+					count++;
 					i++;
 					break;
 				}
 			}
 			i++;
 		}
-		count++;
 	}
-    return count;
+    return count+(idx_oper == -1);
 }

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:08:28 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/16 09:38:38 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/25 16:05:58 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,11 @@ size_t t_arrlen(void **arr)
 int is_in_t_arr_str(t_arr *arr, const char *arg)
 {
     int i = 0;
+    char *key;
     while (i < arr->len)
     {
-        if (strcmp(arr->arr[i], arg) == 0)
+        key = (char *)((t_dic *)arr->arr[i])->key;
+        if (strcmp(key, arg) == 0)
             return (i);
         i++;
     }
