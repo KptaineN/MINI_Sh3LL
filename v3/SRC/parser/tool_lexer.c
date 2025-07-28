@@ -6,11 +6,12 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:24:17 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 13:37:51 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:04:11 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/parsking.h"
+//#include "../../include/parsking.h"
+#include "../../include/minishell.h"
 
 
 /*
@@ -81,7 +82,7 @@ int count_subtokens(const char *str)
 	}
 	return count;
 }
-
+/*
 int count_tokens(t_shell *shell)
 {
     int count = 0;
@@ -117,4 +118,40 @@ int count_tokens(t_shell *shell)
         }
     }
     return count;
+}*/
+
+int count_tokens(t_shell *shell, t_arr *parsed_args, t_arr *oper)
+{
+    int count = 1;
+    int i = 0;
+    void **arr = parsed_args->arr;
+    int len = parsed_args->len;
+    int idx_oper;
+	if (len == 0)
+		return 0;
+	while(i<len)
+	{
+		while (i<len)
+		{	
+			idx_oper = is_in_t_arr_dic_str(oper, arr[i]);
+			if (idx_oper != -1)
+			{
+				if (idx_oper < 2 || idx_oper > 4)
+				{
+					file_access_redirection(shell, parsed_args->arr, idx_oper, i);
+					ft_free((void**)&parsed_args->arr[i++]);
+					if (i != len)
+						ft_free((void**)&parsed_args->arr[i]);
+				}
+				else				
+				{
+					count++;
+					i++;
+					break;
+				}
+			}
+			i++;
+		}
+	}
+    return count+(idx_oper == -1);
 }

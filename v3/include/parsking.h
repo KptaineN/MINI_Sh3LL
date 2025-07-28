@@ -71,7 +71,7 @@ typedef struct s_subtoken_container
 
 {
 	t_subtoken		*parts;		// "\"hamman\"asd\'Papa\'"
-	    int count;          // nombre de sous-tokens
+	  //  int count;          // nombre de sous-tokens
 	int				n_parts;
 }      t_subtoken_container;
 
@@ -79,15 +79,10 @@ typedef struct s_subtoken_container
 // tokens
 typedef struct s_token
 {
-	int idx; // position du token dans shell->tokens
+	//int idx; // position du token dans shell->tokens
 	char			type;
 	char			*value; 	// if command, then here is the path
-	union	u_sub 
-	{
-		int         			(*oper_handlers)(void *, int);	//operator
-		t_subtoken_container	all_parts;						//word
-		t_subtoken_container	*cmd_args_parts;				//cmd
-	} u;
+	t_subtoken_container	*cmd_args_parts;				//cmd
 	struct s_token	*next;
 }					t_token;
 
@@ -110,89 +105,83 @@ typedef struct s_shell
 	//t_cmd			*tree;
 	t_arr			*bcmd;
 	t_arr			*oper;
+	pid_t			*pids;
+	int fd_pid[2];
+	t_subtoken_container *heredoc; // pour le heredoc
 	//int             (**oper_handlers)(void *, int);		//voir init_oper_handlers
 }					t_shell;
 
-//t_list
-t_list	*ft_lstnew(void *content);
-void	ft_lstadd_back(t_list **lst, t_list *new);
-t_list	*set_linked_path(char **env);
-char **linked_to_array_string(t_list *node);
-int execute_builtin(t_minishell *shell, int token_idx);
 int count_subtoken_args(t_subtoken_container *args);
-//t_arr
+
+// str_utils
+char  *ft_strdup_count(const char *s, int *count);
+char  *ft_itoa_inplace(char *s, int n);
+
+// t_list
+t_list *ft_lstnew(void *content);
+void   ft_lstadd_back(t_list **lst, t_list *new);
+void   ft_lstadd_front(t_list **lst, void *content);
+t_list *set_linked_path(char **env);
+char  **linked_to_array_string(t_list *node);
+void   push_lst(t_list **tail, void *content);
+t_list *search_lst(t_list *lst, const char *target);
+void   replace_or_add(t_list **lst, const char *old, const char *new);
+
+// t_arr
 size_t t_arrlen(void **arr);
-int is_in_t_arr_str(t_arr *arr, const char *arg);
-int is_in_t_arr_dic_str(t_arr *arr, const char *arg);
-void build_t_arr_str(t_arr **dst, char **arr_str, int len);
-void init_all_t_arr(t_shell *shell);
+int    is_in_t_arr_str(t_arr *arr, const char *arg);
+int    is_in_t_arr_dic_str(t_arr *arr, const char *arg);
+void   build_t_arr_str(t_arr **dst, char **arr_str, int len);
+void   init_all_t_arr(t_minishell *shell);
 
-//path
-char *find_command_path(char *cmd, t_list *env);
+// path
+char  *find_command_path(char *cmd, t_list *env);
+char **expand_cmd(t_token *token, t_list *env);
+char  *get_value_env(t_list *env, char *value, int len);
+void   execute(t_minishell *shell, t_token *cmd);
 
-//costum split
-char *ft_strdup(const char *s1); // get rid later
-bool escape_check(const char *str ,int idx);
-t_arr 	*custom_split(const char *str, t_shell * shell);
+// custom split
+char    *ft_strdup(const char *s1);    // to remove later
+bool     escape_check(const char *str, int idx);
+t_arr   *custom_split(const char *str, t_shell *shell);
 
-//lexer tools
-int find_c_nonescaped(const char *str, char *needle, int size_needle);
-int count_subtokens(const char *str);
-int count_tokens(t_shell *shell);
+// operator handlers
+void    file_access_redirection(t_shell *shell, void **arr, int t_arr_index, int i);
+//void    handle_heredoc(t_minishell *shell, int i);
 
-//lexer
-void attribute_subtoken_type(t_token *token);
-void attribute_token_type(t_shell *shell);
+// lexer tools
+int     find_c_nonescaped(const char *str, char *needle, int size_needle);
+int     count_subtokens(const char *str);
+int     count_tokens(t_shell *shell, t_arr *parsed_args, t_arr *oper);
 
-//builtin
-char **reconstruct_args(t_subtoken_container *args);
-int execute_builtin(t_minishell *shell, int i);
+// lexermini
+void    attribute_subtoken_type(t_token *token);
+void    attribute_token_type(t_shell *shell);
 
-//launch
-//int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd);
-//int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd);
-//void launch_process(t_shell *shell);
-//oid one_command(t_shell *shell);
+// launch
+int     start_cmd(t_minishell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd);
+int     end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd);
+void    launch_process(t_minishell *shell);
+void    one_command(t_minishell *shell);
 
-//cmd
-bool is_command(char *str, t_list *env);
+// cmd
+bool    is_command(char *str, t_list *env);
 
-// oper handlers function
-int handle_heredoc(void *shell, int token_idx);
-int handle_append(void *shell, int token_idx);
-int handle_and(void *shell, int token_idx);
-int handle_or(void *shell, int token_idx);
-int handle_pipe(void *shell, int token_idx);
-int handle_redirect_in(void *shell, int token_idx);
-int handle_redirect_out(void *shell, int token_idx);
+// builtin funcs
+int     ft_export(void *shell, int token_idx);
+int     ft_unset(void *shell, int token_idx);
+int     ft_exit(void *shell, int token_idx);
+int     ft_env(void *shell, int token_idx);
+int     ft_pwd(void *shell, int token_idx);
+int     ft_echo(void *shell, int token_idx);
+int     ft_cd(void *shell, int token_idx);
 
-// builtin func
-int ft_export(void *shell, int token_idx);
-int ft_unset(void *shell, int token_idx);
-int ft_exit(void *shell, int token_idx);
-int ft_env(void *shell, int token_idx);
-int ft_pwd(void *shell, int token_idx);
-int ft_echo(void *shell, int token_idx);
-int ft_cd(void *shell, int token_idx);
+// display
+void    print_all_parts(t_shell *shell);
+void    print_dic(t_arr *arr);
+void    printStringArray(const char *cmd, const char *arr[]);
 
-char *join_subtokens(t_subtoken_container container);
-
-
-//display
-void print_all_parts(t_shell *shell);
-void	print_dic(t_arr *arr);
-
-// Ancienne déclaration (incorrecte maintenant)
-//void one_command(t_shell *shell);
-//void launch_process(t_shell *shell);
-
-// Nouvelle version correcte :
-void one_command(t_minishell *shell);
-void launch_process(t_minishell *shell);
-void execute_cmd(t_minishell *shell, t_list *curr_cmd);
-int start_cmd(t_minishell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd);
-int end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd);
-
-char *join_subtokens(t_subtoken_container container);
+// free section
+void    ft_free(void **thing);
 
 #endif

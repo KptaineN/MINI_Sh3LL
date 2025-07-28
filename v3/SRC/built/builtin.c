@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 19:26:35 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 12:37:04 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ int count_subtoken_args(t_subtoken_container *args)
 }*/
 
 // Concatène tous les subtokens dans un seul string (sans quotes)
-char *join_subtokens(t_subtoken_container container)
+/*char *join_subtokens(t_subtoken_container container)
 {
 	if (container.count == 0)
 		return (NULL);
@@ -156,7 +156,7 @@ char **reconstruct_args(t_subtoken_container *parts)
     args[count] = NULL;
 
     return args;
-}
+}*/
 
 
 
@@ -190,16 +190,16 @@ int is_builtin(const char *cmd)
 
 
 
-int execute_builtin(t_minishell *shell, int token_idx)
+/*int execute_builtin(t_minishell *shell, int token_idx)
 {
     t_token *tok = &shell->parser.tokens[token_idx];
-    t_subtoken first = tok->u.cmd_args_parts[0].parts[0];
+    t_subtoken first = tok->cmd_args_parts[0].parts[0];
 
     // Export prend directement le token
     if (match_str(first, "export"))
         return builtin_export(tok, shell);
 
-    char **args = reconstruct_args(tok->u.cmd_args_parts);
+   // char **args = reconstruct_args(tok->cmd_args_parts);
 
     if (match_str(first, "cd"))
         return builtin_cd(args, shell);
@@ -225,7 +225,7 @@ int execute_builtin(t_minishell *shell, int token_idx)
 
     free_tab(args);
     return 1;
-}
+}*/
 
 
 		//return (builtin_env(shell->args, shell));

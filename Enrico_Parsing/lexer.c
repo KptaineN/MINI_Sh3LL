@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/25 16:12:55 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/07/28 10:49:25 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void subtoken_of_cmd(t_subtoken_conainter *container, char *arg)
 	parts = container->parts;
 	if (!parts)
 		return;
-
+	parts = container->parts;
 	int i = 0;
 	int idx = 0;
 	while(head[idx])

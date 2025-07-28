@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 19:17:31 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 13:57:55 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,37 @@
 
 void execute_cmd(t_minishell *shell, t_list *curr_cmd);
 
+void add_pid_env(t_minishell *shell, int fd)
+{
+    pid_t received_pid = 0;
+    char s[20]; //PID= + sizeof(pid_t) =
+    if (read(fd, s, 20) > 0)
+        perror("add_pid_func");   
+    ft_itoa_inplace(&s[4], (int) received_pid);
+    replace_or_add(&shell->parser.env, "PID=", (const char *)s);
+}
+
+void send_pid(int fd, int pid)
+{
+    write(fd, "PID=", sizeof("PID="));
+    write(fd, &pid, sizeof(pid));  // Send child's PID to child
+}
 
 int start_cmd(t_minishell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd)
 {
     if (shell->parser.fd_in == -1)
         shell->parser.fd_in = STDIN_FILENO;
 
-    int pid = fork();
+    if (pipe(shell->parser.fd_pid) == -1)
+        perror("fd_pid");
+    int pid;
+    pid = fork();
     if (pid < 0)
         perror("Forks");
     
     if (pid == 0)
     {
-        dup2(shell->parser.fd_in, STDIN_FILENO);
+        /*dup2(shell->parser.fd_in, STDIN_FILENO);
         close(shell->parser.fd_in);
         
         dup2(curr_pipe[1], STDOUT_FILENO);
@@ -35,20 +53,35 @@ int start_cmd(t_minishell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_c
         close(curr_pipe[1]);
 
         execute_cmd(shell, curr_cmd);
-        exit(0);
+        exit(0);*/
+        add_pid_env(shell, shell->parser.fd_pid[0]);
+        dup2(shell->parser.fd_in, STDIN_FILENO);
+        close(shell->parser.fd_in);
+        dup2(curr_pipe[1], STDOUT_FILENO);
+        close(curr_pipe[0]);
+        close(curr_pipe[1]);
+        close(shell->parser.fd_pid[0]);
+        close(shell->parser.fd_pid[1]);
+        execute(shell, curr_cmd->content);
+        exit(1);
     }
 
     if (shell->parser.fd_in != STDIN_FILENO)
         close(shell->parser.fd_in);
-    close(curr_pipe[1]); 
+    send_pid(shell->parser.fd_pid[1], pid);
+    close(curr_pipe[1]);
+    close(shell->parser.fd_pid[0]);
+    close(shell->parser.fd_pid[1]);
     prev_pipe[0] = curr_pipe[0];
     prev_pipe[1] = curr_pipe[1];
+    curr_cmd = curr_cmd->next;
 
     return pid;
 }
 
 int end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd)
 {
+    (void) curr_cmd;
     if (shell->parser.fd_out == -1)
         shell->parser.fd_out = STDOUT_FILENO;
 
@@ -57,7 +90,7 @@ int end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd)
         perror("Forks");
 
     if (pid == 0)
-    {
+    /*{
         dup2(prev_pipe[0], STDIN_FILENO);
         close(prev_pipe[0]);
         close(prev_pipe[1]);
@@ -68,7 +101,23 @@ int end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd)
         // Execute the command
         execute_cmd(shell, curr_cmd);
         exit(0);
+    }*/
+   {
+        add_pid_env(shell, shell->parser.fd_pid[0]);
+        close(shell->parser.fd_pid[0]);
+        close(shell->parser.fd_pid[1]);
+        dup2(prev_pipe[0], STDIN_FILENO);
+        close(prev_pipe[0]);
+        close(prev_pipe[1]);
+
+        dup2(shell->parser.fd_out, STDOUT_FILENO);
+        close(shell->parser.fd_out);
+        // Execute
+        exit(1);
     }
+    send_pid(shell->parser.fd_pid[1], pid);
+    close(shell->parser.fd_pid[0]);
+    close(shell->parser.fd_pid[1]);
 
     close(prev_pipe[0]);
     close(prev_pipe[1]);
@@ -80,6 +129,19 @@ int end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd)
 
 void one_command(t_minishell *shell)
 {
+
+    if (shell->parser.fd_in == -1)
+        shell->parser.fd_in = STDIN_FILENO;
+    if (shell->parser.fd_out == -1)
+        shell->parser.fd_out = STDOUT_FILENO;
+    int fd[2];
+    int fd_pid[2];
+
+    if (pipe(fd) == -1 || pipe(fd_pid) == -1) {
+        perror("pipe failed");
+    }
+    
+
     int pid = fork();
     if (pid < 0)
     {
@@ -88,7 +150,7 @@ void one_command(t_minishell *shell)
     }
 
     if (pid == 0)
-    {
+    {/*
         // Redirections
         if (shell->parser.fd_in != STDIN_FILENO)
         {
@@ -105,7 +167,29 @@ void one_command(t_minishell *shell)
         // Exécute la commande (1 seule dans cmd_head)
         execute_cmd(shell, shell->parser.cmd_head);
         exit(0); // On quitte le process enfant
+    }*/
+        int d; //debug
+        scanf("%d", &d); // debug
+        
+        close(fd[1]);
+        close(fd_pid[0]);  
+        add_pid_env(shell,fd_pid[0]);
+        close(fd[0]);
+        close(fd_pid[0]);
+
+        dup2(shell->parser.fd_in, STDIN_FILENO);
+        close(shell->parser.fd_in);
+        dup2(shell->parser.fd_out, STDOUT_FILENO);
+        close(shell->parser.fd_out);
+        execute(shell, shell->parser.cmd_head->content);
+        exit(1);
     }
+    else
+    close(fd[0]);  // Close read end
+    close(fd_pid[0]);
+    send_pid(fd_pid[1], pid);
+    close(fd[1]);  // Close write end
+    close(fd_pid[1]);
 
     waitpid(pid, NULL, 0); // On attend le process
 }
@@ -166,7 +250,7 @@ void    execute_cmd(t_minishell *shell, t_list *curr_cmd)
         free(args[i]);
     free(args);
 }*/
-void execute_cmd(t_minishell *shell, t_list *curr_cmd)
+/*void execute_cmd(t_minishell *shell, t_list *curr_cmd)
 {
 	t_token *token = curr_cmd->content;
 
@@ -225,7 +309,7 @@ void execute_cmd(t_minishell *shell, t_list *curr_cmd)
 		fprintf(stderr, "Command not found: %s\n", args[0]);
 
 	free_tab(args);
-}
+}*/
 
 
 void launch_process(t_minishell *shell)
@@ -234,7 +318,9 @@ void launch_process(t_minishell *shell)
     int *pid;
     int prev_pipe[2] = {-1,-1};
     int curr_pipe[2];
+   // int fd_pid[2];
     t_list *curr_cmd = shell->parser.cmd_head;  // ✅
+    //    t_list *curr_cmd = shell->cmd_head;
 
     if (shell->parser.n_cmd == 1)                // ✅
     {    
@@ -242,7 +328,7 @@ void launch_process(t_minishell *shell)
         return ;
     }
 
-    pid = malloc(sizeof(int) * shell->parser.n_cmd);  // ✅
+    pid = malloc(sizeof(int) * shell->parser.n_cmd);  // ✅ shell->n_cmd
     if (!pid)
         return;
 
@@ -254,13 +340,14 @@ void launch_process(t_minishell *shell)
     pid[i++] = start_cmd(shell, prev_pipe, curr_pipe, curr_cmd);
     while (curr_cmd->next != NULL)
     {
+        if (pipe(shell->parser.fd_pid) == -1)
+            perror("fd_pid");
         pid[i] = fork();
         if (pid[i] < 0)
             perror("Forks");
-
         if (pid[i] == 0)
         {
-            dup2(prev_pipe[0], STDIN_FILENO);
+           /* dup2(prev_pipe[0], STDIN_FILENO);
             close(prev_pipe[0]);
             close(prev_pipe[1]);
 
@@ -270,13 +357,24 @@ void launch_process(t_minishell *shell)
                 dup2(curr_pipe[1], STDOUT_FILENO);
             
             close(curr_pipe[0]);
-            close(curr_pipe[1]);
+            close(curr_pipe[1]);*/
+            add_pid_env(shell, shell->parser.fd_pid[0]);
+            dup2(prev_pipe[0], STDIN_FILENO);
+            close(prev_pipe[0]);
+            close(prev_pipe[1]);
+            close(shell->parser.fd_pid[0]);
+            close(shell->parser.fd_pid[1]);
+            dup2(curr_pipe[1], STDOUT_FILENO);
 
             execute_cmd(shell, curr_cmd); // ✅ passe bien t_minishell *
             exit(1); // N'oublie pas de sortir dans le fils
         }
         else
         {
+            send_pid(shell->parser.fd_pid[1], (int) pid[i]);
+            close(shell->parser.fd_pid[0]);
+            close(shell->parser.fd_pid[1]);
+
             close(prev_pipe[0]);
             close(prev_pipe[1]);
             prev_pipe[0] = curr_pipe[0];

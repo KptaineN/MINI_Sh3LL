@@ -3,8 +3,13 @@
 size_t env_count(t_minishell *shell)
 {
     size_t count = 0;
-    for (t_env *env = shell->env; env; env = env->next)
+    t_list *current = shell->parser.env;  // shell->parser.env est t_list *
+    
+    while (current)
+    {
         count++;
+        current = current->next;
+    }
     return count;
 }
 
@@ -33,8 +38,9 @@ char **env_to_array(t_minishell *shell)
     if (!arr) return NULL;
 
     size_t i = 0;
-    for (t_env *env = shell->env; env; env = env->next)
+    for (t_list *node = shell->parser.env; node; node = node->next)
     {
+        t_env *env = (t_env *)node->content;
         arr[i] = create_env_entry(env);
         if (!arr[i])
         {

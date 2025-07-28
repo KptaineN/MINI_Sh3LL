@@ -357,16 +357,16 @@ void print_env_debug(t_env *env)
 
 int builtin_export(t_token *token, t_minishell *shell)
 {
-    print_env_debug(shell->env); // Debug: afficher l'environnement avant traitement
+    //print_env_debug(shell->env); // Debug: afficher l'environnement avant traitement
     
-    if (!token || !token->u.cmd_args_parts)
+    if (!token || !token->cmd_args_parts)
         return export_no_arguments(shell);
 
     int total = 0;
 
     // Calculer le nombre total de sous-parties
-    for (int i = 0; token->u.cmd_args_parts[i].n_parts > 0; i++)
-        total += token->u.cmd_args_parts[i].n_parts;
+    for (int i = 0; token->cmd_args_parts[i].n_parts > 0; i++)
+        total += token->cmd_args_parts[i].n_parts;
 
     if (total == 0) // Aucun argument => affiche les exports
         return export_no_arguments(shell);
@@ -379,11 +379,11 @@ int builtin_export(t_token *token, t_minishell *shell)
     args[k++] = ft_strdup("export"); // Simuler args[0]
 
     // Reconstruction des arguments
-    for (int i = 0; token->u.cmd_args_parts[i].n_parts > 0; i++)
+    for (int i = 0; token->cmd_args_parts[i].n_parts > 0; i++)
     {
-        for (int j = 0; j < token->u.cmd_args_parts[i].n_parts; j++)
+        for (int j = 0; j < token->cmd_args_parts[i].n_parts; j++)
         {
-            t_subtoken sub = token->u.cmd_args_parts[i].parts[j];
+            t_subtoken sub = token->cmd_args_parts[i].parts[j];
             if (sub.p && sub.len > 0)
                 args[k++] = ft_strndup(sub.p, sub.len);
         }

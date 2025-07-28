@@ -72,15 +72,15 @@ void print_env(t_env *env)
 int builtin_env(char **args, t_minishell *shell)
 {
     (void)args;
-    t_env *cur = shell->env;
+    t_env *cur = (t_env *)shell->parser.env;
     while (cur)
     {
         if (cur->value) // bash n’imprime pas les clés sans valeur ?
             printf("%s=%s\n", cur->key, cur->value);
         cur = cur->next;
     }
-	printf("[DEBUG] builtin_export/env: env @ %p\n", shell->env);
-	print_env(shell->env);
+	printf("[DEBUG] builtin_export/env: env @ %p\n", shell->parser.env);
+	print_env((t_env *)shell->parser.env);
     shell->exit_status = 0;
     return 0;
 }

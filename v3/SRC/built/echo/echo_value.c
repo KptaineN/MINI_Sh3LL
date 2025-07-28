@@ -1,15 +1,17 @@
 
 #include "echo.h"
 
-static char *find_env_value(t_env *env, const char *key)
+static char *find_env_value(t_list *env_list, const char *key)
 {
-    while (env)
+    t_list *node = env_list;
+    while (node)
     {
-        if (ft_strncmp(env->key, key, ft_strlen(key) + 1) == 0)
-            return (env->value);
-        env = env->next;
+        t_env *current = (t_env *)node->content;
+        if (ft_strncmp(current->key, key, ft_strlen(key) + 1) == 0)
+            return current->value;
+        node = node->next;
     }
-    return (NULL);
+    return NULL;
 }
 
 static char *get_special_var(const char *key)
@@ -37,9 +39,9 @@ static char *extract_key(const char *arg, int start, int *len)
     return ft_substr(arg, start, i);
 }
 
-static char *get_env_or_special_value(t_minishell *sh, const char *key)
+static char *get_env_or_special_value(t_minishell *shell, const char *key)
 {
-    char *val_env = find_env_value(sh->env, key);
+    char *val_env = find_env_value(shell->parser.env, key);
     if (val_env)
         return ft_strdup(val_env);
     return get_special_var(key);

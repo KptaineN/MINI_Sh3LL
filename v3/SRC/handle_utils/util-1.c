@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:25:46 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 14:23:37 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 13:07:36 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,9 @@ void	handle_exit(t_minishell *shell)
 void	handle_env(t_minishell *shell)
 {
 	// Handle the 'env' command
-	if (shell->env)
+	if (shell->parser.env)
 	{
-		print_env(shell->env);
+		print_env((t_env *)shell->parser.env);
 			// Assuming you have a function to print the environment variables
 	}
 	else

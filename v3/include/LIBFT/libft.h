@@ -67,7 +67,7 @@ char	*ft_itoa(int n);
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
 char    *ft_strcpy(char *dest, const char *src);
 char    *ft_strndup(const char *s, size_t n);
-
+char    *ft_strncpy(char *dest, const char *src, size_t n);
 
 
 #endif /* LIBFT_H */

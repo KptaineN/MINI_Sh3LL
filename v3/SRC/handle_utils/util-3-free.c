@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:27:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 17:26:23 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 13:19:11 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,24 +93,24 @@ void free_tokens(t_shell *parser)
     {
         t_token *tok = &parser->tokens[i];
 
-        if (tok->type == TOKEN_WORD)
-        {
-            if (tok->u.all_parts.parts)
-                free(tok->u.all_parts.parts);
-        }
+		if (tok->type == TOKEN_WORD)
+		{
+			if (tok->value)
+				free(tok->value);
+		}
         else if (tok->type == TOKEN_BCMD || tok->type == TOKEN_CMD)
         {
-            if (tok->u.cmd_args_parts)
+            if (tok->cmd_args_parts)
             {
-                for (int j = 0; j < count_subtoken_args(tok->u.cmd_args_parts); j++)
+                for (int j = 0; j < count_subtoken_args(tok->cmd_args_parts); j++)
                 {
-                    if (tok->u.cmd_args_parts[j].parts)
-                        free(tok->u.cmd_args_parts[j].parts);
+                    if (tok->cmd_args_parts[j].parts)
+                        free(tok->cmd_args_parts[j].parts);
                 }
-                free(tok->u.cmd_args_parts);
+                free(tok->cmd_args_parts);
             }
 
-            // Si c'était un CMD, on avait fait un strdup du chemin :
+            // Si c'était un CMD, on aurait fait un strdup du chemin :
             if (tok->type == TOKEN_CMD && tok->value)
                 free(tok->value);
         }
@@ -120,16 +120,18 @@ void free_tokens(t_shell *parser)
     parser->tokens = NULL;
     parser->n_tokens = 0;
 
-    // Libère la liste chaînée de commandes
-    t_list *tmp;
-    while (parser->cmd_head)
-    {
-        tmp = parser->cmd_head->next;
-        free(parser->cmd_head);
-        parser->cmd_head = tmp;
-    }
-    parser->cmd_head = NULL;
-    parser->cmd_tail = NULL;
+	// Libère la liste chaînée de commandes
+	t_list *tmp;
+	while (parser->cmd_head)
+	{
+		tmp = parser->cmd_head->next;
+		if (parser->cmd_head->content)
+			free(parser->cmd_head->content);
+		free(parser->cmd_head);
+		parser->cmd_head = tmp;
+	}
+	parser->cmd_head = NULL;
+	parser->cmd_tail = NULL;
 
     parser->n_cmd = 0;
 }
@@ -166,74 +168,68 @@ void	clean_exit(char **cmd_args, char *msg, int code)
 }
 
  //* Libère toute la mémoire de la structure minishell.
- //* À compléter selon l'évolution de ta structure.
-
- void	free_minishell(t_minishell *shell)
+void	free_env_list(t_list *env)
 {
-	if (!shell)
-        return;
-    // Libère la ligne d'entrée utilisateur
-    // input et args sont déjà libérés dans cleanup_after_exec
-    // S'il reste un input en cas d'erreur, free ici :
-    if (shell->input)
-        free(shell->input);
-		// Libère le tableau d'arguments (ft_free_array est un helper type free_split)
-    if (shell->args)
-        ft_free_array(shell->args);
-
-    // AST : peut être NULL si déjà nettoyée 
-	// Libère l'AST
-    /*
-    if (shell->ast)
-    {
-        free_ast(shell->ast);
-        shell->ast = NULL;
-    }
-    */
-
-    // Env : idem, free ici et nullifier
-	 // Libère la liste chaînée des variables d'environnement
-
-    if (shell->env)
-    {
-        free_env(shell->env);
-        shell->env = NULL;
-    }
-
-    // Tout autre champ à libérer…
-
-	 // (OPTIONNEL selon évolution de la struct)
-	 // if (shell->env_list)
-	 //     free_env_list(shell->env_list);
-	 // (OPTIONNEL plus tard) : libère l'historique ou d'autres ressources globales
-	 // free_history(shell->history);
-	 // (OPTIONNEL plus tard) : libère des fd ou autres buffers
-	 // if (shell->some_fd != -1) close(shell->some_fd);
-	 // (OPTIONNEL plus tard) : libère des structures temporaires
-	 // if (shell->tmp_data) free_tmp_data(shell->tmp_data);
-/*
-	Quand tu ajouteras un nouveau champ à t_minishell, par exemple :
-
-	 un buffer (char *buffer)
-
-	 une nouvelle liste (t_list *jobs)
-
-	 un tableau de file descriptors (int *fd_tab)
-
-Ajoute la ligne de libération dans free_minishell comme ceci :
-
-if (shell->buffer)
-	free(shell->buffer);
-
-if (shell->jobs)
-	free_job_list(shell->jobs);
-
-if (shell->fd_tab)
-	free(shell->fd_tab);
- */
-	 // ... ajoute ici tout ce que tu ajoutes dans la struct plus tard !
+	t_list *tmp;
+	while (env)
+	{
+		tmp = env;
+		env = env->next;
+		if (tmp->content)
+		{
+			t_env *env_node = (t_env *)tmp->content;
+			if (env_node->key)
+				free(env_node->key);
+			if (env_node->value)
+				free(env_node->value);
+			free(env_node);
+		}
+		free(tmp);
+	}
 }
 
+
+void free_parser(t_shell *parser)
+{
+	if (!parser)
+		return;
+	/* free input string */
+	if (parser->input)
+		free(parser->input);
+	/* free parsed arguments array */
+	if (parser->parsed_args)
+		free_t_arr(parser->parsed_args);
+	/* free tokens and command list */
+	free_tokens(parser);
+	/* free environment variables list */
+	if (parser->env)
+		free_env_list(parser->env);
+	/* free builtins and operators arrays */
+	if (parser->bcmd)
+		free_t_arr(parser->bcmd);
+	if (parser->oper)
+		free_t_arr(parser->oper);
+	/* free child process IDs */
+	if (parser->pids)
+		free(parser->pids);
+	/* free heredoc subtokens */
+	if (parser->heredoc)
+	{
+		if (parser->heredoc->parts)
+			free(parser->heredoc->parts);
+		free(parser->heredoc);
+	}
+}
+
+void free_minishell(t_minishell *shell)
+{
+	if (!shell)
+		return;
+	free_parser(&shell->parser);
+	if (shell->args)
+		ft_free_split(shell->args);
+	free(shell);
+}
 
 // Fichier : exit_utils.c par exemple
 void	exit_shell(t_minishell *shell, int exit_code)
@@ -242,3 +238,4 @@ void	exit_shell(t_minishell *shell, int exit_code)
 	rl_clear_history(); // nettoie readline
 	exit(exit_code);
 }
+

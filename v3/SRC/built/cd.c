@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:57 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/07 16:10:11 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 13:03:35 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,8 +154,8 @@ int builtin_cd(char **args, t_minishell *shell)
     if (cd_save_newpwd(new_pwd, sizeof(new_pwd)) < 0)
         return (shell->exit_status = 1);
 
-    if (update_env(&shell->env, "OLDPWD", old_pwd) < 0 ||
-        update_env(&shell->env, "PWD",     new_pwd) < 0)
+    if (update_env((t_env **)&shell->parser.env, "OLDPWD", old_pwd) < 0 ||
+        update_env((t_env **)&shell->parser.env, "PWD",     new_pwd) < 0)
     {
         perror("cd");
         return (shell->exit_status = 1);

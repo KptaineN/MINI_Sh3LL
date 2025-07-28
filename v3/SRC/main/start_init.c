@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:19 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 18:29:41 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 13:37:02 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void init_idx(t_shell *shell, char **envp)
 	shell->fd_out = STDOUT_FILENO;
 	shell->env = set_linked_path(envp);    // Convert to t_list format
 	// Removed parser initialization since t_shell has no parser field
-	init_all_t_arr(shell);
+	//init_all_t_arr(shell);
 }
 
 void	init_minishell(t_minishell *shell, char **envp)
@@ -34,36 +34,38 @@ void	init_minishell(t_minishell *shell, char **envp)
 	// Ne PAS faire memset ici si l'environnement est déjà initialisé dans start_minishell
 
 	shell->args = NULL;
-	shell->input = NULL;
+	shell->parser.input = NULL;
 	shell->exit_status = 0;
 
 	// Initialisation du parser
 	init_idx(&shell->parser, envp);
-	init_all_t_arr(&shell->parser);
+	init_all_t_arr(shell);
 }
 
-
+/*
 t_env *init_env(char **envp)
 {
 	t_env *head = NULL;
 
-	for (int i = 0; envp[i]; i++)
+	int i = 0;
+	while (envp[i])
 	{
 		char *eq = ft_strchr(envp[i], '=');
-		if (!eq)
-			continue;
+		if (eq)
+		{
+			t_env *new = malloc(sizeof *new);
+			if (!new)
+				return NULL;
 
-		t_env *new = malloc(sizeof(t_env));
-		if (!new)
-			return NULL;
-
-		new->key = ft_substr(envp[i], 0, eq - envp[i]);
-		new->value = ft_strdup(eq + 1);
-		new->next = head;
-		head = new;
+			new->key = ft_substr(envp[i], 0, eq - envp[i]);
+			new->value = ft_strdup(eq + 1);
+			new->next = head;
+			head = new;
+		}
+		i++;
 	}
 	return head;
-}
+}*/
 
 /*loop principal dans mainloop.c*/
 
@@ -97,9 +99,9 @@ int	start_minishell(t_minishell *shell, char **envp)
 		return (0);
 
 	memset(shell, 0, sizeof(t_minishell));         // ici c'est ok car tu n'as rien encore mis dans shell
-	shell->env = init_env(envp);                  // initialise ton env
-
-	if (!shell->env)
+	//shell->env = init_env(envp);                  // initialise ton env
+	shell->parser.env = set_linked_path(envp);
+	if (!shell->parser.env)
 	{
 		printf("Erreur : échec d'initialisation de l'environnement\n");
 		return (1);

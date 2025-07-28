@@ -96,30 +96,30 @@ char *remove_quotes(const char *arg);
 int builtin_echo(t_minishell *shell, t_token *token)
 {
     (void)shell;
-    if (!token || !token->u.cmd_args_parts)
+    if (!token || !token->cmd_args_parts)
         return 1;
 
     int i = 1;
     int newline = 1;
 
     // Gestion option -n
-    if (token->u.cmd_args_parts[i].n_parts == 1
-        && ft_strcmp(token->u.cmd_args_parts[i].parts[0].p, "-n") == 0)
+    if (token->cmd_args_parts[i].n_parts == 1
+        && ft_strcmp(token->cmd_args_parts[i].parts[0].p, "-n") == 0)
     {
         newline = 0;
         i++;
     }
 
     // Affichage sécurisé
-    while (token->u.cmd_args_parts[i].n_parts > 0)
+    while (token->cmd_args_parts[i].n_parts > 0)
     {
-        for (int j = 0; j < token->u.cmd_args_parts[i].n_parts; j++)
+        for (int j = 0; j < token->cmd_args_parts[i].n_parts; j++)
         {
-            if (token->u.cmd_args_parts[i].parts[j].p)
-                ft_putstr_fd(token->u.cmd_args_parts[i].parts[j].p, STDOUT_FILENO);
+            if (token->cmd_args_parts[i].parts[j].p)
+                ft_putstr_fd(token->cmd_args_parts[i].parts[j].p, STDOUT_FILENO);
         }
         // espace entre les groupes sauf le dernier
-        if (token->u.cmd_args_parts[i + 1].n_parts > 0)
+        if (token->cmd_args_parts[i + 1].n_parts > 0)
             ft_putchar_fd(' ', STDOUT_FILENO);
         i++;
     }

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/07/14 18:57:00 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 14:26:58 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ typedef struct s_env    t_env;
 typedef struct s_minishell
 {
 	t_shell  parser;
-	t_env   *env;
+	//t_env   *env;
 	char   **args;
-	char    *input;
+	//char    *input;
 	int      exit_status;
 } t_minishell;
 
@@ -92,6 +92,13 @@ void handle_export(t_minishell *shell);
 void handle_unset(t_minishell *shell);
 void handle_echo(t_minishell *shell);
 int is_builtin(const char *cmd);
-
+void free_parser(t_shell *parser);
+void handle_heredoc(t_minishell *shell, int token_idx);
+void handle_append(t_minishell *shell, int token_idx);
+void handle_and(t_minishell *shell, int token_idx);
+void handle_or(t_minishell *shell, int token_idx);
+void handle_pipe(t_minishell *shell, int token_idx);
+void handle_redirect_in(t_minishell *shell, int token_idx);
+void handle_redirect_out(t_minishell *shell, int token_idx);
 
 #endif // MINISHELL_H

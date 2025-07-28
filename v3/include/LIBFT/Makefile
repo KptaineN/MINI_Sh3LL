@@ -53,6 +53,7 @@ SRCS = ft_isalpha.c \
        ft_strcspn.c \
        ft_strcpy.c \
        ft_strndup.c \
+       ft_strncpy.c \
        ft_bubble_str_sort.c \
        GNL/get_next_line.c \
        GNL/get_next_line_utils.c \

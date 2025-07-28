@@ -6,11 +6,11 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:08:28 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 13:37:39 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 14:38:37 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/parsking.h"
+#include "../../include/minishell.h"
 
 //array of string
 size_t t_arrlen(void **arr)
@@ -134,11 +134,11 @@ void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
 }
 
 // initialise the builtins and operators
-void init_all_t_arr(t_shell *shell)
+void init_all_t_arr(t_minishell *shell)
 {
 	char *all_operators[] = {"<<",">>","&&","||","|","<",">"};
 	char *all_builtins[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
-    int (*operator_handlers[])(void *, int) = {
+    void (*operator_handlers[])(t_minishell *, int) = {
 		handle_heredoc,     // "<<"
 		handle_append,      // ">>"
 		handle_and,         // "&&"
@@ -158,6 +158,6 @@ void init_all_t_arr(t_shell *shell)
         NULL
     };
 
-	build_t_arr_dic_str(&shell->oper, all_operators, (void **)operator_handlers,sizeof(all_operators)/sizeof(char *));
-    build_t_arr_dic_str(&shell->bcmd, all_builtins,  (void **)builtin_handlers,sizeof(all_builtins)/sizeof(char *));
+	build_t_arr_dic_str(&shell->parser.oper, all_operators, (void **)operator_handlers,sizeof(all_operators)/sizeof(char *));
+    build_t_arr_dic_str(&shell->parser.bcmd, all_builtins,  (void **)builtin_handlers,sizeof(all_builtins)/sizeof(char *));
 }

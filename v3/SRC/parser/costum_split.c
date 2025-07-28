@@ -1,5 +1,6 @@
 
 #include "../../include/parsking.h"
+#include "../../include/minishell.h"
 
 
 // normal strdup - get rid of later when LIBFT
@@ -93,7 +94,7 @@ static int	count_arg(const char *str, t_shell *shell)//, int *sub_n)
 		{						// is a oper
 			in_word = false;
 			count+=1+(i != 0);
-			i+=strlen((char *)((t_dic *)shell->oper->arr[idx_oper])->key)-1;
+			i+= ft_strlen((char *)((t_dic *)shell->oper->arr[idx_oper])->key)-1;
 		}
 		else if (!in_word)
 		{	

@@ -28,7 +28,7 @@ int builtin_unset(char **args, t_minishell *shell)
     int i = 1;
     while (args[i])
     {
-        unset_one(&shell->env, args[i]);
+        unset_one((t_env **)&shell->parser.env, args[i]);
         i++;
     }
     shell->exit_status = 0;

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:01:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 13:37:44 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 11:08:03 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,23 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
+}
+
+//gives to the next
+void	push_lst(t_list **tail, void *content)
+{
+	t_list *new;
+
+	if (!*tail)
+		return ;
+	new = malloc(sizeof(t_list));
+	if (!new)
+		perror("MALLOC push_list");
+	
+	(*tail)->next = new;
+	(*tail) = (*tail)->next; 
+	new->content = content;
+	new->next = NULL;
 }
 
 t_list	*set_linked_path(char **env)
@@ -92,4 +109,76 @@ char **linked_to_array_string(t_list *node)
 	}
 	node = first;
 	return arr;
+}
+
+void ft_lstadd_front(t_list **lst, void *content)
+{
+    t_list *new_node;
+
+    if (!lst || !content)
+        return;
+
+    // Allocate new node
+    new_node = malloc(sizeof(t_list));
+    if (!new_node)
+        return; // Allocation failure
+
+    // Duplicate content (assumes char *)
+    new_node->content = strdup((char *)content);
+    if (!new_node->content)
+    {
+        free(new_node);
+        return; // Allocation failure
+    }
+
+    // Link new node to current head
+    new_node->next = *lst;
+    *lst = new_node; // Update head to new node
+}
+
+t_list *search_lst(t_list *lst, const char *target)
+{
+    size_t target_len;
+
+    if (!lst || !target)
+        return NULL;
+
+    target_len = strlen(target);
+
+    while (lst)
+    {
+        char *s  = (char *)lst->content;
+        (void)s;
+        if (lst->content && strncmp((char *)lst->content, target, target_len) == 0)
+            return lst;
+        lst = lst->next;
+    }
+
+    return NULL;
+}
+
+void replace_or_add(t_list **lst, const char *old, const char *new)
+{
+    t_list *node;
+
+    if (!*lst || !old || !new)
+        return;
+
+    // Search for node matching old
+    node = search_lst(*lst, old);
+    if (node)
+    {
+        // Match found: free old content and replace
+        free(node->content);
+        node->content = strdup(new);
+        if (!node->content)
+        {
+            // Handle strdup failure (optional: remove node or set to NULL)
+            node->content = NULL;
+        }
+        return;
+    }
+
+    // No match: add new node at front
+    ft_lstadd_front(lst, (void *)new);
 }

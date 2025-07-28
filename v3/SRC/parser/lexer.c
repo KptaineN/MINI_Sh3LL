@@ -6,16 +6,16 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/14 19:27:07 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:05:35 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/parsking.h"
+#include "../../include/minishell.h"
 
 /*
 	Ici on attribue les sous‐types
 	*array de pointeur de taille n_parts
-*/
+
 void attribute_subtoken_type(t_token *token)
 {
 	const char *subtoken;
@@ -28,7 +28,7 @@ void attribute_subtoken_type(t_token *token)
 		return;
 
 	subtoken = token->value;
-	parts    = token->u.all_parts.parts;
+	parts    = token->all_parts.parts;
 	int i = 0;
 	int idx = 0;
 	while (subtoken[idx])
@@ -55,8 +55,8 @@ void attribute_subtoken_type(t_token *token)
 		idx += idx_tail;
 		i++;
 	}
-}
-
+}*/
+/*
 static int count_args_cmd(t_shell *shell, int i)
 {
 	int n_args = 0;
@@ -79,11 +79,36 @@ static int count_args_cmd(t_shell *shell, int i)
 		curr++;
 	}
 	return n_args;
+}*/
+
+static int count_args_cmd(t_shell *shell, int i)
+{
+	int n_args = 0;
+	char **arr = (char **)shell->parsed_args->arr;
+	int len = shell->parsed_args->len;
+	
+	int idx_oper;
+	print_dic(shell->oper);
+	while (1)
+	{
+		if (i==len)
+			break;
+		if (arr[i] != NULL)
+		{
+			printf("arg%d %s\n", i, arr[i]);
+			idx_oper = is_in_t_arr_str(shell->oper, arr[i]);
+			if (idx_oper != -1)
+				return n_args;
+			n_args++;
+		}
+		i++;
+	}
+	return n_args;
 }
 
 void subtoken_of_cmd(t_subtoken_container *container, char *arg)
 {
-	t_subtoken *parts;
+	t_subtoken *parts = NULL;
 	char *head = arg;
 	int idx_tail;
 	int n_parts = container->n_parts;
@@ -92,7 +117,7 @@ void subtoken_of_cmd(t_subtoken_container *container, char *arg)
 	if (!container->parts)
 		return;
 
-	parts = container->parts;
+	//parts = container->parts;
 	int i   = 0;
 	int idx = 0;
 	while (head[idx])
@@ -114,13 +139,17 @@ void subtoken_of_cmd(t_subtoken_container *container, char *arg)
 			parts[i].type = QUOTE_NONE;
 			idx_tail     = find_c_nonescaped(&head[idx], "\"\'", 2);
 		}
-		parts[i].len = idx_tail + 1;
-		parts[i].p   = head;
-		idx += idx_tail;
+		parts[i].len = idx_tail;
+		parts[i].p = (char *)&head[idx];
+		//printf("%.*s\n", idx_tail, &head[idx]);
+		idx+= idx_tail+(parts[i].type != QUOTE_NONE);
+		//parts[i].len = idx_tail + 1;
+		//parts[i].p   = head;
+		//idx += idx_tail;
 		i++;
 	}
 }
-
+/*
 int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len)
 {
 	t_arr *arr_arg = shell->parsed_args;
@@ -129,7 +158,7 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 	char *temp;
 	int idx_container = 0;
 
-	/* allouer len+1 pour le marqueur de fin */
+	// allouer len+1 pour le marqueur de fin 
 	containers = malloc(sizeof(*containers) * (len + 1));
 	if (!containers)
 		return -1;
@@ -157,14 +186,14 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 		free(temp);
 	}
 
-	/* marqueur de fin */
+	// marqueur de fin 
 	containers[idx_container].n_parts = 0;
 	containers[idx_container].parts   = NULL;
 
 	return idx;
-}
+}*/
 
-static void file_access_redirection(t_shell *shell, void **arr, int t_arr_index, int i)
+void file_access_redirection(t_shell *shell, void **arr, int t_arr_index, int i)
 {
 	if (i + 1 >= shell->n_tokens)
 		perror("Argument manquant pour l'opérateur");
@@ -184,7 +213,7 @@ static void file_access_redirection(t_shell *shell, void **arr, int t_arr_index,
 		return;
 	}
 
-	/* sortie */
+	// sortie 
 	if (shell->fd_out != -1)
 	{
 		if (t_arr_index == 1)
@@ -214,11 +243,46 @@ static void file_access_redirection(t_shell *shell, void **arr, int t_arr_index,
 	}
 }
 
+int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len)
+{
+	t_subtoken_container *arr_containers;
+	t_arr *arr_arg = shell->parsed_args;
+	char *curr_arg;
+	int idx_container = 0;
+
+	// allocate len+1 for the end marker
+	cmd_token->cmd_args_parts = malloc(sizeof(t_subtoken_container) * (len + 1));
+	arr_containers = cmd_token->cmd_args_parts;
+	if (!arr_containers)
+		return -1;
+	//cmd_token->cmd_args_parts = arr_containers;
+
+	// fill containers[0..len-1]
+	while (idx_container < len)
+	{
+		curr_arg = arr_arg->arr[idx];
+		if (curr_arg)
+		{
+			arr_containers[idx_container].n_parts = count_subtokens(curr_arg);
+			subtoken_of_cmd(&arr_containers[idx_container++], curr_arg);
+		}
+		idx++;
+	}
+
+	cmd_token->cmd_args_parts->n_parts = len;
+	// end marker
+	//containers[idx_container].n_parts = 0;
+	//containers[idx_container].parts   = NULL;
+
+	return idx - 1;
+}
+
 static void add_cmd(t_shell *shell, t_token *token)
 {
-	t_list *tmp = malloc(sizeof(t_list));
+	t_list *tmp;
+	tmp = malloc(sizeof(t_list));
 	if (!tmp)
-		return;
+		return; // ERROR
 
 	if (!shell->cmd_head)
 	{
@@ -228,46 +292,100 @@ static void add_cmd(t_shell *shell, t_token *token)
 	else
 	{
 		shell->cmd_tail->next = tmp;
-		shell->cmd_tail       = tmp;
+		shell->cmd_tail = tmp;
 	}
-	tmp->content = token;
+	tmp->content = (void *)token;
 	tmp->next    = NULL;
 }
 
+
 void attribute_token_type(t_shell *shell)
+{
+	int t_arr_index;
+	int i = 0;
+	int idx_token = 0;
+	void **arr = shell->parsed_args->arr;
+	t_token *token;
+
+	shell->n_tokens = count_tokens(shell, shell->parsed_args, shell->oper);
+	if (shell->n_tokens != 0)
+	{
+		shell->tokens = malloc(sizeof(t_token) * shell->n_tokens);
+		if (!shell->tokens)
+			perror("Erreur d'allocation pour les tokens");
+	}
+	while (idx_token < shell->n_tokens)
+	{
+		if (arr[i] != NULL)
+		{
+			token = &shell->tokens[idx_token];
+			token->type = TOKEN_WORD;
+			token->value = arr[i];
+
+			// operator
+			t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
+			if (t_arr_index != -1)
+				token->type = TOKEN_OPER;
+
+			// builtin or cmd
+			if (token->type == TOKEN_WORD)
+			{
+				t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
+				if (t_arr_index != -1)
+					token->type = TOKEN_BCMD;
+				else
+					token->type = TOKEN_CMD;
+				i = attribute_cmd_subtokens(shell, token, i, count_args_cmd(shell, i));
+			}
+
+			if (token->type != TOKEN_OPER)
+			{
+				add_cmd(shell, token);
+				shell->n_cmd++;
+			}
+			i++;
+			idx_token++;
+		}
+	}
+}
+
+/*void attribute_token_type(t_shell *shell)
 {
 	int    t_arr_index;
 	int    i         = 0;
 	int    idx_token = 0;
 	void **arr       = shell->parsed_args->arr;
 	t_token *token;
-	bool   c;
+	//bool   c;
 
-	shell->n_tokens = count_tokens(shell);
-	shell->tokens   = malloc(sizeof(t_token) * shell->n_tokens);
-	if (!shell->tokens)
-		perror("Erreur d'allocation pour les tokens");
-
-	while (i < shell->n_tokens)
+	shell->n_tokens = count_tokens(shell->parser);
+	//shell->tokens   = malloc(sizeof(t_token) * shell->n_tokens);
+	if (shell->n_tokens != 0)
 	{
-		c     = false;
+		shell->tokens = malloc(sizeof(t_token)*shell->n_tokens);
+		if (!shell->tokens)
+			perror("Erreur d'allocation pour les tokens");
+	}
+	while (idx_token < shell->n_tokens) //i < shell->n_tokens
+	{
+		//c     = false;
 		token = &shell->tokens[idx_token];
-		token->idx   = idx_token;
+		//token->idx   = idx_token;
 		token->type  = TOKEN_WORD;
 		token->value = arr[i];
 
-		/* OPERATOR ? */
+		// OPERATOR ? 
 		t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
 		if (t_arr_index != -1)
 		{
-			c         = true;
+			//c         = true;
 			token->type = TOKEN_OPER;
 			if (t_arr_index == 1 || t_arr_index == 5 || t_arr_index == 6)
 				file_access_redirection(shell, arr, t_arr_index, i);
-			/* else << */
+			// else << 
 		}
 
-		/* BUILTIN ? */
+		// BUILTIN ? 
 		if (!c)
 		{
 			t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
@@ -279,7 +397,7 @@ void attribute_token_type(t_shell *shell)
 			}
 		}
 
-		/* CMD ? */
+		// CMD ? 
 		if (!c)
 		{
 			token->value = find_command_path(token->value, shell->env);
@@ -293,7 +411,7 @@ void attribute_token_type(t_shell *shell)
 				token->value = arr[i];
 		}
 
-		/* WORD */
+		// WORD
 		if (token->type == TOKEN_WORD)
 		{
 			token->u.all_parts.n_parts = count_subtokens(token->value);
@@ -309,4 +427,4 @@ void attribute_token_type(t_shell *shell)
 		i++;
 		idx_token++;
 	}
-}
+}*/
