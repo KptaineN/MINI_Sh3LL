@@ -1,6 +1,20 @@
 
 #include "../../include/minishell.h"
 
+char	*get_value_env(t_list *env, char *value, int len)
+{
+	t_list	*temp;
+	temp = env;
+	while (1)
+	{
+		if (strncmp(temp->content, value, len) == 0 && *(char* )(temp->content+len) == '=')
+			return (temp->content + len +1); // Skip "value="
+		temp = temp->next;
+		if (temp == env)
+			return (NULL);
+	}
+	return (NULL);
+}
 
 // Helper function to get PATH from environment
 static char	*get_path_env(t_list *env)
@@ -258,7 +272,7 @@ char **expand_cmd(t_token *token, t_list *env)
 
 
 
-void execute(t_minishell *shell, t_token *cmd)
+void execute_cmd(t_minishell *shell, t_token *cmd)
 {
 	char **args = expand_cmd(cmd,shell->parser.env);
 	//char **env = linked_to_array_string(shell->env);

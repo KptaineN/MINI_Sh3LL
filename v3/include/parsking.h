@@ -138,7 +138,7 @@ void   init_all_t_arr(t_minishell *shell);
 char  *find_command_path(char *cmd, t_list *env);
 char **expand_cmd(t_token *token, t_list *env);
 char  *get_value_env(t_list *env, char *value, int len);
-void   execute(t_minishell *shell, t_token *cmd);
+void   execute_cmd(t_minishell *shell, t_token *cmd);
 
 // custom split
 char    *ft_strdup(const char *s1);    // to remove later
@@ -182,6 +182,5 @@ void    print_dic(t_arr *arr);
 void    printStringArray(const char *cmd, const char *arr[]);
 
 // free section
-void    ft_free(void **thing);
 
 #endif

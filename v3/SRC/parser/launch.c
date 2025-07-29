@@ -13,7 +13,7 @@
 #include "../../include/parsking.h"
 #include "../../include/minishell.h"
 
-void execute_cmd(t_minishell *shell, t_list *curr_cmd);
+
 
 void add_pid_env(t_minishell *shell, int fd)
 {
@@ -62,7 +62,8 @@ int start_cmd(t_minishell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_c
         close(curr_pipe[1]);
         close(shell->parser.fd_pid[0]);
         close(shell->parser.fd_pid[1]);
-        execute(shell, curr_cmd->content);
+        //execute(shell, curr_cmd->content);
+        execute_cmd(shell, (t_token *)curr_cmd->content);
         exit(1);
     }
 
@@ -113,6 +114,7 @@ int end_cmd(t_minishell *shell, int *prev_pipe, t_list *curr_cmd)
         dup2(shell->parser.fd_out, STDOUT_FILENO);
         close(shell->parser.fd_out);
         // Execute
+        execute_cmd(shell, (t_token *)curr_cmd->content);
         exit(1);
     }
     send_pid(shell->parser.fd_pid[1], pid);
@@ -181,7 +183,9 @@ void one_command(t_minishell *shell)
         close(shell->parser.fd_in);
         dup2(shell->parser.fd_out, STDOUT_FILENO);
         close(shell->parser.fd_out);
-        execute(shell, shell->parser.cmd_head->content);
+       // execute_cmd(shell, shell->parser.cmd_head);
+        execute_cmd(shell, (t_token *)shell->parser.cmd_head->content);
+        //execute(shell, shell->parser.cmd_head->content);
         exit(1);
     }
     else
@@ -365,8 +369,8 @@ void launch_process(t_minishell *shell)
             close(shell->parser.fd_pid[0]);
             close(shell->parser.fd_pid[1]);
             dup2(curr_pipe[1], STDOUT_FILENO);
-
-            execute_cmd(shell, curr_cmd); // ✅ passe bien t_minishell *
+            execute_cmd(shell, (t_token *)curr_cmd->content);
+           // execute_cmd(shell, curr_cmd); // ✅ passe bien t_minishell *
             exit(1); // N'oublie pas de sortir dans le fils
         }
         else

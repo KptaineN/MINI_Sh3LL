@@ -96,6 +96,7 @@ int looping(t_minishell *shell)
 			continue;
 		}
 		attribute_token_type(&shell->parser);
+		// print_commands(shell->parser.cmd_head);
 		shell->parser.pids = malloc(sizeof(pid_t) * shell->parser.n_cmd);
 		if (!shell->parser.pids)
 			perror("MALLOC pids");
@@ -103,11 +104,11 @@ int looping(t_minishell *shell)
 		launch_process(shell);
 		printf("\nlast line\n");
 		// 6) Cleanup (ajuster selon ce qui est alloué)
-	free_tab((char **)shell->parser.parsed_args->arr);
-	free(shell->parser.parsed_args);
-	shell->parser.parsed_args = NULL;
+		free_tab((char **)shell->parser.parsed_args->arr);
+		free(shell->parser.parsed_args);
+		shell->parser.parsed_args = NULL;
 
-	free_tokens(&shell->parser);
+		free_tokens(&shell->parser);
 
 		free(step2);
 		free(input);

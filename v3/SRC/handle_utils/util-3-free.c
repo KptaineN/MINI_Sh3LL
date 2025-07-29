@@ -14,6 +14,13 @@
 
 
 
+void ft_free(void **thing)
+{
+    if (!*thing)
+        return;
+    free(*thing);
+    *thing = NULL;
+}
 void	free_args(char **args)
 {
 	int	i = 0;

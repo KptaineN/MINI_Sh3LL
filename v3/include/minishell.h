@@ -100,5 +100,7 @@ void handle_or(t_minishell *shell, int token_idx);
 void handle_pipe(t_minishell *shell, int token_idx);
 void handle_redirect_in(t_minishell *shell, int token_idx);
 void handle_redirect_out(t_minishell *shell, int token_idx);
+void ft_free(void **thing);
+
 
 #endif // MINISHELL_H

@@ -88,7 +88,7 @@ static int count_args_cmd(t_shell *shell, int i)
 	int len = shell->parsed_args->len;
 	
 	int idx_oper;
-	print_dic(shell->oper);
+	//print_dic(shell->oper);
 	while (1)
 	{
 		if (i==len)
