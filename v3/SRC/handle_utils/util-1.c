@@ -51,7 +51,7 @@ void	handle_env(t_minishell *shell)
 	// Handle the 'env' command
 	if (shell->parser.env)
 	{
-		print_env((t_env *)shell->parser.env);
+		print_env((t_list *)shell->parser.env);
 			// Assuming you have a function to print the environment variables
 	}
 	else

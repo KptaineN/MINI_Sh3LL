@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/parsking.h"
+#include "../../include/minishell.h"
 
 
 t_list	*ft_lstnew(void *content)
@@ -77,7 +77,7 @@ t_list	*set_linked_path(char **env)
 	}
 	return (head);
 }
-
+/*
 static int count_linked(t_list *node)
 {
 	int count = 1;
@@ -91,8 +91,8 @@ static int count_linked(t_list *node)
 		node = node->next ; 
 	}
 	return count;
-}
-
+}*/
+/**
 char **linked_to_array_string(t_list *node)
 {
 	t_list *first = node;
@@ -109,7 +109,38 @@ char **linked_to_array_string(t_list *node)
 	}
 	node = first;
 	return arr;
+}*/
+/*char **linked_to_array_string(t_list *env)
+{
+    int len = 0;
+    t_list *tmp = env;
+    while (tmp) { len++; tmp = tmp->next; }
+    char **arr = malloc(sizeof(char *) * (len + 1));
+    tmp = env;
+    for (int i = 0; i < len; i++) {
+        arr[i] = tmp->content;
+        tmp = tmp->next;
+    }
+    arr[len] = NULL;
+    return arr;
+}*/
+char **linked_to_array_string(t_list *node)
+{
+    int len = 0;
+    t_list *tmp = node;
+    while (tmp) { len++; tmp = tmp->next; }
+    char **arr = malloc(sizeof(char *) * (len + 1));
+    int i = 0;
+    tmp = node;
+    while (tmp)
+    {
+        arr[i++] = ft_strdup(tmp->content);
+        tmp = tmp->next;
+    }
+    arr[i] = NULL;
+    return arr;
 }
+
 
 void ft_lstadd_front(t_list **lst, void *content)
 {
@@ -156,6 +187,7 @@ t_list *search_lst(t_list *lst, const char *target)
 
     return NULL;
 }
+
 
 void replace_or_add(t_list **lst, const char *old, const char *new)
 {

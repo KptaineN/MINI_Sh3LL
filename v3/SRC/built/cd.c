@@ -43,11 +43,11 @@ static t_env *find_env_node(t_env *env, const char *key)
     }
     return NULL;
 }*/
-
+/**
 // Ajoute un nouveau nœud en tête
-static int add_env_node(t_env **env, const char *key, const char *value)
+static int add_env_node(t_list **env, const char *key, const char *value)
 {
-    t_env *node = malloc(sizeof(*node));
+    t_list *node = malloc(sizeof(*node));
     if (!node) return -1;
     node->key   = ft_strdup(key);
     node->value = ft_strdup(value);
@@ -64,10 +64,10 @@ static int add_env_node(t_env **env, const char *key, const char *value)
 }
 
 // Met à jour ou crée la variable `key` à la valeur `value`
-static int update_env(t_env **env, const char *key, const char *value)
+static int update_env(t_list **env, const char *key, const char *value)
 {
 	// Utilisation d'un pointeur vers pointeur pour parcourir la liste
-	t_env **curr = env;
+	t_list **curr = env;
 	while (*curr)
 	{
 		if (ft_strcmp((*curr)->key, key) == 0)
@@ -85,7 +85,7 @@ static int update_env(t_env **env, const char *key, const char *value)
 	return add_env_node(env, key, value);
 }
 
-/*** Étapes du builtin cd ***/
+** Étapes du builtin cd ***
 
 // 1) Sauvegarde l’ancien répertoire dans old_pwd
 static int cd_save_oldpwd(char *old_pwd, size_t sz)
@@ -131,7 +131,7 @@ static int cd_save_newpwd(char *new_pwd, size_t sz)
     return 0;
 }
 
-/*** Orchestrateur ***/
+** Orchestrateur ***
 int builtin_cd(char **args, t_minishell *shell)
 {
     char        old_pwd[4096];   // Taille PATH_MAX
@@ -154,12 +154,36 @@ int builtin_cd(char **args, t_minishell *shell)
     if (cd_save_newpwd(new_pwd, sizeof(new_pwd)) < 0)
         return (shell->exit_status = 1);
 
-    if (update_env((t_env **)&shell->parser.env, "OLDPWD", old_pwd) < 0 ||
-        update_env((t_env **)&shell->parser.env, "PWD",     new_pwd) < 0)
+    if (update_env((t_list **)&shell->parser.env, "OLDPWD", old_pwd) < 0 ||
+        update_env((t_list **)&shell->parser.env, "PWD",     new_pwd) < 0)
     {
         perror("cd");
         return (shell->exit_status = 1);
     }
+    return (shell->exit_status = 0);
+}*/
+int builtin_cd(char **args, t_minishell *shell)
+{
+    char old_pwd[4096];
+    char new_pwd[4096];
+    const char *target;
+
+    if (!getcwd(old_pwd, sizeof(old_pwd)))
+        return perror("cd"), shell->exit_status = 1;
+
+    target = (args[1] == NULL || *args[1] == '\0') ? getenv("HOME") :
+              (strcmp(args[1], "-") == 0 ? getenv("OLDPWD") : args[1]);
+
+    if (!target)
+        return perror("cd: HOME/OLDPWD not set"), shell->exit_status = 1;
+    if (chdir(target) != 0)
+        return perror("cd"), shell->exit_status = 1;
+    if (!getcwd(new_pwd, sizeof(new_pwd)))
+        return perror("cd"), shell->exit_status = 1;
+
+    set_env_value((t_list **)&shell->parser.env, "OLDPWD", old_pwd);
+    set_env_value((t_list **)&shell->parser.env, "PWD", new_pwd);
+
     return (shell->exit_status = 0);
 }
 

@@ -89,38 +89,116 @@ static int count_args_cmd(t_shell *shell, int i)
 	
 	int idx_oper;
 	//print_dic(shell->oper);
-	while (1)
+	while (i < len && arr[i] != NULL) // avant (1)
 	{
-		if (i==len)
-			break;
-		if (arr[i] != NULL)
-		{
-			printf("arg%d %s\n", i, arr[i]);
-			idx_oper = is_in_t_arr_str(shell->oper, arr[i]);
-			if (idx_oper != -1)
-				return n_args;
-			n_args++;
-		}
+		// Debug : afficher chaque mot testé
+		printf("count_args_cmd: arr[%d] = \"%s\"\n", i, arr[i]);
+		/*if (i==len)
+			break;*/
+			//printf("arg%d %s\n", i, arr[i]);
+		idx_oper = is_in_t_arr_str(shell->oper, arr[i]);
+		if (idx_oper != -1)
+			return n_args;
+		n_args++;
 		i++;
+	}
+	if (n_args == 0)
+	{
+		printf("count_args_cmd: No valid arguments found.\n");
+		//n_args = 1;  Indicate no valid arguments found
+		return 1; // Indicate no valid arguments found
 	}
 	return n_args;
 }
 
 void subtoken_of_cmd(t_subtoken_container *container, char *arg)
 {
+    if (!container || !arg) {
+        printf("subtoken_of_cmd: container ou arg NULL\n");
+        return;
+    }
+
+    int n_parts = container->n_parts;
+    if (n_parts <= 0) {
+        printf("subtoken_of_cmd: n_parts=%d invalide\n", n_parts);
+        return;
+    }
+
+    container->parts = malloc(sizeof(t_subtoken) * n_parts);
+    if (!container->parts) {
+        printf("subtoken_of_cmd: échec allocation mémoire\n");
+        return;
+    }
+
+    t_subtoken *parts = container->parts;
+    int i = 0;
+    int idx = 0;
+    int idx_tail = 0;
+    int arg_len = ft_strlen(arg);
+
+    printf("subtoken_of_cmd: processing \"%s\" (len=%d, n_parts=%d)\n", arg, arg_len, n_parts);
+
+    while (idx < arg_len && i < n_parts) {
+        if (arg[idx] == '\'' && escape_check(arg, idx)) {
+            int start = idx + 1;
+            parts[i].type = QUOTE_SINGLE;
+            idx_tail = find_c_nonescaped(&arg[start], "\'", 1);
+            if (idx_tail < 0) {
+                printf("subtoken_of_cmd: quote simple non fermée\n");
+                break;
+            }
+            parts[i].len = idx_tail;
+            parts[i].p = (char *)&arg[start];
+            idx = start + idx_tail + 1;
+        }
+        else if (arg[idx] == '\"' && escape_check(arg, idx)) {
+            int start = idx + 1;
+            parts[i].type = QUOTE_DOUBLE;
+            idx_tail = find_c_nonescaped(&arg[start], "\"", 1);
+            if (idx_tail < 0) {
+                printf("subtoken_of_cmd: quote double non fermée\n");
+                break;
+            }
+            parts[i].len = idx_tail;
+            parts[i].p = (char *)&arg[start];
+            idx = start + idx_tail + 1;
+        }
+        else {
+            int start = idx;
+            parts[i].type = QUOTE_NONE;
+            idx_tail = find_c_nonescaped(&arg[start], "\"\'", 2);
+            if (idx_tail < 0) 
+                idx_tail = arg_len - idx;
+            parts[i].len = idx_tail;
+            parts[i].p = (char *)&arg[start];
+            idx = start + idx_tail;
+        }
+        i++;
+    }
+    
+    printf("subtoken_of_cmd: traité %d parties sur %d\n", i, n_parts);
+}
+/**
+void subtoken_of_cmd(t_subtoken_container *container, char *arg)
+{
+	if (!container || !arg)
+        return;
+
 	t_subtoken *parts = NULL;
-	char *head = arg;
-	int idx_tail;
 	int n_parts = container->n_parts;
+	if (n_parts <= 0)
+        return;
 
 	container->parts = malloc(sizeof(t_subtoken) * n_parts);
 	if (!container->parts)
 		return;
 
-	//parts = container->parts;
+	char *head = arg;
+	parts = container->parts;
+	int idx_tail;
 	int i   = 0;
 	int idx = 0;
-	while (head[idx])
+	while (head[idx] && i < n_parts)
 	{
 		if (head[idx] == '\'' && escape_check(head, idx))
 		{
@@ -149,7 +227,63 @@ void subtoken_of_cmd(t_subtoken_container *container, char *arg)
 		i++;
 	}
 }
-/*
+void subtoken_of_cmd(t_subtoken_container *container, char *arg)
+{
+    if (!container || !arg)
+        return;
+
+    t_subtoken *parts = NULL;
+    int n_parts = container->n_parts;
+    if (n_parts <= 0)
+        return;
+
+    container->parts = malloc(sizeof(t_subtoken) * n_parts);
+    if (!container->parts)
+        return;
+
+    parts = container->parts;
+    int i = 0;
+    int idx = 0;
+    int idx_tail = 0;
+    int arg_len = ft_strlen(arg);
+
+    while (idx < arg_len && i < n_parts)
+    {
+        if (arg[idx] == '\'' && escape_check(arg, idx))
+        {
+            int start = idx + 1;
+            parts[i].type = QUOTE_SINGLE;
+            idx_tail = find_c_nonescaped(&arg[start], "\'", 1);
+            if (idx_tail < 0) break; // Pas de quote fermante, on stoppe
+            parts[i].len = idx_tail;
+            parts[i].p = (char *)&arg[start];
+            idx = start + idx_tail + 1; // saute la quote fermante
+        }
+        else if (arg[idx] == '\"' && escape_check(arg, idx))
+        {
+            int start = idx + 1;
+            parts[i].type = QUOTE_DOUBLE;
+            idx_tail = find_c_nonescaped(&arg[start], "\"", 1);
+            if (idx_tail < 0) break; // Pas de quote fermante
+            parts[i].len = idx_tail;
+            parts[i].p = (char *)&arg[start];
+            idx = start + idx_tail + 1; // saute la quote fermante
+        }
+        else
+        {
+            int start = idx;
+            parts[i].type = QUOTE_NONE;
+            idx_tail = find_c_nonescaped(&arg[start], "\"\'", 2);
+            if (idx_tail < 0) idx_tail = arg_len - idx; // Jusqu'à la fin si rien trouvé
+            parts[i].len = idx_tail;
+            parts[i].p = (char *)&arg[start];
+            idx = start + idx_tail;
+        }
+        i++;
+    }
+}
+
+
 int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len)
 {
 	t_arr *arr_arg = shell->parsed_args;
@@ -245,6 +379,60 @@ void file_access_redirection(t_shell *shell, void **arr, int t_arr_index, int i)
 
 int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len)
 {
+    // VÉRIFICATIONS DE SÉCURITÉ
+    if (!shell || !cmd_token || !shell->parsed_args) {
+        printf("attribute_cmd_subtokens: paramètres NULL\n");
+        return idx + 1;
+    }
+    
+    if (len <= 0) {
+        printf("attribute_cmd_subtokens: len=%d invalide\n", len);
+        return idx + 1;
+    }
+    
+    t_subtoken_container *arr_containers;
+    t_arr *arr_arg = shell->parsed_args;
+    char *curr_arg;
+    int idx_container = 0;
+    
+    printf("attribute_cmd_subtokens: idx=%d, len=%d\n", idx, len);
+
+    // Allocation sécurisée
+    cmd_token->cmd_args_parts = malloc(sizeof(t_subtoken_container) * (len + 1));
+    arr_containers = cmd_token->cmd_args_parts;
+    if (!arr_containers) {
+        printf("attribute_cmd_subtokens: échec allocation mémoire\n");
+        return idx + 1;
+    }
+
+    // Traiter les arguments
+    while (idx_container < len && idx < arr_arg->len) {
+        curr_arg = arr_arg->arr[idx];
+        if (!curr_arg) {
+            printf("attribute_cmd_subtokens: curr_arg NULL à l'index %d\n", idx);
+            break;
+        }
+        
+        printf("attribute_cmd_subtokens: processing arg[%d] = \"%s\"\n", idx, curr_arg);
+        
+        arr_containers[idx_container].n_parts = count_subtokens(curr_arg);
+        subtoken_of_cmd(&arr_containers[idx_container], curr_arg);
+        
+        idx_container++;
+        idx++;
+    }
+
+    // Marquer la fin
+    if (idx_container < len + 1) {
+        arr_containers[idx_container].n_parts = 0;
+        arr_containers[idx_container].parts = NULL;
+    }
+
+    return idx;
+}
+/**
+int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len)
+{
 	t_subtoken_container *arr_containers;
 	t_arr *arr_arg = shell->parsed_args;
 	char *curr_arg;
@@ -274,8 +462,8 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 	//containers[idx_container].n_parts = 0;
 	//containers[idx_container].parts   = NULL;
 
-	return idx - 1;
-}
+	return idx + len;
+}*/
 
 static void add_cmd(t_shell *shell, t_token *token)
 {
@@ -326,16 +514,29 @@ void attribute_token_type(t_shell *shell)
 			t_arr_index = is_in_t_arr_dic_str(shell->oper, arr[i]);
 			if (t_arr_index != -1)
 				token->type = TOKEN_OPER;
-
-			// builtin or cmd
-			if (token->type == TOKEN_WORD)
+			else
 			{
-				t_arr_index = is_in_t_arr_dic_str(shell->bcmd, arr[i]);
+				// === 2. Cherche BUILTIN (CORRIGÉ) ===
+				t_arr_index = is_in_t_arr_str(shell->bcmd, arr[i]);
 				if (t_arr_index != -1)
 					token->type = TOKEN_BCMD;
 				else
 					token->type = TOKEN_CMD;
-				i = attribute_cmd_subtokens(shell, token, i, count_args_cmd(shell, i));
+
+				// === 3. Gestion des arguments/subtokens ===
+				int nb_args = count_args_cmd(shell, i);
+				if (nb_args <= 0)
+					nb_args = 1;
+
+				int old_i = i;
+				int new_i = attribute_cmd_subtokens(shell, token, i, nb_args);
+
+				if (new_i <= old_i) {
+					printf("BUG: attribute_cmd_subtokens n’avance pas (%d -> %d) — on avance à la main !\n", old_i, new_i);
+					i = old_i + 1;
+				} else {
+					i = new_i;
+				}
 			}
 
 			if (token->type != TOKEN_OPER)
@@ -345,6 +546,10 @@ void attribute_token_type(t_shell *shell)
 			}
 			i++;
 			idx_token++;
+		}
+		else
+		{
+			i++;
 		}
 	}
 }

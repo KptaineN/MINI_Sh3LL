@@ -1,18 +1,31 @@
 
 #include "echo.h"
-
+/**
 static char *find_env_value(t_list *env_list, const char *key)
 {
     t_list *node = env_list;
     while (node)
     {
-        t_env *current = (t_env *)node->content;
+        t_list *current = (t_list *)node->content;
         if (ft_strncmp(current->key, key, ft_strlen(key) + 1) == 0)
             return current->value;
         node = node->next;
     }
     return NULL;
+}*/
+char *find_env_value(t_list *env, const char *key)
+{
+    size_t keylen = ft_strlen(key);
+    while (env)
+    {
+        char *entry = (char *)env->content;
+        if (ft_strncmp(entry, key, keylen) == 0 && entry[keylen] == '=')
+            return entry + keylen + 1;
+        env = env->next;
+    }
+    return NULL;
 }
+
 
 static char *get_special_var(const char *key)
 {

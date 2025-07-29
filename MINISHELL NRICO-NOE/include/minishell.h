@@ -178,8 +178,8 @@ int is_builtin(t_ast *ast);
 int execute_external(t_ast *ast, t_minishell *shell);
 void free_t_arr(t_arr *array);
 void free_tab(char **tab);
-char **env_to_envp(t_env *env); // à mettre dans minishell.h
-int env_len(t_env *env);
+char **env_to_envp(t_list *env); // à mettre dans minishell.h
+int env_list(t_env *env);
 void execute_ast(t_ast *node, t_minishell *shell);
 void	exit_shell(t_minishell *shell, int exit_code);
 int	builtin_exit(t_ast *node, t_minishell *shell);

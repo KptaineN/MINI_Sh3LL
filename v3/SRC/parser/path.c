@@ -1,13 +1,135 @@
 
 #include "../../include/minishell.h"
 
+/*char **linked_to_array_string(t_list *env)
+{
+    int len = 0;
+    t_list *tmp = env;
+    while (tmp)
+    {
+        len++;
+        tmp = tmp->next;
+    }
+    char **arr = malloc(sizeof(char *) * (len + 1));
+    tmp = env;
+    for (int i = 0; i < len; i++)
+    {
+        arr[i] = tmp->content;
+        tmp = tmp->next;
+    }
+    arr[len] = NULL;
+    return arr;
+}*/
+
+/*
+void set_env_value(t_list **env, const char *key, const char *value)
+{
+    t_list *tmp = *env;
+    size_t key_len = strlen(key);
+    char *new_str;
+
+    // Cherche si ça existe
+    while (tmp)
+    {
+        char *entry = tmp->content;
+        if (strncmp(entry, key, key_len) == 0 && entry[key_len] == '=')
+        {
+            free(tmp->content);
+            new_str = malloc(key_len + 1 + strlen(value) + 1);
+            sprintf(new_str, "%s=%s", key, value);
+            tmp->content = new_str;
+            return;
+        }
+        tmp = tmp->next;
+    }
+    // Sinon, on ajoute
+    new_str = malloc(key_len + 1 + strlen(value) + 1);
+    sprintf(new_str, "%s=%s", key, value);
+    t_list *new_node = malloc(sizeof(t_list));
+    new_node->content = new_str;
+    new_node->next = NULL;
+    // Ajout fin de liste
+    if (!*env)
+        *env = new_node;
+    else
+    {
+        tmp = *env;
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = new_node;
+    }
+}*/
+// Remplace ou ajoute une variable
+int set_env_value(t_list **env, const char *key, const char *value)
+{
+	t_list *tmp = *env;
+	size_t key_len = ft_strlen(key);
+	char *new_str;
+
+	// Cherche si la clé existe déjà
+	while (tmp)
+	{
+		char *content = (char *)tmp->content;
+		char *equal = ft_strchr(content, '=');
+		if (equal && (size_t)(equal - content) == key_len && !strncmp(content, key, key_len))
+		{
+			free(tmp->content);
+			new_str = malloc(key_len + 1 + ft_strlen(value) + 1);
+			if (!new_str) exit(1);
+			sprintf(new_str, "%s=%s", key, value);
+			tmp->content = new_str;
+			return 0;
+		}
+		tmp = tmp->next;
+	}
+	// Sinon ajoute un noeud
+	new_str = malloc(key_len + 1 + ft_strlen(value) + 1);
+	if (!new_str) exit(1);
+	sprintf(new_str, "%s=%s", key, value);
+	t_list *node = malloc(sizeof(t_list));
+	if (!node) exit(1);
+	node->content = new_str;
+	node->next = *env;
+	*env = node;
+	return 0;
+}
+
+/*
+char *get_env_value(t_list *env, const char *key)
+{
+    size_t key_len = strlen(key);
+    while (env)
+    {
+        char *entry = env->content;
+        if (strncmp(entry, key, key_len) == 0 && entry[key_len] == '=')
+            return entry + key_len + 1;
+        env = env->next;
+    }
+    return NULL;
+}*/
+char *get_env_value(t_list *env, const char *key)
+{
+    size_t key_len = ft_strlen(key);
+    while (env)
+    {
+        char *content = env->content;
+        char *equal = ft_strchr(content, '=');
+        if (equal && (size_t)(equal - content) == key_len && !ft_strncmp(content, key, key_len))
+            return equal + 1;
+        env = env->next;
+    }
+    return NULL;
+}
+
+
+
 char	*get_value_env(t_list *env, char *value, int len)
 {
 	t_list	*temp;
 	temp = env;
 	while (1)
 	{
-		if (strncmp(temp->content, value, len) == 0 && *(char* )(temp->content+len) == '=')
+		if (ft_strncmp(temp->content, value, len) == 0 && *(char* )(temp->content+len) == '=')
 			return (temp->content + len +1); // Skip "value="
 		temp = temp->next;
 		if (temp == env)
@@ -270,13 +392,69 @@ char **expand_cmd(t_token *token, t_list *env)
 	return res;
 }
 
+int (*get_builtin_handler(t_arr *bcmd, int idx))(void *, int)
+{
+    if (!bcmd || !bcmd->arr || idx < 0 || idx >= bcmd->len)
+        return NULL;
+    t_dic *dic = (t_dic *)bcmd->arr[idx];
+    return (int (*)(void *, int))dic->value;
+}
 
 
 void execute_cmd(t_minishell *shell, t_token *cmd)
 {
-	char **args = expand_cmd(cmd,shell->parser.env);
-	//char **env = linked_to_array_string(shell->env);
-	if (!args)
-		perror("malloc res and env execute()");
-	execv(find_command_path(cmd->value,shell->parser.env), (char **const) args);
+    if (!cmd || !cmd->value) 
+    {
+        fprintf(stderr, "Erreur interne: cmd null\n");
+        exit(1); // Quitter le process fils proprement
+    }
+
+    // 1. Gestion des builtins
+    int idx = is_in_t_arr_str(shell->parser.bcmd, cmd->value);
+    if (idx != -1) 
+    {
+        // Appel du handler builtin : il faut une table de fonction (voir plus bas)
+        int (*handler)(void *, int) = get_builtin_handler(shell->parser.bcmd, idx);
+        if (handler)
+        {
+            shell->exit_status = handler(shell, 0); // ou passer les bons args
+            exit(shell->exit_status);
+        }
+        else
+        {
+            fprintf(stderr, "Erreur interne: handler builtin null pour %s\n", cmd->value);
+            exit(1);
+        }
+    }
+
+    // 2. Expansion des arguments
+    char **args = expand_cmd(cmd, shell->parser.env);
+    if (!args || !args[0]) // args[0] est toujours la commande
+    {
+        fprintf(stderr, "%s: command not found\n", cmd->value);
+        exit(127);
+    }
+
+    // 3. Recherche du PATH
+    char *cmd_path = find_command_path(cmd->value, shell->parser.env);
+    if (!cmd_path)
+    {
+        fprintf(stderr, "%s: command not found\n", cmd->value);
+        exit(127);
+    }
+	if (!args[0] || !cmd_path)
+	{
+    	fprintf(stderr, "%s: command not found\n", cmd->value);
+    	exit(127);
+    }
+	printf("DEBUG: shell->parser.env pointe sur %p\n", (void*)shell->parser.env);
+	char **envp = linked_to_array_string(shell->parser.env);
+	t_list *test = (t_list*)shell->parser.env;
+	printf("Premier env : content=%s\n", (char *)test->content);
+	// 4. Exécution
+    execve(cmd_path, args, envp);
+	free_tab(envp);
+    // Si execve échoue :
+    fprintf(stderr, "%s: command not found\n", cmd->value);
+    exit(127);
 }

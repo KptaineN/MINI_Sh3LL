@@ -95,14 +95,20 @@ static int count_args_cmd(t_shell *shell, int i)
 
 void subtoken_of_cmd(t_subtoken_conainter *container, char *arg)
 {
+	if (!container || !arg)
+        return;
 	t_subtoken *parts;
 	char *head = arg;
 	int idx_tail;
 	int n_parts = container->n_parts;
+    if (n_parts <= 0)
+        return;
 	container->parts = malloc(sizeof(t_subtoken)*n_parts);
-	parts = container->parts;
-	if (!parts)
-		return;
+	 if (!container->parts)
+        return;
+	//parts = container->parts;
+	//if (!parts)
+	//	return;
 	parts = container->parts;
 	int i = 0;
 	int idx = 0;

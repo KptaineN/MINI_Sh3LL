@@ -13,6 +13,35 @@
 #include "../../include/parsking.h"
 #include "../../include/minishell.h"
 
+void replace_or_add_env(t_list **env, const char *key, const char *value)
+{
+    t_list *current = *env;
+    size_t key_len = ft_strlen(key);
+    char *new_str;
+
+    while (current)
+    {
+        char *entry = (char *)current->content;
+        // On veut une égalité parfaite sur la clé, puis un '=' juste après
+        if (ft_strncmp(entry, key, key_len) == 0 && entry[key_len] == '=')
+        {
+            // Trouvé : on remplace
+            free(current->content);
+            new_str = malloc(key_len + 1 + ft_strlen(value) + 1);
+            if (!new_str) exit(1);
+            sprintf(new_str, "%s=%s", key, value);
+            current->content = new_str;
+            return;
+        }
+        current = current->next;
+    }
+    // Pas trouvé, ajoute à la fin
+    new_str = malloc(key_len + 1 + ft_strlen(value) + 1);
+    if (!new_str) exit(1);
+    sprintf(new_str, "%s=%s", key, value);
+    t_list *new_node = ft_lstnew(new_str);
+    ft_lstadd_back(env, new_node);
+}
 
 
 void add_pid_env(t_minishell *shell, int fd)
@@ -22,7 +51,7 @@ void add_pid_env(t_minishell *shell, int fd)
     if (read(fd, s, 20) > 0)
         perror("add_pid_func");   
     ft_itoa_inplace(&s[4], (int) received_pid);
-    replace_or_add(&shell->parser.env, "PID=", (const char *)s);
+    replace_or_add_env(&(shell->parser.env), "PID=", s);
 }
 
 void send_pid(int fd, int pid)

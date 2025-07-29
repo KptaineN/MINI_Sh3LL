@@ -3,6 +3,10 @@
 
 #include "../../../include/minishell.h"
 #include "../../../include/parsking.h"
+#include "../../../include/struct.h"
+// Au début de ton header (ex : echo.h ou export.h)
+
+
 
 //int builtin_echo(t_shell *parser, t_token *token);
 int builtin_echo(t_minishell *shell, t_token *token);

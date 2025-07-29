@@ -1,0 +1,75 @@
+
+1️⃣ Ce que tu dois faire tout de suite : PATCH ton gestionnaire de builtins et opérateurs
+
+Utilise le patch que j’ai mis dans le canvas (Patch Functions, voir ta zone de droite).
+Copie le exactement dans ton projet (remplace les anciennes fonctions), car il :
+
+    ajoute tous les NULL-checks manquants,
+
+    sécurise tous les mallocs,
+
+    compare proprement les clés,
+
+    NE SEGFAULT PAS si tu as une case vide dans bcmd ou oper !
+
+2️⃣ Pourquoi tu crashais
+
+La cause des segfaults is_in_t_arr_dic_str c’est quasi sûr :
+
+    Tu passes une structure (bcmd/oper) où certaines entrées ne sont pas initialisées (NULL) OU mal typées.
+
+    Parfois la clé n’est pas copiée (strdup fail → key == NULL).
+
+    Ou tu avais un accés mémoire sauvage car la table de handlers n’était pas alignée sur la table de keys.
+
+La nouvelle version du patch ignore toute entrée NULL ou sans clé (safe).
+3️⃣ Pour tes builtins : vérifie bien
+
+    Le tableau de noms ET le tableau de handlers doivent être strictement de même taille.
+
+    Quand tu ajoutes un builtin/opérateur, tu ajoutes sa clé et son handler à la même position.
+
+    Aucun handler n’est NULL, sinon ça crashera à l’exécution.
+
+4️⃣ Pour les malloc/free
+
+    Le patch protège chaque malloc.
+
+    Tu peux ajouter en DEBUG dans chaque fonction un print avant tout return ou break en cas d’erreur, pour voir où ça plante.
+
+5️⃣ Pourquoi l’ancien code marchait "mieux" ?
+
+Avant, tu avais peut-être des comparaisons plus "tolérantes" (genre strncmp sur une longueur mal calculée) : c’est risqué.
+Maintenant, c’est du solide : soit la clé matche pile-poil, soit non.
+6️⃣ Test minimum
+
+Après avoir patché :
+
+    Compile.
+
+    Fais minishell, tape pwd, env, echo, etc. Si tu as encore un crash sur les builtins, mets des printf juste avant tout return/continue/break dans la boucle de recherche.
+
+7️⃣ Ce qu’il te reste à PATCHER après
+
+    Si tu vois encore des munmap_chunk(): invalid pointer ou des crashs sur le free, vérifie les free sur t_arr : ne free jamais deux fois le même bloc (par ex, temp, arr[i], etc).
+
+    Vérifie bien que tu ne fais pas un free sur une zone stack (genre tableau statique ou variable locale).
+
+Exemple d’utilisation après patch
+
+Dans ton looping ou ta gestion de la commande :
+
+int idx = is_in_t_arr_dic_str(shell->parser.bcmd, cmd_name);
+if (idx != -1)
+{
+    int (*handler)(void *, int) = ((t_dic *)shell->parser.bcmd->arr[idx])->value;
+    if (handler)
+        handler(shell, ...);
+    else
+        printf("[ERROR] Handler NULL pour %s\n", cmd_name);
+}
+
+➡️ Copie/colle le patch du canvas, compile, relance. Si crash, mets le log exact ici, je te corrige le reste.
+On lâche pas, on va l’avoir cette shell solide !
+
+(Et si tu veux la vérif complète d’une de tes fonctions d’appel builtin/operator, balance le code, je te l’explique/patch en mode "code review")

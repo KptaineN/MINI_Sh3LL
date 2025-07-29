@@ -175,7 +175,7 @@ void	clean_exit(char **cmd_args, char *msg, int code)
 }
 
  //* Libère toute la mémoire de la structure minishell.
-void	free_env_list(t_list *env)
+void free_env_list(t_list *env)
 {
 	t_list *tmp;
 	while (env)
@@ -183,17 +183,11 @@ void	free_env_list(t_list *env)
 		tmp = env;
 		env = env->next;
 		if (tmp->content)
-		{
-			t_env *env_node = (t_env *)tmp->content;
-			if (env_node->key)
-				free(env_node->key);
-			if (env_node->value)
-				free(env_node->value);
-			free(env_node);
-		}
+			free(tmp->content);
 		free(tmp);
 	}
 }
+
 
 
 void free_parser(t_shell *parser)

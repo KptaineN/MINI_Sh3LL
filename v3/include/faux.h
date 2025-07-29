@@ -26,6 +26,10 @@ typedef struct s_env
 t_env				*init_env(char **envp);
 void				free_env(t_env *env);
 void				print_env(t_env *env);
+t_env *init_env(char **envp);
+t_env				*create_env(const char *key, const char *value);
+char **env_to_envp(t_env *env);
+
 char				*get_env_value(t_env *env, const char *name);
 // ... autres prototypes liés à l'env
 #endif

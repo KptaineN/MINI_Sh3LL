@@ -16,7 +16,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "LIBFT/libft.h"
-#include "env.h"
+
 #include "parsking.h"
 #include "../SRC/built/echo/echo.h"
 #include "../SRC/built/export/export.h"
@@ -35,9 +35,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-typedef struct s_shell  t_shell;
-typedef struct s_env    t_env;
-
+#include "struct.h"
 typedef struct s_minishell
 {
 	t_shell  parser;
@@ -70,12 +68,12 @@ int builtin_exit(t_minishell *shell, t_token *token);
 void exit_shell(t_minishell *shell, int exit_code); // ← ajoute ça ici
 /* Utilities */
 char *ft_strjoin3(char *a, const char *b, const char *c, int free_a);
-char *get_env_value(t_env *env, const char *name);
-char *find_cmd(const char *cmd, t_env *env);
-char *get_valid_path(char *cmd, t_env *env);
+char *get_env_value(t_list *env, const char *name);
+char *find_cmd(const char *cmd, t_list *env);
+char *get_valid_path(char *cmd, t_list *env);
 char *search_in_paths(char **paths, char *cmd);
-char **env_to_envp(t_env *env);
-int    env_len(t_env *env);
+char **env_to_envp(t_list *env);
+int    env_len(t_list *env);
 char *replace_exit_code(const char *input, int exit_code);
 char *replace_variables(const char *arg, t_minishell *shell);
 char *expand_argument(const char *arg, t_minishell *shell);
@@ -101,6 +99,11 @@ void handle_pipe(t_minishell *shell, int token_idx);
 void handle_redirect_in(t_minishell *shell, int token_idx);
 void handle_redirect_out(t_minishell *shell, int token_idx);
 void ft_free(void **thing);
-
+// Si tu utilises la version t_list
+int set_env_value(t_list **env, const char *key, const char *value);
+void print_env(t_list *env);
+// Dans minishell.h (ou env.h)
+t_list *init_env(char **envp);
+char *find_env_value(t_list *env, const char *key);
 
 #endif // MINISHELL_H

@@ -68,7 +68,10 @@ int looping(t_minishell *shell)
 			continue;
 		}
 		add_history(input);
-
+		if (ft_strcmp(input, "exit") == 0) {
+            free(input);
+            break;
+        }
 		// 2) expansion de $?
 		step1 = expand_status(input, shell);
 		if (!step1)
@@ -96,7 +99,18 @@ int looping(t_minishell *shell)
 			continue;
 		}
 		attribute_token_type(&shell->parser);
+		printf("DEBUG: n_cmd = %d\n", shell->parser.n_cmd);
 		// print_commands(shell->parser.cmd_head);
+		if (shell->parser.n_cmd == 1) 
+		{
+            t_token *cmd = (t_token *)shell->parser.cmd_head->content;
+            if (cmd && cmd->value && strcmp(cmd->value, "exit") == 0) 
+			{
+                free(step2);
+                // free parser/env ici !
+                break;
+            }
+        }
 		shell->parser.pids = malloc(sizeof(pid_t) * shell->parser.n_cmd);
 		if (!shell->parser.pids)
 			perror("MALLOC pids");

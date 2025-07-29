@@ -13,7 +13,14 @@ size_t env_count(t_minishell *shell)
     return count;
 }
 
-char *create_env_entry(t_env *env)
+// Si tu stockes des char* dans content
+char *create_env_entry(char *env_line)
+{
+    return ft_strdup(env_line);
+}
+
+/**
+char *create_env_entry(t_list *env)
 {
     size_t klen = ft_strlen(env->key);
     size_t vlen = env->value ? ft_strlen(env->value) : 0;
@@ -29,7 +36,7 @@ char *create_env_entry(t_env *env)
     else entry[klen] = '\0';
 
     return entry;
-}
+}**/
 
 char **env_to_array(t_minishell *shell)
 {
@@ -40,8 +47,8 @@ char **env_to_array(t_minishell *shell)
     size_t i = 0;
     for (t_list *node = shell->parser.env; node; node = node->next)
     {
-        t_env *env = (t_env *)node->content;
-        arr[i] = create_env_entry(env);
+        t_list *env = (t_list *)node->content;
+        arr[i] = create_env_entry((char*)env->content);
         if (!arr[i])
         {
             free_export_arr(arr);

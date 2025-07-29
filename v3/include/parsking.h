@@ -2,9 +2,7 @@
 #ifndef MINI_H
 # define MINI_H
 
-// Forward declarations
-typedef struct s_minishell t_minishell;
-typedef struct s_env t_env;
+#include "struct.h"
 # include <stdio.h>             // printf, perror, etc.
 
 # include <dirent.h>            // opendir, readdir (for wildcard expansion)
@@ -125,8 +123,8 @@ t_list *set_linked_path(char **env);
 char  **linked_to_array_string(t_list *node);
 void   push_lst(t_list **tail, void *content);
 t_list *search_lst(t_list *lst, const char *target);
-void   replace_or_add(t_list **lst, const char *old, const char *new);
-
+//void   replace_or_add(t_list **lst, const char *old, const char *new);
+void replace_or_add_env(t_list **env, const char *key, const char *value);
 // t_arr
 size_t t_arrlen(void **arr);
 int    is_in_t_arr_str(t_arr *arr, const char *arg);
@@ -182,5 +180,6 @@ void    print_dic(t_arr *arr);
 void    printStringArray(const char *cmd, const char *arr[]);
 
 // free section
+void free_env_list(t_list *env);
 
 #endif

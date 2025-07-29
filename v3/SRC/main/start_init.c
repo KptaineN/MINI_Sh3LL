@@ -16,12 +16,37 @@
 
 void init_idx(t_shell *shell, char **envp)
 {
+	
+	shell->env = init_env(envp);
+	if (!shell->env)
+	{
+		perror("Error initializing environment");
+		exit(EXIT_FAILURE);
+	}
 	shell->fd_in = -1;
 	shell->fd_out = -1;
 	shell->doc = -1;
 	shell->fd_in  = STDIN_FILENO;
 	shell->fd_out = STDOUT_FILENO;
-	shell->env = set_linked_path(envp);    // Convert to t_list format
+	//shell->env = set_linked_path(envp);    // Convert to t_list format
+	shell->n_tokens = 0;
+	shell->n_cmd = 0;
+	shell->tokens = NULL;
+	shell->cmd_head = NULL;
+	shell->cmd_tail = NULL;
+	shell->pids = NULL;
+	shell->heredoc = NULL;
+	shell->smaller = 0;
+	shell->bigger = 0;
+	shell->append = 0;
+	shell->fd_pid[0] = -1;
+	shell->fd_pid[1] = -1;
+	shell->parsed_args = NULL;
+	shell->bcmd = NULL;
+	shell->oper = NULL;
+	
+
+
 	// Removed parser initialization since t_shell has no parser field
 	//init_all_t_arr(shell);
 }
@@ -100,12 +125,7 @@ int	start_minishell(t_minishell *shell, char **envp)
 
 	memset(shell, 0, sizeof(t_minishell));         // ici c'est ok car tu n'as rien encore mis dans shell
 	//shell->env = init_env(envp);                  // initialise ton env
-	shell->parser.env = set_linked_path(envp);
-	if (!shell->parser.env)
-	{
-		printf("Erreur : échec d'initialisation de l'environnement\n");
-		return (1);
-	}
+	
 
 	init_signals();                                // gestion des signaux
 	init_minishell(shell, envp);                   // initialise le reste (parser, etc)

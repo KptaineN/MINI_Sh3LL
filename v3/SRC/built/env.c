@@ -1,17 +1,6 @@
 #include "../../include/minishell.h"
 
-void free_env(t_env *env)
-{
-    t_env *tmp;
-    while (env)
-    {
-        tmp = env->next;
-        free(env->key);
-        free(env->value);
-        free(env);
-        env = tmp;
-    }
-}
+
 /*
 char **env_to_envp(t_env *env)
 {
@@ -29,7 +18,7 @@ char **env_to_envp(t_env *env)
 	}
 	envp[i] = NULL;
 	return envp;
-}*/
+}
 char **env_to_envp(t_env *env)
 {
 	int count = env_len(env);
@@ -67,20 +56,20 @@ void print_env(t_env *env)
         env = env->next;
     }
 }
-
+*/
 
 int builtin_env(char **args, t_minishell *shell)
 {
     (void)args;
-    t_env *cur = (t_env *)shell->parser.env;
+    t_list *cur = shell->parser.env;
     while (cur)
     {
-        if (cur->value) // bash n’imprime pas les clés sans valeur ?
-            printf("%s=%s\n", cur->key, cur->value);
+        // On n’affiche que les entrées contenant '='
+        char *entry = (char *)cur->content;
+        if (ft_strchr(entry, '=')) // Affiche seulement si c'est une vraie variable d'env
+            printf("%s\n", entry);
         cur = cur->next;
     }
-	printf("[DEBUG] builtin_export/env: env @ %p\n", shell->parser.env);
-	print_env((t_env *)shell->parser.env);
     shell->exit_status = 0;
     return 0;
 }
