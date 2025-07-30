@@ -2,14 +2,10 @@
 #define EXPORT_H
 
 #include "../../../include/minishell.h"
-#include "../../../include/parsking.h"
+
 
 // Au début de ton header (ex : echo.h ou export.h)
-
-#include "../../include/struct.h"
-
-
-int builtin_export(t_token *token, t_shell *shell);
+    int builtin_export(t_shell *shell, char **argv);
 
 int export_no_arguments(t_shell *shell);
 int process_export_argument(char *arg, t_shell *shell);

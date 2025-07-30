@@ -12,6 +12,10 @@
 
 #include "../../include/minishell.h"
 
+// Add declarations for operator handler functions
+
+
+
 /*array of string
 size_t t_arrlen(void **arr)
 {
@@ -336,7 +340,7 @@ void init_all_t_arr(t_shell *shell)
 {
     char *all_operators[] = {"<<", ">>", "&&", "||", "|", "<", ">"};
     char *all_builtins[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
-    void (*operator_handlers[])(t_shell *, int) = {
+    int (*operator_handlers[])(t_shell *, char **) = {
         handle_heredoc,     // "<<"
         handle_append,      // ">>"
         handle_and,         // "&&"
@@ -345,12 +349,19 @@ void init_all_t_arr(t_shell *shell)
         handle_redirect_in, // "<"
         handle_redirect_out // ">"
     };
-    int (*builtin_handlers[])(void *, int) = {
-        ft_echo, ft_cd, ft_pwd, ft_export, ft_unset, ft_env, ft_exit
+    int (*builtin_handlers[])(t_shell *, char **) = {
+        ft_echo,
+        ft_cd,
+        ft_pwd,
+        ft_export,
+        ft_unset,
+        ft_env,
+        ft_exit,
+        NULL
     };
     int n_operateurs = sizeof(all_operators) / sizeof(char *);
     int n_builtins = sizeof(all_builtins) / sizeof(char *);
 
-    build_t_arr_dic_str(&shell->parser.oper, all_operators, (void **)operator_handlers, n_operateurs);
-    build_t_arr_dic_str(&shell->parser.bcmd, all_builtins, (void **)builtin_handlers, n_builtins);
+    build_t_arr_dic_str(&shell->oper, all_operators, (void **)operator_handlers, n_operateurs);
+    build_t_arr_dic_str(&shell->bcmd, all_builtins, (void **)builtin_handlers, n_builtins);
 }

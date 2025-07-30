@@ -58,10 +58,10 @@ void print_env(t_env *env)
 }
 */
 
-int builtin_env(char **args, t_shell *shell)
+int builtin_env(t_shell *shell, char **args)
 {
     (void)args;
-    t_list *cur = shell->parser.env;
+    t_list *cur = shell->env;
     while (cur)
     {
         // On n’affiche que les entrées contenant '='

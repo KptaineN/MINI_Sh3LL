@@ -1,24 +1,28 @@
 #include "../../../include/minishell.h"
 
 
-void handle_pipe(t_shell *shell, int token_idx)
+int handle_pipe(t_shell *shell, char **argv)
 {
     (void) shell;
-    printf("Handling PIPE (|) at token %d\n", token_idx);
+    (void) argv; // Suppress unused parameter warning
+    printf("Handling PIPE (|)\n");
     // TODO: Implement pipe logic
-    
+    return 0;
 }
-void handle_redirect_in(t_shell *shell, int token_idx)
+int handle_redirect_in(t_shell *shell, char **argv)
 {
     (void) shell;
-    printf("Handling REDIRECT_IN (<) at token %d\n", token_idx);
+    (void) argv; // Suppress unused parameter warning
+    printf("Handling REDIRECT_IN (<)\n");
     // TODO: Implement input redirection logic
-    
+    return 0;
 }
-void handle_redirect_out(t_shell *shell, int token_idx)
+int handle_redirect_out(t_shell *shell, char **argv)
 {
     (void) shell;
-    printf("Handling REDIRECT_OUT (>) at token %d\n", token_idx);
+    (void) argv; // Suppress unused parameter warning
+    printf("Handling REDIRECT_OUT (>)\n");
     // TODO: Implement output redirection logic
-    
+    return 0;
+
 }

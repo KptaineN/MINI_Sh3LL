@@ -47,52 +47,77 @@ void free_t_arr(t_arr *array)
  * Libère la liste chaînée de l'environnement
  * Chaque content doit être (char *) ou une struct allouée.
  * ======================================== */
-void free_env_list(t_list *env)
+void free_list_str(t_list *lst)
 {
     t_list *tmp;
 
-    while (env)
+    while (lst)
     {
-        tmp = env->next;
-        if (env->content)
-            free(env->content);
-        free(env);
-        env = tmp;
+        tmp = lst->next;
+        if (lst->content)
+            free(lst->content);
+        free(lst);
+        lst = tmp;
     }
 }
+void free_str_array(char **arr)
+{
+    if (!arr) {
+        printf("[DEBUG] free_str_array: arr == NULL\n");
+        return;
+    }
+    for (int i = 0; arr[i]; i++)
+        free(arr[i]);
+    free(arr);
+}
+
+
+void free_cmd_list(t_shell *shell)
+{
+    t_list *node = shell->cmd_head;
+    while (node)
+    {
+        t_list *next = node->next;
+        free(node);
+        node = next;
+    }
+    shell->cmd_head = NULL;
+    shell->cmd_tail = NULL;
+    shell->n_cmd    = 0;
+}
+
 
 /* ========================================
  * Libère les tokens (liste chaînée t_token)
  * ======================================== */
-void free_tokens(t_shell *parser)
+/* ========================================
+ * Libère le tableau de tokens (tableau, pas liste)
+ * ======================================== */
+void free_tokens(t_shell *shell)
 {
-    t_token *tmp;
-    t_token *next;
-
-    if (!parser || !parser->tokens)
+    if (!shell || !shell->tokens)
         return;
 
-    tmp = parser->tokens;
-    while (tmp)
+    /* 1) On supprime la structure cmd_args_parts,
+     *    MAIS on NE libère PAS les .p (elles aliasent parsed_args->arr,
+     *    déjà libérées par free_tab).
+     */
+    for (int i = 0; i < shell->n_tokens; i++)
     {
-        next = tmp->next;
-        if (tmp->value)
-            free(tmp->value);
-
-        if (tmp->cmd_args_parts)
+        t_token *tok = &shell->tokens[i];
+        if (tok->cmd_args_parts)
         {
-            // Libérer tous les sous-tokens
-            for (int i = 0; i < tmp->cmd_args_parts->n_parts; i++)
-                if (tmp->cmd_args_parts->parts[i].p)
-                    free(tmp->cmd_args_parts->parts[i].p);
-            free(tmp->cmd_args_parts->parts);
-            free(tmp->cmd_args_parts);
+            free(tok->cmd_args_parts->parts);
+            free(tok->cmd_args_parts);
         }
-        free(tmp);
-        tmp = next;
     }
-    parser->tokens = NULL;
+
+    /* 2) On libère le tableau de tokens lui-même */
+    free(shell->tokens);
+    shell->tokens   = NULL;
+    shell->n_tokens = 0;
 }
+
 
 /* ========================================
  * Libère tout le parser
@@ -102,7 +127,7 @@ void free_parser(t_shell *parser)
     if (!parser)
         return;
 
-    free_tokens(parser);
+    //free_tokens(parser);
     if (parser->parsed_args)
         free_t_arr(parser->parsed_args);
     parser->parsed_args = NULL;
@@ -116,7 +141,7 @@ void free_parser(t_shell *parser)
     parser->oper = NULL;
 
     if (parser->env)
-        free_env_list(parser->env);
+        free_list_str(parser->env);
     parser->env = NULL;
 }
 
@@ -128,11 +153,28 @@ void free_minishell(t_shell *shell)
     if (!shell)
         return;
 
-    free_parser(&shell->parser);
+    free_parser(shell);
     if (shell->args)
-        free_tab(shell->args);
+        free_str_array(shell->args);
     shell->args = NULL;
 }
+
+#include <unistd.h>  // pour _exit
+
+void child_exit(char **args,
+                char *cmd_path,
+                char **envp,
+                t_list *candidates,
+                int code)
+{
+    if (envp)     free_str_array(envp);
+    if (args)     free_str_array(args);
+    if (cmd_path) free(cmd_path);
+    if (candidates) free_list_str(candidates);
+    _exit(code);
+}
+
+
 
 
 // Fichier : exit_utils.c par exemple

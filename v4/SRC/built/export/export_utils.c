@@ -3,7 +3,7 @@
 size_t env_count(t_shell *shell)
 {
     size_t count = 0;
-    t_list *current = shell->parser.env;  // shell->parser.env est t_list *
+    t_list *current = shell->env;  // shell->parser.env est t_list *
     
     while (current)
     {
@@ -45,7 +45,7 @@ char **env_to_array(t_shell *shell)
     if (!arr) return NULL;
 
     size_t i = 0;
-    for (t_list *node = shell->parser.env; node; node = node->next)
+    for (t_list *node = shell->env; node; node = node->next)
     {
         t_list *env = (t_list *)node->content;
         arr[i] = create_env_entry((char*)env->content);

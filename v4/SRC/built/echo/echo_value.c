@@ -54,7 +54,7 @@ static char *extract_key(const char *arg, int start, int *len)
 
 static char *get_env_or_special_value(t_shell *shell, const char *key)
 {
-    char *val_env = find_env_value(shell->parser.env, key);
+    char *val_env = find_env_value(shell->env, key);
     if (val_env)
         return ft_strdup(val_env);
     return get_special_var(key);

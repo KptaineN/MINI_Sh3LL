@@ -95,7 +95,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
 
-	if (argc != 1)
+	if (argc != 1 || argv[1])
 	{
 		ft_putstr_fd("Usage: ./minishell\n", STDERR_FILENO);
 		return (EXIT_FAILURE);

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/parsking.h"
+#include "../../include/minishell.h"
 
 
 bool is_command(char *str, t_list *env)

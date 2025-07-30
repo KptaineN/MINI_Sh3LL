@@ -81,7 +81,32 @@ static int count_args_cmd(t_shell *shell, int i)
 	return n_args;
 }*/
 
-static int count_args_cmd(t_shell *shell, int i)
+
+void add_cmd(t_shell *shell, t_token *token)
+{
+    t_list *tmp = malloc(sizeof(t_list));
+    if (!tmp)
+    {
+        perror("Erreur malloc add_cmd");
+        return;
+    }
+
+    tmp->content = (void *)token;
+    tmp->next = NULL;
+
+    if (!shell->cmd_head)
+    {
+        shell->cmd_head = tmp;
+        shell->cmd_tail = tmp;
+    }
+    else
+    {
+        shell->cmd_tail->next = tmp;
+        shell->cmd_tail = tmp;
+    }
+}
+
+int count_args_cmd(t_shell *shell, int i)
 {
     int n_args = 0;
     char **arr;
@@ -494,29 +519,6 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
 
 	return idx + len;
 }*/
-static void add_cmd(t_shell *shell, t_token *token)
-{
-    t_list *tmp = malloc(sizeof(t_list));
-    if (!tmp)
-    {
-        perror("Erreur malloc add_cmd");
-        return;
-    }
-
-    tmp->content = (void *)token;
-    tmp->next = NULL;
-
-    if (!shell->cmd_head)
-    {
-        shell->cmd_head = tmp;
-        shell->cmd_tail = tmp;
-    }
-    else
-    {
-        shell->cmd_tail->next = tmp;
-        shell->cmd_tail = tmp;
-    }
-}
 
 /*void attribute_token_type(t_shell *shell)
 {

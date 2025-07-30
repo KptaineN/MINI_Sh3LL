@@ -12,55 +12,63 @@
 
 #include "../../include/minishell.h"
 
+#include "minishell.h"
 
+/* Initialise les champs de base du shell */
 void init_idx(t_shell *shell, char **envp)
 {
-	shell->env = init_env(envp);
-	if (!shell->env)
-	{
-		perror("Error initializing environment");
-		exit(EXIT_FAILURE);
-	}
+    /* Environnement */
+    shell->env = init_env(envp);
+    if (!shell->env)
+    {
+        perror("Error initializing environment");
+        exit(EXIT_FAILURE);
+    }
 
-	shell->fd_in  = STDIN_FILENO;
-	shell->fd_out = STDOUT_FILENO;
-	shell->heredoc = -1;
+    /* Descripteurs par défaut */
+    shell->fd_in  = STDIN_FILENO;
+    shell->fd_out = STDOUT_FILENO;
 
-	shell->n_tokens = 0;
-	shell->n_cmd = 0;
-	shell->tokens = NULL;
-	shell->cmd_head = NULL;
-	shell->cmd_tail = NULL;
-	shell->pids = NULL;
-	shell->heredoc = NULL;
-	shell->fd_pid[0] = -1;
-	shell->fd_pid[1] = -1;
-	shell->parsed_args = NULL;
-	shell->bcmd = NULL;
-	shell->oper = NULL;
+    /* Pas de heredoc pour l'instant */
+    shell->heredoc = NULL;
+
+    /* Comptages et pointeurs initiaux */
+    shell->n_tokens   = 0;
+    shell->n_cmd      = 0;
+    shell->tokens     = NULL;
+    shell->cmd_head   = NULL;
+    shell->cmd_tail   = NULL;
+    shell->pids       = NULL;
+    shell->fd_pid[0]  = -1;
+    shell->fd_pid[1]  = -1;
+    shell->parsed_args= NULL;
+    shell->bcmd       = NULL;
+    shell->oper       = NULL;
 }
 
-void	init_shell(t_shell *shell, char **envp)
+/* Initialise le shell avant la boucle */
+void init_shell(t_shell *shell, char **envp)
 {
-	if (!shell || !envp)
-		return;
+    if (!shell || !envp)
+        return;
 
-	shell->args = NULL;
-	shell->exit_status = 0;
-	shell->parser.input = NULL;
+    shell->args        = NULL;
+    shell->exit_status = 0;
+    shell->input       = NULL;
 
-	init_idx(&shell->parser, envp);
-	init_all_t_arr(shell); // Initialise bcmd et oper
+    /* On passe shell, pas &shell */
+    init_idx(shell, envp);
+    init_all_t_arr(shell);
 }
 
-int	start_shell(t_shell *shell, char **envp)
+/* Démarrage du shell */
+int start_shell(t_shell *shell, char **envp)
 {
-	if (!shell)
-		return (0);
+    if (!shell)
+        return 0;
 
-	ft_bzero(shell, sizeof(t_shell));
-	init_signals();
-	init_shell(shell, envp);
-
-	return (1);
+    ft_bzero(shell, sizeof(t_shell));
+    init_signals();
+    init_shell(shell, envp);
+    return 1;
 }

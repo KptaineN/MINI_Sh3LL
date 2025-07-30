@@ -389,72 +389,181 @@ char **expand_cmd(t_token *token, t_list *env)
 		res[i] = expand_container(&temp_container, &head, env);
 		i++;
 	}
+	free_list_str(head); // Free the linked list used for expansion
+	//res[i] = NULL; // Terminate the array with NULL
 	return res;
 }
 
-int (*get_builtin_handler(t_arr *bcmd, int idx))(void *, int)
+int (*get_builtin_handler(t_arr *bcmd, int idx))(t_shell *, char **)
 {
-    if (!bcmd || !bcmd->arr || idx < 0 || idx >= bcmd->len)
+
+    if (!bcmd || idx < 0 || idx >= bcmd->len)
         return NULL;
-    t_dic *dic = (t_dic *)bcmd->arr[idx];
-    return (int (*)(void *, int))dic->value;
+    return ((int (*)(t_shell *, char **))bcmd->arr[idx]);
 }
 
-
+/*/
 void execute_cmd(t_shell *shell, t_token *cmd)
 {
     if (!cmd || !cmd->value) 
     {
         fprintf(stderr, "Erreur interne: cmd null\n");
-        exit(1); // Quitter le process fils proprement
+        child_exit(NULL, NULL, linked_to_array_string(shell->env), shell->cmd_tail, 127);
     }
 
     // 1. Gestion des builtins
-    int idx = is_in_t_arr_str(shell->parser.bcmd, cmd->value);
+    int idx = is_in_t_arr_str(shell->bcmd, cmd->value);
     if (idx != -1) 
     {
         // Appel du handler builtin : il faut une table de fonction (voir plus bas)
-        int (*handler)(void *, int) = get_builtin_handler(shell->parser.bcmd, idx);
+        int (*handler)(void *, int) = get_builtin_handler(shell->bcmd, idx);
         if (handler)
         {
             shell->exit_status = handler(shell, 0); // ou passer les bons args
-            exit(shell->exit_status);
-        }
+            exit_shell(shell, shell->exit_status);
+		}
         else
         {
             fprintf(stderr, "Erreur interne: handler builtin null pour %s\n", cmd->value);
-            exit(1);
+            child_exit(NULL, NULL, linked_to_array_string(shell->env), shell->cmd_tail, 127);
         }
     }
 
     // 2. Expansion des arguments
-    char **args = expand_cmd(cmd, shell->parser.env);
+    char **args = expand_cmd(cmd, shell->env);
     if (!args || !args[0]) // args[0] est toujours la commande
     {
         fprintf(stderr, "%s: command not found\n", cmd->value);
-        exit(127);
+        child_exit(args, NULL, linked_to_array_string(shell->env), shell->cmd_tail, 127);
     }
 
     // 3. Recherche du PATH
-    char *cmd_path = find_command_path(cmd->value, shell->parser.env);
+    char *cmd_path = find_command_path(cmd->value, shell->env);
     if (!cmd_path)
     {
         fprintf(stderr, "%s: command not found\n", cmd->value);
-        exit(127);
+        child_exit(args, NULL, linked_to_array_string(shell->env), shell->cmd_tail, 127);
     }
 	if (!args[0] || !cmd_path)
 	{
     	fprintf(stderr, "%s: command not found\n", cmd->value);
-    	exit(127);
+    	child_exit(args, cmd_path, linked_to_array_string(shell->env), shell->cmd_tail, 127);
     }
-	printf("DEBUG: shell->parser.env pointe sur %p\n", (void*)shell->parser.env);
-	char **envp = linked_to_array_string(shell->parser.env);
-	t_list *test = (t_list*)shell->parser.env;
+	printf("DEBUG: shell->env pointe sur %p\n", (void*)shell->env);
+	char **envp = linked_to_array_string(shell->env);
+	t_list *test = (t_list*)shell->env;
 	printf("Premier env : content=%s\n", (char *)test->content);
 	// 4. Exécution
     execve(cmd_path, args, envp);
-	free_tab(envp);
+	//free_tab(envp);
     // Si execve échoue :
     fprintf(stderr, "%s: command not found\n", cmd->value);
-    exit(127);
+    child_exit(args, cmd_path, envp, shell->cmd_tail, 127);
+}*/
+/*void execute_cmd(t_shell *shell, t_token *cmd)
+{
+    // Sécurité interne /
+    if (!cmd || !cmd->value)
+        child_exit(NULL, NULL, NULL, NULL, 127);
+
+    // 1) Gestion des builtins (dans le père) /
+    int idx = is_in_t_arr_str(shell->bcmd, cmd->value);
+    if (idx != -1)
+    {
+        int (*handler)(void *, int) = get_builtin_handler(shell->bcmd, idx);
+        if (!handler)
+        {
+            fprintf(stderr, "Erreur interne: builtin handler manquant pour `%s`\n", cmd->value);
+            child_exit(NULL, NULL, NULL, NULL, 1);
+        }
+        // On exécute dans le shell principal, puis on termine proprement 
+        shell->exit_status = handler(shell, 0);
+        exit_shell(shell, shell->exit_status);
+    }
+
+    // 2) Expansion des arguments /
+    char **args = expand_cmd(cmd, shell->env);
+    if (!args || !args[0])
+    {
+        fprintf(stderr, "%s: command not found\n", cmd->value);
+        child_exit(args, NULL, NULL, NULL, 127);
+    }
+
+    // 3) Recherche du chemin absolu /
+    char *cmd_path = find_command_path(cmd->value, shell->env);
+    if (!cmd_path)
+    {
+        fprintf(stderr, "%s: command not found\n", cmd->value);
+        child_exit(args, NULL, NULL, NULL, 127);
+    }
+
+    // 4) Préparation de envp pour execve /
+    char **envp = linked_to_array_string(shell->env);
+    if (!envp)
+    {
+        perror("linked_to_array_string");
+        child_exit(args, cmd_path, NULL, NULL, 127);
+    }
+
+    // 5) Exécution 
+    execve(cmd_path, args, envp);
+	perror(cmd->value);
+    // Si execve retourne, c'est qu'il y a eu une erreur 
+    fprintf(stderr, "%s: command not found\n", cmd->value);
+    child_exit(args, cmd_path, envp, NULL, 127);
+}*/
+
+
+
+/*
+ * Exécute une commande, builtin ou externe, dans un processus enfant.
+ */
+void execute_cmd(t_shell *shell, t_token *cmd)
+{
+    char      **args;
+    char       *cmd_path;
+    char      **envp;
+
+    if (!cmd || !cmd->value)
+        child_exit(NULL, NULL, NULL, NULL, 1);
+
+    // Expansion des arguments
+    args = expand_cmd(cmd, shell->env);
+    if (!args || !args[0])
+    {
+        fprintf(stderr, "%s: command not found\n", cmd->value);
+        child_exit(args, NULL, NULL, NULL, 127);
+    }
+
+    /* 1) Built-ins */
+    int idx = is_in_t_arr_str(shell->bcmd, args[0]);
+    if (idx != -1)
+    {
+        int (*handler)(t_shell *, char **) = get_builtin_handler(shell->bcmd, idx);
+        if (handler)
+        {
+            shell->exit_status = handler(shell, args);
+            exit_shell(shell, shell->exit_status);
+        }
+        // En cas d’imprévu
+        child_exit(args, NULL, NULL, NULL, 1);
+    }
+
+    /* 2) Recherche du PATH */
+    cmd_path = find_command_path(args[0], shell->env);
+    if (!cmd_path)
+    {
+        fprintf(stderr, "%s: command not found\n", args[0]);
+        child_exit(args, NULL, NULL, NULL, 127);
+    }
+
+    /* 3) Préparation de l'envp et exec */
+    envp = linked_to_array_string(shell->env);
+    execve(cmd_path, args, envp);
+
+    /* 4) Si execve échoue, afficher l’erreur et cleanup */
+    perror("execve");
+    child_exit(args, cmd_path, envp, NULL, 127);
 }
+
+

@@ -1,5 +1,5 @@
 
-#include "../../include/parsking.h"
+
 #include "../../include/minishell.h"
 
 /* =============================

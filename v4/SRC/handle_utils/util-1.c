@@ -49,9 +49,9 @@ void	handle_exit(t_shell *shell)
 void	handle_env(t_shell *shell)
 {
 	// Handle the 'env' command
-	if (shell->parser.env)
+	if (shell->env)
 	{
-		print_env((t_list *)shell->parser.env);
+		print_env((t_list *)shell->env);
 			// Assuming you have a function to print the environment variables
 	}
 	else

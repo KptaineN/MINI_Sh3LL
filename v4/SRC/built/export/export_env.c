@@ -7,7 +7,7 @@ typedef struct s_env
 
 t_list *find_env_var(t_shell *shell, const char *key)
 {
-    for (t_list *node = shell->parser.env; node; node = node->next)
+    for (t_list *node = shell->env; node; node = node->next)
     {
         t_env *env = (t_env *)node->content;
         if (ft_strcmp(env->key, key) == 0)
@@ -48,8 +48,8 @@ int create_env_var(t_shell *shell, const char *key, const char *value)
         return 1;
     }
     new_node->content = new_env;
-    new_node->next = shell->parser.env;
-    shell->parser.env = new_node;
+    new_node->next = shell->env;
+    shell->env = new_node;
     return 0;
 }
 

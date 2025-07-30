@@ -1,5 +1,5 @@
 #include "../../include/minishell.h"
-#include "../../include/parsking.h"
+
 /*** Helpers pour env ***/
 
 
@@ -92,34 +92,25 @@ char *remove_quotes(const char *arg);
     return ft_strcmp(arg, "-n") == 0;
 }*/
 
-
-int builtin_echo(t_shell *shell, t_token *token)
+int builtin_echo(t_shell *shell, char **argv)
 {
-    (void)shell;
-    if (!token || !token->cmd_args_parts)
-        return 1;
-
     int i = 1;
     int newline = 1;
 
-    // Gestion option -n
-    if (token->cmd_args_parts[i].n_parts == 1
-        && ft_strcmp(token->cmd_args_parts[i].parts[0].p, "-n") == 0)
+    (void)shell;
+
+    // Gestion de l'option -n (peut être répétée)
+    while (argv[i] && ft_strncmp(argv[i], "-n", 3) == 0)
     {
         newline = 0;
         i++;
     }
 
-    // Affichage sécurisé
-    while (token->cmd_args_parts[i].n_parts > 0)
+    // Affichage de tous les arguments restants, séparés par un espace
+    while (argv[i])
     {
-        for (int j = 0; j < token->cmd_args_parts[i].n_parts; j++)
-        {
-            if (token->cmd_args_parts[i].parts[j].p)
-                ft_putstr_fd(token->cmd_args_parts[i].parts[j].p, STDOUT_FILENO);
-        }
-        // espace entre les groupes sauf le dernier
-        if (token->cmd_args_parts[i + 1].n_parts > 0)
+        ft_putstr_fd(argv[i], STDOUT_FILENO);
+        if (argv[i + 1])
             ft_putchar_fd(' ', STDOUT_FILENO);
         i++;
     }
@@ -129,6 +120,7 @@ int builtin_echo(t_shell *shell, t_token *token)
 
     return 0;
 }
+
 
 
 

@@ -2,6 +2,8 @@
 #                                   VARIABLES                                 #
 ###############################################################################
 
+
+
 # Project directories (current directory)
 PROJECT_DIR  := .
 SRC_DIR      := $(PROJECT_DIR)/SRC
@@ -25,9 +27,10 @@ ALL_DIRS     := $(SRC_DIR) $(foreach s,$(SUBDIRS),$(SRC_DIR)/$(s))
 ALL_PATHS    := -I$(INC_DIR) -I$(LIBFT_INC)
 # Compiler settings
 CC           := cc
-CFLAGS       := -Wall -Wextra -Werror $(ALL_PATHS)
+CFLAGS       := -g -fsanitize=address -fno-omit-frame-pointer -Wall -Wextra -Werror $(ALL_PATHS)
 # Linker flags
-LDFLAGS      := -lreadline
+LDFLAGS      := -lreadline -fsanitize=address
+
 ###############################################################################
 #                                VPATH & RULES                               #
 ###############################################################################

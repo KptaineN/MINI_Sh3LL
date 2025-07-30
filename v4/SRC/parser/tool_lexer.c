@@ -14,6 +14,20 @@
 #include "../../include/minishell.h"
 
 
+
+/*
+ * Vérifie si le caractère à l’indice idx n’est pas échappé
+ * par un nombre impair de backslashes précédents.
+ */
+bool escape_check(const char *str, int idx)
+{
+    bool toggle = true;
+    while (idx > 0 && str[--idx] == '\\')
+        toggle = !toggle;
+    return toggle;
+}
+
+
 /*
 	trouve la premiere occurence de charactere
 	str = Enrico et Noe sont beau
@@ -291,7 +305,7 @@ void attribute_token_type(t_shell *shell)
     }
 
     shell->n_tokens = count_tokens(shell, shell->parsed_args, shell->oper);
-    shell->tokens = calloc(shell->n_tokens, sizeof(t_token));
+    shell->tokens = (t_token *)calloc(shell->n_tokens, sizeof(t_token));
     if (!shell->tokens)
     {
         perror("Erreur allocation tokens");
@@ -301,7 +315,7 @@ void attribute_token_type(t_shell *shell)
     while (i < shell->parsed_args->len && idx_token < shell->n_tokens)
     {
         t_token *token = &shell->tokens[idx_token];
-        token->value = arr[i];
+        token->value = arr[i]; // If arr[i] is reused elsewhere, consider duplicating with strdup(arr[i])
 
         if (is_in_t_arr_dic_str(shell->oper, arr[i]) != -1)
         {

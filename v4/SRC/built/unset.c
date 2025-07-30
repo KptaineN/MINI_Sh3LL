@@ -26,13 +26,14 @@ static void unset_one(t_list **env, const char *key)
         cur  = cur->next;
     }
 }
-int builtin_unset(char **args, t_shell *shell)
+
+int builtin_unset(t_shell *shell, char **argv)
 {
-    // args[0] == "unset"
+    // argv[0] == "unset"
     int i = 1;
-    while (args[i])
+    while (argv[i])
     {
-        unset_one((t_list **)&shell->parser.env, args[i]);
+        unset_one((t_list **)&shell->env, argv[i]);
         i++;
     }
     shell->exit_status = 0;
@@ -41,13 +42,13 @@ int builtin_unset(char **args, t_shell *shell)
 void unset_env_value(t_list **env, const char *key)
 {
     t_list *tmp = *env, *prev = NULL;
-    size_t key_len = strlen(key);
+    size_t key_len = ft_strlen(key);
 
     while (tmp)
     {
         char *content = (char*)tmp->content;
-        char *equal = strchr(content, '=');
-        if (equal && (size_t)(equal - content) == key_len && !strncmp(content, key, key_len))
+        char *equal = ft_strchr(content, '=');
+        if (equal && (size_t)(equal - content) == key_len && !ft_strncmp(content, key, key_len))
         {
             if (prev)
                 prev->next = tmp->next;

@@ -16,31 +16,31 @@ int	is_numeric(const char *str)
 	}
 	return (1);
 }
-
-int	builtin_exit(t_shell *sh, t_token *token)
+int builtin_exit(t_shell *shell, char **argv)
 {
-	long	code;
+    long code = 0;
 
-	write(1, "exit\n", 5);
-	if (token && token->next)
-	{
-		char *arg1 = token->next->value;
-		if (!is_numeric(arg1))
-		{
-			ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
-			exit_shell(sh, 255);
-		}
-		if (token->next->next)
-		{
-			ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-			return (1);
-		}
-		code = ft_atoi(arg1);
-		exit_shell(sh, code % 256);
-	}
-	exit_shell(sh, 0);
-	return (0);
+    write(1, "exit\n", 5);
+
+    if (argv[1]) // y a-t-il un argument après "exit" ?
+    {
+        if (!is_numeric(argv[1]))
+        {
+            ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
+            exit_shell(shell, 255);
+        }
+        if (argv[2]) // trop d'arguments
+        {
+            ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+            return (1);
+        }
+        code = ft_atoi(argv[1]);
+        exit_shell(shell, code % 256);
+    }
+    exit_shell(shell, 0);
+    return 0;
 }
+
 
 char	*replace_exit_code(const char *input, int code)
 {
@@ -53,8 +53,13 @@ char	*replace_exit_code(const char *input, int code)
 		*pos = '\0';
 		char *before = ft_strdup(res);
 		char *after = ft_strdup(pos + 2);
-		res = ft_strjoin3(before, code_str, after, 1);
+		char *tmp = ft_strjoin(before, code_str);
+		char *new_res = ft_strjoin(tmp, after);
+		free(res);
+		free(before);
 		free(after);
+		free(tmp);
+		res = new_res;
 	}
 	free(code_str);
 	return (res);

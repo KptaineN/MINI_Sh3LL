@@ -10,77 +10,43 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/parsking.h"
 #include "../../include/minishell.h"
 
-int ft_echo(void *sh, int token_idx)
+int ft_echo(t_shell *shell, char **argv)
 {
-    t_shell *shell = (t_shell *)sh;
-    t_token    *tok   = &shell->parser.tokens[token_idx];
-    (void)token_idx;
-    (void)tok; // Suppress unused variable warning
-    return builtin_echo(shell, tok);
+    (void)argv;
+    return builtin_echo(shell, argv);
 }
 
-int ft_cd(void *shell, int token_idx)
+int ft_cd(t_shell *shell, char **argv)
 {
-    t_shell *sh  = (t_shell *)shell;
-    t_token     *tok = &sh->parser.tokens[token_idx];
-    //char        **args = reconstruct_args(tok->cmd_args_parts);
-    (void)token_idx;
-    char        **args = NULL;
-    (void)tok; // Suppress unused variable warning
-    (void)args; // Suppress unused variable warning
-    return builtin_cd(args, sh);
+
+    return builtin_cd(shell, argv);
+}
+int ft_pwd(t_shell *shell, char **argv)
+{
+    return builtin_pwd(shell, argv);
 }
 
-int ft_pwd(void *shell, int token_idx)
+int ft_export(t_shell *shell, char **argv)
+{
+
+    return builtin_export(shell, argv);
+}
+
+int ft_unset(t_shell *shell, char **argv)
+{
+    return builtin_unset(shell, argv);
+}
+
+int ft_env(t_shell *shell, char **argv)
+{
+    return builtin_env(shell, argv);
+}
+
+int ft_exit(t_shell *shell, char **argv)
 {
     (void)shell;
-    (void)token_idx;
-    return builtin_pwd();
-}
-
-int ft_export(void *shell, int token_idx)
-{
-    t_shell *sh  = (t_shell *)shell;
-    t_token     *tok = &sh->parser.tokens[token_idx];
-   //char        **args = reconstruct_args(tok->u.cmd_args_parts);
-    (void)token_idx;
-   char        **args = NULL;
-    (void)args; // Suppress unused variable warning
-
-   (void)tok; // Suppress unused variable warning
-    return builtin_export(tok, sh);
-}
-
-int ft_unset(void *shell, int token_idx)
-{
-    t_shell *sh  = (t_shell *)shell;
-    t_token     *tok = &sh->parser.tokens[token_idx];
-   // char        **args = reconstruct_args(tok->cmd_args_parts);
-   (void)token_idx; 
-   char        **args = NULL;
-    (void)tok; // Suppress unused variable warning
-    return builtin_unset(args, sh);
-}
-
-int ft_env(void *shell, int token_idx)
-{
-    t_shell *sh  = (t_shell *)shell;
-    t_token     *tok = &sh->parser.tokens[token_idx];
-    //char        **args = reconstruct_args(tok->cmd_args_parts);
-    (void)token_idx;
-    char        **args = NULL;
-    (void)tok; // Suppress unused variable warning
-    return builtin_env(args, sh);
-}
-
-int ft_exit(void *shell, int token_idx)
-{
-    t_shell *sh  = (t_shell *)shell;
-    t_token     *tok = &sh->parser.tokens[token_idx];
-    (void)token_idx;
-    (void)tok; // Suppress unused variable warning
-    return builtin_exit(sh, tok);
+    (void)argv;
+    return builtin_exit(shell, argv);
 }

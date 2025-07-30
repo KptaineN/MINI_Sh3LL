@@ -353,8 +353,21 @@ void print_env_debug(t_list *env)
         env = env->next;
     }
 }
+int builtin_export(t_shell *shell, char **argv)
+{
+    // Cas sans argument explicite : export seul => affiche les variables exportées
+    if (!argv[1])
+        return export_no_arguments(shell);
 
+    int error = 0;
+    for (int i = 1; argv[i]; i++)
+        error |= process_export_argument(argv[i], shell);
 
+    shell->exit_status = error;
+    return error;
+}
+
+/*/
 int builtin_export(t_token *token, t_shell *shell)
 {
     //print_env_debug(shell->env); // Debug: afficher l'environnement avant traitement
@@ -393,7 +406,7 @@ int builtin_export(t_token *token, t_shell *shell)
     // Cas sans argument explicite après "export"
     if (!args[1])
     {
-        free_tab(args);
+        free_str_array(args);
         return export_no_arguments(shell);
     }
 
@@ -402,7 +415,7 @@ int builtin_export(t_token *token, t_shell *shell)
     for (int i = 1; args[i]; i++)
         error |= process_export_argument(args[i], shell);
 
-    free_tab(args);
+    free_str_array(args);
     shell->exit_status = error;
     return error;
-}
+}*/

@@ -162,7 +162,7 @@ int builtin_cd(char **args, t_shell *shell)
     }
     return (shell->exit_status = 0);
 }*/
-int builtin_cd(char **args, t_shell *shell)
+int builtin_cd(t_shell *shell, char **args)
 {
     char old_pwd[4096];
     char new_pwd[4096];
@@ -188,9 +188,11 @@ int builtin_cd(char **args, t_shell *shell)
 }
 
 
-int builtin_pwd(void)
+int builtin_pwd(t_shell *shell, char **argv)
 {
-	char cwd[1024];
+    (void)shell; // On n'utilise pas shell ici
+    (void)argv;
+    char cwd[1024];
     
 	if (getcwd(cwd, sizeof(cwd)))
 	{
