@@ -226,7 +226,9 @@ int attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len
         return idx + len;
 
     cmd_token->cmd_args_parts = containers;
+    cmd_token->n_args = len;
 
+    printf("[DEBUG] attribute_cmd_subtokens: len = %d, idx = %d\n", len, idx);
     for (int k = 0; k < len && idx < arr_arg->len; k++, idx++)
     {
         containers[k].n_parts = count_subtokens(args[idx]);
@@ -327,9 +329,11 @@ void attribute_token_type(t_shell *shell)
             token->type = (is_in_t_arr_str(shell->bcmd, arr[i]) != -1) ? TOKEN_BCMD : TOKEN_CMD;
 
             int nb_args = count_args_cmd(shell, i);
+            printf("[DEBUG] attribute_token_type: token '%s' has %d args\n", token->value, nb_args);
             if (nb_args <= 0) nb_args = 1;
 
             int new_i = attribute_cmd_subtokens(shell, token, i, nb_args);
+            printf("[DEBUG] attribute_token_type: new_i = %d, i = %d\n", new_i, i);
             i = (new_i > i) ? new_i : i + 1;
         }
         idx_token++;

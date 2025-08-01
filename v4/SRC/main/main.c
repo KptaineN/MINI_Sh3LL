@@ -106,6 +106,8 @@ int	main(int argc, char **argv, char **envp)
 		ft_putstr_fd("Failed to start minishell\n", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
+	printf("ft_echo=%p ft_cd=%p ft_pwd=%p ft_export=%p ft_unset=%p ft_env=%p ft_exit=%p\n",
+    ft_echo, ft_cd, ft_pwd, ft_export, ft_unset, ft_env, ft_exit);
 
 	looping(&shell);         // Boucle principale (readline, parsing, exec)
 	free_minishell(&shell);  // Libère proprement toute la mémoire

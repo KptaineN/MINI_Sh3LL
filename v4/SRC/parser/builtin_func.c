@@ -14,7 +14,6 @@
 
 int ft_echo(t_shell *shell, char **argv)
 {
-    (void)argv;
     return builtin_echo(shell, argv);
 }
 
@@ -46,7 +45,9 @@ int ft_env(t_shell *shell, char **argv)
 
 int ft_exit(t_shell *shell, char **argv)
 {
-    (void)shell;
-    (void)argv;
     return builtin_exit(shell, argv);
 }
+//typedef int (*builtin_fptr)(t_shell *, char **); meme chose 
+//t_dic *make_dic(const char *name, int (*fn)(t_shell *, char **))
+
+

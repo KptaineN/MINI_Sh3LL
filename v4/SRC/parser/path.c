@@ -339,10 +339,29 @@ char *build_expansion(t_subtoken_container *a,int count, t_list **add_head)
 	}
 	new[i] = 0;
 	return new;
-}
-
+}//aspect critique : on ne libère pas les parties de a->parts, mais on libère les t_subtoken_container dans free_tokens
+/**
 char *expand_container(t_subtoken_container *a, t_list **head, t_list *env)
 {
+    if (!a || !a->parts || a->n_parts <= 0)
+        return ft_strdup(""); // ← retourne une string vide, pas NULL
+
+    // Gestion de la partie quote/expansion
+    // Pour chaque part...
+    // Si c'est QUOTE_NONE/SINGLE, tu dois copier le contenu tel quel
+
+    // exemple simplifié :
+    t_subtoken *sub = &a->parts[0];
+    if (sub->len > 0 && sub->p)
+        return ft_strndup(sub->p, sub->len); // copier proprement la string
+	return ft_strdup("");
+
+    return ft_strdup("");
+	if (!a) { printf("[expand_container] container a is NULL\n"); return NULL; }
+	if (!a->parts) { printf("[expand_container] a->parts is NULL\n"); return NULL; }
+	if (a->n_parts <= 0) { printf("[expand_container] n_parts <= 0\n"); return NULL; }
+	if (!head || !*head) { printf("[expand_container] head is NULL\n"); return NULL; }
+
 	t_list *curr = *head;
 	int j = 0;
 	t_subtoken *b;
@@ -360,9 +379,128 @@ char *expand_container(t_subtoken_container *a, t_list **head, t_list *env)
 		j++;
 	}
 	return build_expansion(a,count,&((*head)->next));
+}*/
+char *expand_container(t_subtoken_container *a, t_list **head, t_list *env)
+{
+	(void)head;
+    (void)env;
+    if (!a || !a->parts || a->n_parts <= 0)
+        return ft_strdup("");
+
+    // On calcule la taille totale
+    int total_len = 0;
+    for (int i = 0; i < a->n_parts; i++)
+        total_len += a->parts[i].len;
+
+    char *out = malloc(total_len + 1);
+    if (!out)
+        return NULL;
+
+    int pos = 0;
+    for (int i = 0; i < a->n_parts; i++)
+    {
+        ft_memcpy(out + pos, a->parts[i].p, a->parts[i].len);
+        pos += a->parts[i].len;
+    }
+    out[total_len] = 0;
+    return out;
 }
 
 
+char **expand_cmd(t_token *token, t_list *env)
+{
+    if (!token || !token->cmd_args_parts)
+        return NULL;
+
+    int skip_first = 0;
+    int nb_args = token->n_args;
+    // Check si premier argument == commande (pour ne pas le doubler)
+    if (nb_args > 0
+        && token->cmd_args_parts[0].n_parts == 1
+        && token->cmd_args_parts[0].parts[0].len == (int)ft_strlen(token->value)
+        && ft_strncmp(token->cmd_args_parts[0].parts[0].p, token->value, token->cmd_args_parts[0].parts[0].len) == 0)
+    {
+        skip_first = 1;
+    }
+
+    int argc_final = skip_first ? nb_args : nb_args + 1;
+    char **res = malloc(sizeof(char *) * (argc_final + 1));
+    if (!res)
+        return NULL;
+
+    int j = 0;
+    // Ajoute la commande au début si pas déjà là
+    if (!skip_first)
+        res[j++] = ft_strdup(token->value);
+
+    // Ajoute les arguments (concaténation de sous-tokens si besoin)
+    for (int i = 0; i < nb_args; i++)
+        res[j++] = expand_container(&token->cmd_args_parts[i], NULL, env);
+
+    res[j] = NULL;
+    // DEBUG
+    for (int k = 0; k < j; k++)
+        printf("[expand_cmd] argv[%d] = '%s'\n", k, res[k]);
+
+    return res;
+}
+
+
+/*
+char **expand_cmd(t_token *token, t_list *env)
+{
+    if (!token) return NULL;
+    if (!token->cmd_args_parts || !token->cmd_args_parts->parts)
+        return NULL;
+
+    int nb_args = token->cmd_args_parts->n_parts;
+    int skip_first = 0;
+
+    // Check si le 1er argument == token->value (commande)
+    if (nb_args > 0
+        && !ft_strncmp(token->cmd_args_parts->parts[0].p, token->value, token->cmd_args_parts->parts[0].len)
+        && (int)ft_strlen(token->value) == token->cmd_args_parts->parts[0].len)
+    {
+        skip_first = 1;
+    }
+
+    int final_args = nb_args - skip_first;
+	printf("[DEBUG][expand_cmd] token->value='%s'\n", token->value);
+	if (token->cmd_args_parts)
+	{
+	    printf("[DEBUG] n_parts = %d\n", token->cmd_args_parts->n_parts);
+	    for (int i = 0; i < token->cmd_args_parts->n_parts; i++)
+	        printf("[DEBUG] parts[%d]='%.*s'\n", i, 
+	            token->cmd_args_parts->parts[i].len, 
+	            token->cmd_args_parts->parts[i].p);
+	}
+	else
+	    printf("[DEBUG] token->cmd_args_parts == NULL\n");
+
+    char **res = malloc(sizeof(char *) * (final_args + 2)); // +1 pour la commande, +1 pour NULL
+    if (!res) return NULL;
+
+    res[0] = ft_strdup(token->value);
+
+    for (int i = 0; i < final_args; i++)
+    {
+        t_subtoken_container tmp;
+        tmp.parts = &token->cmd_args_parts->parts[i + skip_first];
+        tmp.n_parts = 1;
+        res[i + 1] = expand_container(&tmp, NULL, env);
+        printf("[expand_cmd] res[%d] = '%s'\n", i + 1, res[i + 1]);
+    }
+    res[final_args + 1] = NULL;
+
+    // DEBUG PRINT FINAL TABLEAU
+    for (int k = 0; k < final_args + 1; k++)
+        printf("FINAL argv[%d] = '%s'\n", k, res[k]);
+
+    return res;
+}*/
+
+
+/**
 char **expand_cmd(t_token *token, t_list *env)
 {
 	int i;
@@ -377,7 +515,7 @@ char **expand_cmd(t_token *token, t_list *env)
 	// {hello,a}, {mom} subtoken
 	// {h,e,l,l,o} char * 
 	i = 0;
-	while(i<token->cmd_args_parts->n_parts) // container
+	//while(i<token->cmd_args_parts->n_parts) // container
 	while (i < token->cmd_args_parts->n_parts) // container
 	{
 		// Créer un container temporaire pour un seul subtoken
@@ -390,17 +528,89 @@ char **expand_cmd(t_token *token, t_list *env)
 		i++;
 	}
 	free_list_str(head); // Free the linked list used for expansion
-	//res[i] = NULL; // Terminate the array with NULL
+	res[i] = NULL; // Terminate the array with NULL
 	return res;
 }
 
-int (*get_builtin_handler(t_arr *bcmd, int idx))(t_shell *, char **)
+char **expand_cmd(t_token *token, t_list *env)
 {
 
+    if (!token) { printf("[expand_cmd] token is NULL\n"); return NULL; }
+    if (!token->cmd_args_parts) { printf("[expand_cmd] cmd_args_parts is NULL\n"); }
+    else if (!token->cmd_args_parts->parts) { printf("[expand_cmd] cmd_args_parts->parts is NULL\n"); }
+     int nb_args = 0;
+    char **res = NULL;
+
+    if (!token)
+        return NULL;
+    if (!token->cmd_args_parts || !token->cmd_args_parts->parts)
+        nb_args = 0;
+    else
+        nb_args = token->cmd_args_parts->n_parts;
+
+    res = malloc(sizeof(char *) * (nb_args + 2)); // +2: commande + NULL
+    if (!res)
+        return NULL;
+
+    res[0] = ft_strdup(token->value);
+	printf("[expand_cmd] res[0] = '%s'\n", res[0]);
+	printf("token->value = %s\n", token->value);
+
+    for (int i = 0; i < nb_args; i++)
+    {
+		printf("cmd_args_parts[%d] = '%.*s'\n", i,
+        token->cmd_args_parts->parts[i].len,
+        token->cmd_args_parts->parts[i].p);
+        t_subtoken_container tmp;
+        tmp.parts = &token->cmd_args_parts->parts[i];
+        tmp.n_parts = 1;
+        // Sécurise l’appel :
+        if (!tmp.parts || tmp.n_parts <= 0)
+            res[i + 1] = NULL;
+        else
+            res[i + 1] = expand_container(&tmp, NULL, env);
+			printf("[expand_cmd] res[%d] = '%s'\n", i + 1, res[i + 1]);
+    }
+    res[nb_args + 1] = NULL;
+    return res;
+}
+char **expand_cmd(t_token *token, t_list *env)
+{
+    if (!token || !token->cmd_args_parts)
+        return NULL;
+
+    int nb_args = token->cmd_args_parts->n_parts; // ici, chaque "arg" = un container de subtokens
+    char **res = malloc(sizeof(char *) * (nb_args + 2)); // +1 pour commande, +1 pour NULL
+
+    if (!res)
+        return NULL;
+
+    // argv[0] = commande
+    res[0] = ft_strdup(token->value);
+
+    // Pour chaque argument, concaténer ses sous-tokens
+    for (int i = 0; i < nb_args; i++)
+    {
+        t_subtoken_container tmp_container;
+		tmp_container.parts = &token->cmd_args_parts->parts[i];
+		tmp_container.n_parts = 1; // <--- IMPORTANT : un seul sous-token ici
+		res[i + 1] = expand_container(&tmp_container, NULL, env);
+		
+        printf("[expand_cmd] argv[%d] = '%s'\n", i+1, res[i+1]);
+    }
+    res[nb_args + 1] = NULL;
+    return res;
+}*/
+
+
+int (*get_builtin_handler(t_arr *bcmd, int idx))(t_shell *, char **)
+{
     if (!bcmd || idx < 0 || idx >= bcmd->len)
         return NULL;
-    return ((int (*)(t_shell *, char **))bcmd->arr[idx]);
+    t_dic *dic = (t_dic *)bcmd->arr[idx];
+    return dic->value;
 }
+
 
 /*/
 void execute_cmd(t_shell *shell, t_token *cmd)
@@ -540,7 +750,10 @@ void execute_cmd(t_shell *shell, t_token *cmd)
     if (idx != -1)
     {
         int (*handler)(t_shell *, char **) = get_builtin_handler(shell->bcmd, idx);
-        if (handler)
+        printf("DEBUG handler=%p idx=%d\n", handler, idx);
+		printf("[CALL] handler=%p for %s\n", handler, args[0]);
+
+		if (handler)
         {
             shell->exit_status = handler(shell, args);
             exit_shell(shell, shell->exit_status);

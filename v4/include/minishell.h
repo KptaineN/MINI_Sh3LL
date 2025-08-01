@@ -49,10 +49,13 @@ typedef struct s_arr
     int             len;
 }   t_arr;
 
+struct s_shell; // AVANT la déclaration de t_dic !
+typedef struct s_shell t_shell;
 typedef struct s_dic
 {
     void *key;
-    void *value;
+    int (*value)(t_shell *, char **); // plus besoin de cast !
+    //void *value;
 }   t_dic;
 
 typedef enum e_toktype
@@ -89,6 +92,7 @@ typedef struct s_token
     char                    *value;
     t_subtoken_container    *cmd_args_parts;
     struct s_token          *next;
+   int                     n_args;
 }   t_token;
 
 typedef struct s_shell
@@ -220,11 +224,16 @@ int ft_env(t_shell *shell, char **argv);
 int ft_exit(t_shell *shell, char **argv);
 int handle_heredoc(t_shell *shell, char **argv);
 int handle_append(t_shell *shell, char **argv);
+
 int handle_and(t_shell *shell, char **argv);
 int handle_or(t_shell *shell, char **argv);
 int handle_pipe(t_shell *shell, char **argv);
 int handle_redirect_in(t_shell *shell, char **argv);
 int handle_redirect_out(t_shell *shell, char **argv);
+
+typedef int (*builtin_fptr)(t_shell *, char **);
+
+void free_t_arr_dic(t_arr *array);
 
 
 # endif // MINISHELL_H

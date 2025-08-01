@@ -13,6 +13,26 @@
 #include "../../include/minishell.h"
 
 
+void free_t_arr_dic(t_arr *array)
+{
+    if (!array)
+        return;
+    if (array->arr)
+    {
+        for (int i = 0; i < array->len; i++) {
+            t_dic *dic = (t_dic *)array->arr[i];
+            if (dic) {
+                if (dic->key)
+                    free(dic->key);
+                free(dic);
+            }
+        }
+        free(array->arr);
+    }
+    free(array);
+}
+
+
 /* ========================================
  * Libère un tableau de chaînes de type char**
  * ======================================== */
@@ -93,32 +113,61 @@ void free_cmd_list(t_shell *shell)
 /* ========================================
  * Libère le tableau de tokens (tableau, pas liste)
  * ======================================== */
+
 void free_tokens(t_shell *shell)
 {
     if (!shell || !shell->tokens)
         return;
 
-    /* 1) On supprime la structure cmd_args_parts,
-     *    MAIS on NE libère PAS les .p (elles aliasent parsed_args->arr,
-     *    déjà libérées par free_tab).
-     */
     for (int i = 0; i < shell->n_tokens; i++)
     {
         t_token *tok = &shell->tokens[i];
+        // Libère tous les sous-tokens de chaque arg
         if (tok->cmd_args_parts)
         {
-            free(tok->cmd_args_parts->parts);
+            for (int j = 0; j < tok->n_args; j++)
+            {
+                t_subtoken_container *cont = &tok->cmd_args_parts[j];
+                if (cont->parts)
+                {
+                    for (int k = 0; k < cont->n_parts; k++)
+                    {
+                        // Si tu as fait ft_substr ou ft_strdup sur parts[k].p, free-le
+                        if (cont->parts[k].p)
+                            free(cont->parts[k].p);
+                    }
+                    free(cont->parts);
+                }
+            }
             free(tok->cmd_args_parts);
         }
+        // Si value = strdup/ft_substr => free, sinon ne pas toucher
+        // (mais dans ton parsing c’est souvent juste un pointeur du split, donc ne rien faire)
     }
 
-    /* 2) On libère le tableau de tokens lui-même */
     free(shell->tokens);
     shell->tokens   = NULL;
     shell->n_tokens = 0;
 }
 
 
+
+void free_subtoken_container(t_subtoken_container *container)
+{
+    if (!container)
+        return;
+    if (container->parts)
+    {
+        for (int i = 0; i < container->n_parts; i++)
+        {
+            t_subtoken *sub = &container->parts[i];
+            if (sub->p)
+                free(sub->p); // Libère le pointeur de chaque sous-token
+        }
+        free(container->parts);
+    }
+    free(container);
+}
 /* ========================================
  * Libère tout le parser
  * ======================================== */
@@ -133,11 +182,11 @@ void free_parser(t_shell *parser)
     parser->parsed_args = NULL;
 
     if (parser->bcmd)
-        free_t_arr(parser->bcmd);
+        free_t_arr_dic(parser->bcmd);
     parser->bcmd = NULL;
 
     if (parser->oper)
-        free_t_arr(parser->oper);
+        free_t_arr_dic(parser->oper);
     parser->oper = NULL;
 
     if (parser->env)

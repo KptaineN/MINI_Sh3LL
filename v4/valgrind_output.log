@@ -1,141 +1,141 @@
-==92946== Memcheck, a memory error detector
-==92946== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
-==92946== Using Valgrind-3.25.1-4441567fbe-20250520 and LibVEX; rerun with -h for copyright info
-==92946== Command: timeout 10s ./minishell
-==92946== Parent PID: 92775
-==92946== 
---92946-- 
---92946-- Valgrind options:
---92946--    --tool=memcheck
---92946--    --leak-check=full
---92946--    --show-leak-kinds=all
---92946--    --track-origins=yes
---92946--    --verbose
---92946--    --log-file=valgrind_output.log
---92946-- Contents of /proc/version:
---92946--   Linux version 6.15.7-100.fc41.x86_64 (mockbuild@cd4ea0a8d5f6475ea2ff70b110e1c74d) (gcc (GCC) 14.3.1 20250523 (Red Hat 14.3.1-1), GNU ld version 2.43.1-5.fc41) #1 SMP PREEMPT_DYNAMIC Thu Jul 17 16:56:15 UTC 2025
---92946-- 
---92946-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed-fma
---92946-- Page sizes: currently 4096, max supported 4096
---92946-- Valgrind library directory: /usr/libexec/valgrind
---92946-- Reading syms from /usr/bin/timeout
---92946-- Reading syms from /usr/lib64/ld-linux-x86-64.so.2
---92946-- Warning: cross-CU LIMITATION: some inlined fn names
---92946-- might be shown as UnknownInlinedFun
---92946-- Reading syms from /usr/libexec/valgrind/memcheck-amd64-linux
---92946--    object doesn't have a dynamic symbol table
---92946-- Scheduler: using generic scheduler lock implementation.
---92946-- Reading suppressions file: /usr/libexec/valgrind/default.supp
-==92946== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-92946-by-kiefer-on-desktop-5kn91go.home
-==92946== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-92946-by-kiefer-on-desktop-5kn91go.home
-==92946== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-92946-by-kiefer-on-desktop-5kn91go.home
-==92946== 
-==92946== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==92946== don't want to do, unless you know exactly what you're doing,
-==92946== or are doing some strange experiment):
-==92946==   /usr/libexec/valgrind/../../bin/vgdb --pid=92946 ...command...
-==92946== 
-==92946== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==92946==   /path/to/gdb timeout
-==92946== and then give GDB the following command
-==92946==   target remote | /usr/libexec/valgrind/../../bin/vgdb --pid=92946
-==92946== --pid is optional if only one valgrind process is running
-==92946== 
-==92946== Downloading debug info for /usr/libexec/valgrind/memcheck-amd64-linux...
---92946--   Considering /home/kiefer/.cache/debuginfod_client/9ab5aeea7f89a025bb34d01c42449dc692996f61/debuginfo ..
---92946--   .. CRC is valid
-==92946== Successfully downloaded debug file for /usr/libexec/valgrind/memcheck-amd64-linux
-==92946== Downloading debug info for /home/kiefer/.cache/debuginfod_client/9ab5aeea7f89a025bb34d01c42449dc692996f61/debuginfo...
---92946--   Considering /home/kiefer/.cache/debuginfod_client/7eb32a56150be12c16d214a711baac7f564521fc/debuginfo ..
---92946--   .. build-id is valid
-==92946== Successfully downloaded debug file for /home/kiefer/.cache/debuginfod_client/9ab5aeea7f89a025bb34d01c42449dc692996f61/debuginfo
---92946-- REDIR: 0x4032020 (ld-linux-x86-64.so.2:strlen) redirected to 0x582360cf (vgPlain_amd64_linux_REDIR_FOR_strlen)
---92946-- REDIR: 0x40309c0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x582360e9 (vgPlain_amd64_linux_REDIR_FOR_strcmp)
---92946-- REDIR: 0x4030790 (ld-linux-x86-64.so.2:index) redirected to 0x58236122 (vgPlain_amd64_linux_REDIR_FOR_index)
---92946-- REDIR: 0x402fb20 (ld-linux-x86-64.so.2:bcmp) redirected to 0x58236104 (vgPlain_amd64_linux_REDIR_FOR_memcmp)
---92946-- Reading syms from /usr/libexec/valgrind/vgpreload_core-amd64-linux.so
---92946-- Reading syms from /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so
-==92946== WARNING: new redirection conflicts with existing -- ignoring it
---92946--     old: 0x040309c0 (strcmp              ) R-> (0000.0) 0x582360e9 vgPlain_amd64_linux_REDIR_FOR_strcmp
---92946--     new: 0x040309c0 (strcmp              ) R-> (2016.0) 0x04857550 strcmp
-==92946== WARNING: new redirection conflicts with existing -- ignoring it
---92946--     old: 0x04032020 (strlen              ) R-> (0000.0) 0x582360cf vgPlain_amd64_linux_REDIR_FOR_strlen
---92946--     new: 0x04032020 (strlen              ) R-> (2007.0) 0x04856200 strlen
---92946-- REDIR: 0x402fdf0 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x485bca0 (mempcpy)
---92946-- Reading syms from /usr/lib64/libc.so.6
-==92946== Downloading debug info for /usr/lib64/libc.so.6...
---92946--   Considering /home/kiefer/.cache/debuginfod_client/1fe4f71c184938b1af3656d8b8cdb4928ab12394/debuginfo ..
---92946--   .. CRC is valid
-==92946== Successfully downloaded debug file for /usr/lib64/libc.so.6
---92946-- REDIR: 0x40321c0 (ld-linux-x86-64.so.2:strncmp) redirected to 0x4856d00 (strncmp)
---92946-- REDIR: 0x4906ad0 (libc.so.6:strnlen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906b60 (libc.so.6:strpbrk) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4904ad0 (libc.so.6:strcmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x491bea0 (libc.so.6:wcsnlen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903ad0 (libc.so.6:memset) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x491b590 (libc.so.6:wcslen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x497f2d0 (libc.so.6:__memcpy_chk) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903a40 (libc.so.6:memrchr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x491be40 (libc.so.6:wcsncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4902f60 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x491a370 (libc.so.6:wcschr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x49049c0 (libc.so.6:index) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906b90 (libc.so.6:rindex) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x491a420 (libc.so.6:wcscmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903cf0 (libc.so.6:stpncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4928160 (libc.so.6:wmemchr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906970 (libc.so.6:strncmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903d50 (libc.so.6:strcasecmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4905d50 (libc.so.6:strcspn) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x491b360 (libc.so.6:wcscpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4904950 (libc.so.6:strcat) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906870 (libc.so.6:strncasecmp_l) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4904a40 (libc.so.6:strchrnul) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4902e70 (libc.so.6:bcmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4905ce0 (libc.so.6:strcpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903df0 (libc.so.6:strcasecmp_l) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906740 (libc.so.6:strlen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906a10 (libc.so.6:strncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x49281e0 (libc.so.6:wmemcmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x497f3f0 (libc.so.6:__memmove_chk) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
-==92946== WARNING: new redirection conflicts with existing -- ignoring it
---92946--     old: 0x049c5150 (__memcpy_chk_avx_una) R-> (2030.0) 0x0485bdb0 __memcpy_chk
---92946--     new: 0x049c5150 (__memcpy_chk_avx_una) R-> (2024.0) 0x0485b6b0 __memmove_chk
---92946-- REDIR: 0x4903c80 (libc.so.6:stpcpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903800 (libc.so.6:memmove) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
-==92946== Preferring higher priority redirection:
---92946--     old: 0x049c5180 (__memcpy_avx_unalign) R-> (2018.0) 0x04858c20 __memcpy_avx_unaligned_erms
---92946--     new: 0x049c5180 (__memcpy_avx_unalign) R-> (2018.1) 0x0485a9b0 memmove
---92946-- REDIR: 0x4902df0 (libc.so.6:memchr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4906d90 (libc.so.6:strspn) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4919fa0 (libc.so.6:wcpncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x4903920 (libc.so.6:mempcpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x49067d0 (libc.so.6:strncasecmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
---92946-- REDIR: 0x49c9db0 (libc.so.6:__strrchr_avx2) redirected to 0x48559e0 (rindex)
---92946-- REDIR: 0x49c7750 (libc.so.6:__strcmp_avx2) redirected to 0x48573d0 (strcmp)
---92946-- REDIR: 0x49c7f00 (libc.so.6:__strlen_avx2) redirected to 0x48560e0 (strlen)
---92946-- REDIR: 0x49c8fe0 (libc.so.6:__strncmp_avx2) redirected to 0x4856b20 (strncmp)
---92946-- REDIR: 0x49c7320 (libc.so.6:__strchr_avx2) redirected to 0x4855c20 (index)
---92946-- REDIR: 0x49c4780 (libc.so.6:__memchr_avx2) redirected to 0x4857610 (memchr)
---92946-- REDIR: 0x49c7560 (libc.so.6:__strchrnul_avx2) redirected to 0x485b730 (strchrnul)
---92946-- REDIR: 0x48fef50 (libc.so.6:malloc) redirected to 0x484c7f0 (malloc)
-==92946== Downloading debug info for /usr/bin/timeout...
---92946--   Considering /home/kiefer/.cache/debuginfod_client/5e420182b34328f111cbfcd1fcb70915ba33dd9f/debuginfo ..
---92946--   .. CRC is valid
-==92946== Successfully downloaded debug file for /usr/bin/timeout
-==92946== Downloading debug info for /home/kiefer/.cache/debuginfod_client/5e420182b34328f111cbfcd1fcb70915ba33dd9f/debuginfo...
---92946--   Considering /home/kiefer/.cache/debuginfod_client/d2339c1c16539d48d65b2cf62b78c3ddc4db8ed3/debuginfo ..
---92946--   .. build-id is valid
-==92946== Successfully downloaded debug file for /home/kiefer/.cache/debuginfod_client/5e420182b34328f111cbfcd1fcb70915ba33dd9f/debuginfo
---92946-- REDIR: 0x49c5140 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x485b860 (mempcpy)
---92946-- REDIR: 0x49c5180 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x485a9b0 (memmove)
---92946-- REDIR: 0x48ff650 (libc.so.6:free) redirected to 0x484fb11 (free)
---92946-- REDIR: 0x49c5150 (libc.so.6:__memcpy_chk_avx_unaligned_erms) redirected to 0x485bdb0 (__memcpy_chk)
-==92946== 
-==92946== HEAP SUMMARY:
-==92946==     in use at exit: 0 bytes in 0 blocks
-==92946==   total heap usage: 30 allocs, 30 frees, 3,993 bytes allocated
-==92946== 
-==92946== All heap blocks were freed -- no leaks are possible
-==92946== 
-==92946== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==62682== Memcheck, a memory error detector
+==62682== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==62682== Using Valgrind-3.25.1-4441567fbe-20250520 and LibVEX; rerun with -h for copyright info
+==62682== Command: timeout 10s ./minishell
+==62682== Parent PID: 62509
+==62682== 
+--62682-- 
+--62682-- Valgrind options:
+--62682--    --tool=memcheck
+--62682--    --leak-check=full
+--62682--    --show-leak-kinds=all
+--62682--    --track-origins=yes
+--62682--    --verbose
+--62682--    --log-file=valgrind_output.log
+--62682-- Contents of /proc/version:
+--62682--   Linux version 6.15.8-100.fc41.x86_64 (mockbuild@59b7f37a276946098db19d099fc830b6) (gcc (GCC) 14.3.1 20250523 (Red Hat 14.3.1-1), GNU ld version 2.43.1-5.fc41) #1 SMP PREEMPT_DYNAMIC Thu Jul 24 12:25:37 UTC 2025
+--62682-- 
+--62682-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed-fma
+--62682-- Page sizes: currently 4096, max supported 4096
+--62682-- Valgrind library directory: /usr/libexec/valgrind
+--62682-- Reading syms from /usr/bin/timeout
+--62682-- Reading syms from /usr/lib64/ld-linux-x86-64.so.2
+--62682-- Warning: cross-CU LIMITATION: some inlined fn names
+--62682-- might be shown as UnknownInlinedFun
+--62682-- Reading syms from /usr/libexec/valgrind/memcheck-amd64-linux
+--62682--    object doesn't have a dynamic symbol table
+--62682-- Scheduler: using generic scheduler lock implementation.
+--62682-- Reading suppressions file: /usr/libexec/valgrind/default.supp
+==62682== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-62682-by-kiefer-on-desktop-5kn91go.home
+==62682== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-62682-by-kiefer-on-desktop-5kn91go.home
+==62682== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-62682-by-kiefer-on-desktop-5kn91go.home
+==62682== 
+==62682== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==62682== don't want to do, unless you know exactly what you're doing,
+==62682== or are doing some strange experiment):
+==62682==   /usr/libexec/valgrind/../../bin/vgdb --pid=62682 ...command...
+==62682== 
+==62682== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==62682==   /path/to/gdb timeout
+==62682== and then give GDB the following command
+==62682==   target remote | /usr/libexec/valgrind/../../bin/vgdb --pid=62682
+==62682== --pid is optional if only one valgrind process is running
+==62682== 
+==62682== Downloading debug info for /usr/libexec/valgrind/memcheck-amd64-linux...
+--62682--   Considering /home/kiefer/.cache/debuginfod_client/9ab5aeea7f89a025bb34d01c42449dc692996f61/debuginfo ..
+--62682--   .. CRC is valid
+==62682== Successfully downloaded debug file for /usr/libexec/valgrind/memcheck-amd64-linux
+==62682== Downloading debug info for /home/kiefer/.cache/debuginfod_client/9ab5aeea7f89a025bb34d01c42449dc692996f61/debuginfo...
+--62682--   Considering /home/kiefer/.cache/debuginfod_client/7eb32a56150be12c16d214a711baac7f564521fc/debuginfo ..
+--62682--   .. build-id is valid
+==62682== Successfully downloaded debug file for /home/kiefer/.cache/debuginfod_client/9ab5aeea7f89a025bb34d01c42449dc692996f61/debuginfo
+--62682-- REDIR: 0x4032020 (ld-linux-x86-64.so.2:strlen) redirected to 0x582360cf (vgPlain_amd64_linux_REDIR_FOR_strlen)
+--62682-- REDIR: 0x40309c0 (ld-linux-x86-64.so.2:strcmp) redirected to 0x582360e9 (vgPlain_amd64_linux_REDIR_FOR_strcmp)
+--62682-- REDIR: 0x4030790 (ld-linux-x86-64.so.2:index) redirected to 0x58236122 (vgPlain_amd64_linux_REDIR_FOR_index)
+--62682-- REDIR: 0x402fb20 (ld-linux-x86-64.so.2:bcmp) redirected to 0x58236104 (vgPlain_amd64_linux_REDIR_FOR_memcmp)
+--62682-- Reading syms from /usr/libexec/valgrind/vgpreload_core-amd64-linux.so
+--62682-- Reading syms from /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so
+==62682== WARNING: new redirection conflicts with existing -- ignoring it
+--62682--     old: 0x040309c0 (strcmp              ) R-> (0000.0) 0x582360e9 vgPlain_amd64_linux_REDIR_FOR_strcmp
+--62682--     new: 0x040309c0 (strcmp              ) R-> (2016.0) 0x04857550 strcmp
+==62682== WARNING: new redirection conflicts with existing -- ignoring it
+--62682--     old: 0x04032020 (strlen              ) R-> (0000.0) 0x582360cf vgPlain_amd64_linux_REDIR_FOR_strlen
+--62682--     new: 0x04032020 (strlen              ) R-> (2007.0) 0x04856200 strlen
+--62682-- REDIR: 0x402fdf0 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x485bca0 (mempcpy)
+--62682-- Reading syms from /usr/lib64/libc.so.6
+==62682== Downloading debug info for /usr/lib64/libc.so.6...
+--62682--   Considering /home/kiefer/.cache/debuginfod_client/1fe4f71c184938b1af3656d8b8cdb4928ab12394/debuginfo ..
+--62682--   .. CRC is valid
+==62682== Successfully downloaded debug file for /usr/lib64/libc.so.6
+--62682-- REDIR: 0x40321c0 (ld-linux-x86-64.so.2:strncmp) redirected to 0x4856d00 (strncmp)
+--62682-- REDIR: 0x4906ad0 (libc.so.6:strnlen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906b60 (libc.so.6:strpbrk) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4904ad0 (libc.so.6:strcmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x491bea0 (libc.so.6:wcsnlen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903ad0 (libc.so.6:memset) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x491b590 (libc.so.6:wcslen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x497f2d0 (libc.so.6:__memcpy_chk) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903a40 (libc.so.6:memrchr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x491be40 (libc.so.6:wcsncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4902f60 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x491a370 (libc.so.6:wcschr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x49049c0 (libc.so.6:index) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906b90 (libc.so.6:rindex) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x491a420 (libc.so.6:wcscmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903cf0 (libc.so.6:stpncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4928160 (libc.so.6:wmemchr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906970 (libc.so.6:strncmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903d50 (libc.so.6:strcasecmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4905d50 (libc.so.6:strcspn) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x491b360 (libc.so.6:wcscpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4904950 (libc.so.6:strcat) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906870 (libc.so.6:strncasecmp_l) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4904a40 (libc.so.6:strchrnul) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4902e70 (libc.so.6:bcmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4905ce0 (libc.so.6:strcpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903df0 (libc.so.6:strcasecmp_l) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906740 (libc.so.6:strlen) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906a10 (libc.so.6:strncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x49281e0 (libc.so.6:wmemcmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x497f3f0 (libc.so.6:__memmove_chk) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+==62682== WARNING: new redirection conflicts with existing -- ignoring it
+--62682--     old: 0x049c5150 (__memcpy_chk_avx_una) R-> (2030.0) 0x0485bdb0 __memcpy_chk
+--62682--     new: 0x049c5150 (__memcpy_chk_avx_una) R-> (2024.0) 0x0485b6b0 __memmove_chk
+--62682-- REDIR: 0x4903c80 (libc.so.6:stpcpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903800 (libc.so.6:memmove) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+==62682== Preferring higher priority redirection:
+--62682--     old: 0x049c5180 (__memcpy_avx_unalign) R-> (2018.0) 0x04858c20 __memcpy_avx_unaligned_erms
+--62682--     new: 0x049c5180 (__memcpy_avx_unalign) R-> (2018.1) 0x0485a9b0 memmove
+--62682-- REDIR: 0x4902df0 (libc.so.6:memchr) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4906d90 (libc.so.6:strspn) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4919fa0 (libc.so.6:wcpncpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x4903920 (libc.so.6:mempcpy) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x49067d0 (libc.so.6:strncasecmp) redirected to 0x48451ea (_vgnU_ifunc_wrapper)
+--62682-- REDIR: 0x49c9db0 (libc.so.6:__strrchr_avx2) redirected to 0x48559e0 (rindex)
+--62682-- REDIR: 0x49c7750 (libc.so.6:__strcmp_avx2) redirected to 0x48573d0 (strcmp)
+--62682-- REDIR: 0x49c7f00 (libc.so.6:__strlen_avx2) redirected to 0x48560e0 (strlen)
+--62682-- REDIR: 0x49c8fe0 (libc.so.6:__strncmp_avx2) redirected to 0x4856b20 (strncmp)
+--62682-- REDIR: 0x49c7320 (libc.so.6:__strchr_avx2) redirected to 0x4855c20 (index)
+--62682-- REDIR: 0x49c4780 (libc.so.6:__memchr_avx2) redirected to 0x4857610 (memchr)
+--62682-- REDIR: 0x49c7560 (libc.so.6:__strchrnul_avx2) redirected to 0x485b730 (strchrnul)
+--62682-- REDIR: 0x48fef50 (libc.so.6:malloc) redirected to 0x484c7f0 (malloc)
+==62682== Downloading debug info for /usr/bin/timeout...
+--62682--   Considering /home/kiefer/.cache/debuginfod_client/5e420182b34328f111cbfcd1fcb70915ba33dd9f/debuginfo ..
+--62682--   .. CRC is valid
+==62682== Successfully downloaded debug file for /usr/bin/timeout
+==62682== Downloading debug info for /home/kiefer/.cache/debuginfod_client/5e420182b34328f111cbfcd1fcb70915ba33dd9f/debuginfo...
+--62682--   Considering /home/kiefer/.cache/debuginfod_client/d2339c1c16539d48d65b2cf62b78c3ddc4db8ed3/debuginfo ..
+--62682--   .. build-id is valid
+==62682== Successfully downloaded debug file for /home/kiefer/.cache/debuginfod_client/5e420182b34328f111cbfcd1fcb70915ba33dd9f/debuginfo
+--62682-- REDIR: 0x49c5140 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x485b860 (mempcpy)
+--62682-- REDIR: 0x49c5180 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x485a9b0 (memmove)
+--62682-- REDIR: 0x48ff650 (libc.so.6:free) redirected to 0x484fb11 (free)
+--62682-- REDIR: 0x49c5150 (libc.so.6:__memcpy_chk_avx_unaligned_erms) redirected to 0x485bdb0 (__memcpy_chk)
+==62682== 
+==62682== HEAP SUMMARY:
+==62682==     in use at exit: 0 bytes in 0 blocks
+==62682==   total heap usage: 30 allocs, 30 frees, 3,993 bytes allocated
+==62682== 
+==62682== All heap blocks were freed -- no leaks are possible
+==62682== 
+==62682== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

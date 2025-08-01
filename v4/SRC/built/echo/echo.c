@@ -95,11 +95,21 @@ char *remove_quotes(const char *arg);
 int builtin_echo(t_shell *shell, char **argv)
 {
     int i = 1;
+    printf("[DEBUG] echo argv[0]=%s\n", argv[0]);
+    printf("[DEBUG] echo argv[1]=%s\n", argv[1]);
+    // ... etc
+    while (argv[i]) {
+        printf("[DEBUG] argv[%d]=%s\n", i, argv[i]);
+        i++;
+    }
     int newline = 1;
 
-    (void)shell;
+   // (void)shell;
 
+   
     // Gestion de l'option -n (peut être répétée)
+    printf("[ECHO DEBUG] quand i = 1 l11  argv[0]=%s, argv[1]=%s\n", argv[0], argv[1]);
+
     while (argv[i] && ft_strncmp(argv[i], "-n", 3) == 0)
     {
         newline = 0;
@@ -109,7 +119,9 @@ int builtin_echo(t_shell *shell, char **argv)
     // Affichage de tous les arguments restants, séparés par un espace
     while (argv[i])
     {
-        ft_putstr_fd(argv[i], STDOUT_FILENO);
+        printf("[ECHO-ARG %d] = '%s'\n", i, argv[i]);
+        if (argv[i][0])
+            ft_putstr_fd(argv[i], STDOUT_FILENO);
         if (argv[i + 1])
             ft_putchar_fd(' ', STDOUT_FILENO);
         i++;
@@ -117,7 +129,7 @@ int builtin_echo(t_shell *shell, char **argv)
 
     if (newline)
         ft_putchar_fd('\n', STDOUT_FILENO);
-
+    (void)shell; // Pour éviter l'avertissement de variable non utilisée
     return 0;
 }
 

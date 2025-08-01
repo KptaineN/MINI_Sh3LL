@@ -1,96 +1,83 @@
+[BUILD] key=<<, handler=0x402ac8
+build_t_arr_dic_str: [0] key='<<', value=0x402ac8
+[BUILD] key=>>, handler=0x402ae9
+build_t_arr_dic_str: [1] key='>>', value=0x402ae9
+[BUILD] key=&&, handler=0x402b0a
+build_t_arr_dic_str: [2] key='&&', value=0x402b0a
+[BUILD] key=||, handler=0x402b2b
+build_t_arr_dic_str: [3] key='||', value=0x402b2b
+[BUILD] key=|, handler=0x402b4c
+build_t_arr_dic_str: [4] key='|', value=0x402b4c
+[BUILD] key=<, handler=0x402b6d
+build_t_arr_dic_str: [5] key='<', value=0x402b6d
+[BUILD] key=>, handler=0x402b8e
+build_t_arr_dic_str: [6] key='>', value=0x402b8e
+[BUILD] key=echo, handler=0x403114
+build_t_arr_dic_str: [0] key='echo', value=0x403114
+[BUILD] key=cd, handler=0x403139
+build_t_arr_dic_str: [1] key='cd', value=0x403139
+[BUILD] key=pwd, handler=0x40315e
+build_t_arr_dic_str: [2] key='pwd', value=0x40315e
+[BUILD] key=export, handler=0x403183
+build_t_arr_dic_str: [3] key='export', value=0x403183
+[BUILD] key=unset, handler=0x4031a8
+build_t_arr_dic_str: [4] key='unset', value=0x4031a8
+[BUILD] key=env, handler=0x4031cd
+build_t_arr_dic_str: [5] key='env', value=0x4031cd
+[BUILD] key=exit, handler=0x4031f2
+build_t_arr_dic_str: [6] key='exit', value=0x4031f2
+ft_echo=0x403114 ft_cd=0x403139 ft_pwd=0x40315e ft_export=0x403183 ft_unset=0x4031a8 ft_env=0x4031cd ft_exit=0x4031f2
 ᕕ( ᐛ )ᕗ minishell$ pwd
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==92943==ERROR: AddressSanitizer: SEGV on unknown address 0x50b000000110 (pc 0x50b000000110 bp 0x7ffe1c42df90 sp 0x7ffe1c42df48 T0)
-==92943==The signal is caused by a READ memory access.
-==92943==Hint: PC is at a non-executable region. Maybe a wild jump?
-    #0 0x50b000000110  (<unknown module>)
-    #1 0x407d80 in launch_process SRC/parser/launch.c:566
-    #2 0x404deb in looping SRC/main/main_loop.c:232
-    #3 0x404860 in main SRC/main/main.c:110
-    #4 0x7f9156e0f487 in __libc_start_call_main (/lib64/libc.so.6+0x3487) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #5 0x7f9156e0f54a in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x354a) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #6 0x401464 in _start (/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4/minishell+0x401464) (BuildId: 1bcf11df7a02022929044a4d4b5b5f90edac6778)
-
-AddressSanitizer can not provide additional info.
-SUMMARY: AddressSanitizer: SEGV (<unknown module>) 
-==92943==ABORTING
 count_args_cmd: arr[0] = "pwd"
+[DEBUG] attribute_token_type: token 'pwd' has 1 args
+[DEBUG] attribute_cmd_subtokens: len = 1, idx = 0
+[DEBUG] attribute_token_type: new_i = 1, i = 0
+[expand_cmd] argv[0] = 'pwd'
+DEBUG handler=0x40315e idx=2
+[CALL] handler=0x40315e for pwd
+/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4
+count_args_cmd: arr[0] = "pwd"
+[DEBUG] attribute_token_type: token 'pwd' has 1 args
+[DEBUG] attribute_cmd_subtokens: len = 1, idx = 0
+[DEBUG] attribute_token_type: new_i = 1, i = 0
 ᕕ( ᐛ )ᕗ minishell$ ls
-execve: Bad address
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==92944==ERROR: AddressSanitizer: BUS on unknown address (pc 0x7f915700f3a5 bp 0xbebebebebebebeae sp 0x7ffe1c42d650 T0)
-==92944==The signal is caused by a READ memory access.
-==92944==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
-    #0 0x7f915700f3a5 in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) (/lib64/libasan.so.8+0xf3a5) (BuildId: 89c230c891879ee538159d2e56f56784c84db409)
-    #1 0x7f91570c14ee in free.part.0 (/lib64/libasan.so.8+0xc14ee) (BuildId: 89c230c891879ee538159d2e56f56784c84db409)
-    #2 0x403ee1 in free_str_array SRC/handle_utils/util-3-free.c:70
-    #3 0x40454b in child_exit SRC/handle_utils/util-3-free.c:171
-    #4 0x40b20f in execute_cmd SRC/parser/path.c:566
-    #5 0x407d80 in launch_process SRC/parser/launch.c:566
-    #6 0x404deb in looping SRC/main/main_loop.c:232
-    #7 0x404860 in main SRC/main/main.c:110
-    #8 0x7f9156e0f487 in __libc_start_call_main (/lib64/libc.so.6+0x3487) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #9 0x7f9156e0f54a in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x354a) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #10 0x401464 in _start (/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4/minishell+0x401464) (BuildId: 1bcf11df7a02022929044a4d4b5b5f90edac6778)
-
-AddressSanitizer can not provide additional info.
-SUMMARY: AddressSanitizer: BUS (/lib64/libasan.so.8+0xf3a5) (BuildId: 89c230c891879ee538159d2e56f56784c84db409) in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType)
-==92944==ABORTING
+debug8minishell_with_tester.sh
+gdb_commands.txt
+gdb_output.log
+include
+lasttest.sh
+Makefile
+minishell
+minishell_tester
+obj
+SRC
+test_commands.txt
+test_output.log
+test_parser
+test_split
+valgrind_output.log
 count_args_cmd: arr[0] = "ls"
+[DEBUG] attribute_token_type: token 'ls' has 1 args
+[DEBUG] attribute_cmd_subtokens: len = 1, idx = 0
+[DEBUG] attribute_token_type: new_i = 1, i = 0
 ᕕ( ᐛ )ᕗ minishell$ echo "Hello World"
-AddressSanitizer:DEADLYSIGNAL
-=================================================================
-==92945==ERROR: AddressSanitizer: SEGV on unknown address 0x50b0000000f0 (pc 0x50b0000000f0 bp 0x7ffe1c42df90 sp 0x7ffe1c42df48 T0)
-==92945==The signal is caused by a READ memory access.
-==92945==Hint: PC is at a non-executable region. Maybe a wild jump?
-    #0 0x50b0000000f0  (<unknown module>)
-    #1 0x407d80 in launch_process SRC/parser/launch.c:566
-    #2 0x404deb in looping SRC/main/main_loop.c:232
-    #3 0x404860 in main SRC/main/main.c:110
-    #4 0x7f9156e0f487 in __libc_start_call_main (/lib64/libc.so.6+0x3487) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #5 0x7f9156e0f54a in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x354a) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #6 0x401464 in _start (/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4/minishell+0x401464) (BuildId: 1bcf11df7a02022929044a4d4b5b5f90edac6778)
 
-AddressSanitizer can not provide additional info.
-SUMMARY: AddressSanitizer: SEGV (<unknown module>) 
-==92945==ABORTING
 count_args_cmd: arr[0] = "echo"
 count_args_cmd: arr[1] = ""Hello World""
+[DEBUG] attribute_token_type: token 'echo' has 2 args
+[DEBUG] attribute_cmd_subtokens: len = 2, idx = 0
+[DEBUG] attribute_token_type: new_i = 2, i = 0
+[expand_cmd] argv[0] = 'echo'
+[expand_cmd] argv[1] = 'Hello World'
+DEBUG handler=0x403114 idx=0
+[CALL] handler=0x403114 for echo
+[DEBUG] echo argv[0]=echo
+[DEBUG] echo argv[1]=Hello World
+[DEBUG] argv[1]=Hello World
+[ECHO DEBUG] quand i = 1 l11  argv[0]=echo, argv[1]=Hello World
+count_args_cmd: arr[0] = "echo"
+count_args_cmd: arr[1] = ""Hello World""
+[DEBUG] attribute_token_type: token 'echo' has 2 args
+[DEBUG] attribute_cmd_subtokens: len = 2, idx = 0
+[DEBUG] attribute_token_type: new_i = 2, i = 0
 ᕕ( ᐛ )ᕗ minishell$ exit
-=================================================================
-==92942==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0x50b000000100 in thread T0
-    #0 0x7f91570c1518 in free.part.0 (/lib64/libasan.so.8+0xc1518) (BuildId: 89c230c891879ee538159d2e56f56784c84db409)
-    #1 0x403d4e in free_t_arr SRC/handle_utils/util-3-free.c:40
-    #2 0x404352 in free_parser SRC/handle_utils/util-3-free.c:136
-    #3 0x404491 in free_minishell SRC/handle_utils/util-3-free.c:156
-    #4 0x40486f in main SRC/main/main.c:111
-    #5 0x7f9156e0f487 in __libc_start_call_main (/lib64/libc.so.6+0x3487) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #6 0x7f9156e0f54a in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x354a) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #7 0x401464 in _start (/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4/minishell+0x401464) (BuildId: 1bcf11df7a02022929044a4d4b5b5f90edac6778)
-
-0x50b000000100 is located 16 bytes inside of 112-byte region [0x50b0000000f0,0x50b000000160)
-freed by thread T0 here:
-    #0 0x7f91570c1518 in free.part.0 (/lib64/libasan.so.8+0xc1518) (BuildId: 89c230c891879ee538159d2e56f56784c84db409)
-    #1 0x403d4e in free_t_arr SRC/handle_utils/util-3-free.c:40
-    #2 0x404352 in free_parser SRC/handle_utils/util-3-free.c:136
-    #3 0x404491 in free_minishell SRC/handle_utils/util-3-free.c:156
-    #4 0x40486f in main SRC/main/main.c:111
-    #5 0x7f9156e0f487 in __libc_start_call_main (/lib64/libc.so.6+0x3487) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #6 0x7f9156e0f54a in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x354a) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #7 0x401464 in _start (/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4/minishell+0x401464) (BuildId: 1bcf11df7a02022929044a4d4b5b5f90edac6778)
-
-previously allocated by thread T0 here:
-    #0 0x7f91570c2877 in malloc (/lib64/libasan.so.8+0xc2877) (BuildId: 89c230c891879ee538159d2e56f56784c84db409)
-    #1 0x40bdb0 in build_t_arr_dic_str SRC/parser/t_arr.c:310
-    #2 0x40c80c in init_all_t_arr SRC/parser/t_arr.c:366
-    #3 0x4053e6 in init_shell SRC/main/start_init.c:61
-    #4 0x405432 in start_shell SRC/main/start_init.c:72
-    #5 0x404837 in main SRC/main/main.c:104
-    #6 0x7f9156e0f487 in __libc_start_call_main (/lib64/libc.so.6+0x3487) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #7 0x7f9156e0f54a in __libc_start_main@GLIBC_2.2.5 (/lib64/libc.so.6+0x354a) (BuildId: 1fe4f71c184938b1af3656d8b8cdb4928ab12394)
-    #8 0x401464 in _start (/home/kiefer/Documents/42/minishell/v3/MINI_Sh3LL/v4/minishell+0x401464) (BuildId: 1bcf11df7a02022929044a4d4b5b5f90edac6778)
-
-SUMMARY: AddressSanitizer: bad-free (/lib64/libasan.so.8+0xc1518) (BuildId: 89c230c891879ee538159d2e56f56784c84db409) in free.part.0
-==92942==ABORTING

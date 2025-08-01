@@ -282,3 +282,113 @@ Using host libthread_db library "/lib64/libthread_db.so.1".
 [Inferior 1 (process 92992) exited with code 01]
 gdb_commands.txt:5: Error in sourced command file:
 No stack.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 44523]
+[Detaching after fork from child process 44525]
+[Detaching after fork from child process 44526]
+[Inferior 1 (process 44520) exited with code 01]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 45977]
+[Detaching after fork from child process 45979]
+[Detaching after fork from child process 45980]
+[Inferior 1 (process 45974) exited with code 01]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 46897]
+[Detaching after fork from child process 46899]
+[Detaching after fork from child process 46900]
+[Inferior 1 (process 46894) exited with code 01]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 48435]
+[Detaching after fork from child process 48437]
+[Detaching after fork from child process 48438]
+[Inferior 1 (process 48432) exited with code 01]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 57111]
+[Detaching after fork from child process 57112]
+[Detaching after fork from child process 57113]
+[Inferior 1 (process 57108) exited normally]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 61013]
+[Detaching after fork from child process 61014]
+[Detaching after fork from child process 61015]
+[Inferior 1 (process 61010) exited normally]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7fe2c80 in _start () from /lib64/ld-linux-x86-64.so.2
+#0  0x00007ffff7fe2c80 in _start () from /lib64/ld-linux-x86-64.so.2
+#1  0x0000000000000001 in ?? ()
+#2  0x00007fffffffdd6e in ?? ()
+#3  0x0000000000000000 in ?? ()
+rax            0x0                 0
+rbx            0x0                 0
+rcx            0x0                 0
+rdx            0x0                 0
+rsi            0x0                 0
+rdi            0x0                 0
+rbp            0x0                 0x0
+rsp            0x7fffffffd950      0x7fffffffd950
+r8             0x0                 0
+r9             0x0                 0
+r10            0x0                 0
+r11            0x0                 0
+r12            0x0                 0
+r13            0x0                 0
+r14            0x0                 0
+r15            0x0                 0
+rip            0x7ffff7fe2c80      0x7ffff7fe2c80 <_start>
+eflags         0x202               [ IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x0                 0
+gs_base        0x0                 0
+A debugging session is active.
+
+	Inferior 1 [process 62713] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

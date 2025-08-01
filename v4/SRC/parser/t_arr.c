@@ -290,10 +290,60 @@ void build_t_arr_str(t_arr **dst, char **arr_str, int len)
     }
 }
 
+void build_t_arr_dic_str(t_arr **dst, char **keys,  int (**values)(t_shell *, char **), int len)
+{
+    *dst = malloc(sizeof(t_arr));
+    if (!*dst)
+        return;
+    (*dst)->len = len;
+    (*dst)->arr = malloc(sizeof(t_dic *) * len);
+    if (!(*dst)->arr) {
+        free(*dst);
+        *dst = NULL;
+        return;
+    }
+    for (int i = 0; i < len; i++)
+    {
+        t_dic *dic = malloc(sizeof(t_dic));
+        if (!dic)
+        {
+            // Free tout ce qui a été déjà alloué
+            for (int j = 0; j < i; j++) {
+                t_dic *prev = (t_dic *)(*dst)->arr[j];
+                free(prev->key);
+                free(prev);
+            }
+            free((*dst)->arr);
+            free(*dst);
+            *dst = NULL;
+            return;
+        }
+        dic->key = ft_strdup(keys[i]);
+        dic->value = values[i];
+        printf("[BUILD] key=%s, handler=%p\n",  (char *)dic->key, (void *)dic->value); // wildjump
+        if (!dic->key)
+        {
+            free(dic);
+            for (int j = 0; j < i; j++) {
+                t_dic *prev = (t_dic *)(*dst)->arr[j];
+                free(prev->key);
+                free(prev);
+            }
+            free((*dst)->arr);
+            free(*dst);
+            *dst = NULL;
+            return;
+        }
+        (*dst)->arr[i] = dic;
+        // Debug print:
+        printf("build_t_arr_dic_str: [%d] key='%s', value=%p\n", i, (char *)dic->key, (void *)dic->value);
+    }
+}
+
 /*
     Alloue un t_arr de t_dic* (clé strdup + value copié direct, ex: ptr de handler)
     Sécurise tous les mallocs et print debug.
-*/
+
 void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
 {
     *dst = malloc(sizeof(t_arr));
@@ -331,7 +381,7 @@ void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
         // Debug print:
         // printf("build_t_arr_dic_str: [%d] key='%s', value=%p\n", i, temp[i].key, temp[i].value);
     }
-}
+}*/
 
 /*
     Initialise tous les builtins et opérateurs dans la shell (via bcmd et oper)
@@ -357,11 +407,10 @@ void init_all_t_arr(t_shell *shell)
         ft_unset,
         ft_env,
         ft_exit,
-        NULL
     };
     int n_operateurs = sizeof(all_operators) / sizeof(char *);
     int n_builtins = sizeof(all_builtins) / sizeof(char *);
 
-    build_t_arr_dic_str(&shell->oper, all_operators, (void **)operator_handlers, n_operateurs);
-    build_t_arr_dic_str(&shell->bcmd, all_builtins, (void **)builtin_handlers, n_builtins);
+    build_t_arr_dic_str(&shell->oper, all_operators, operator_handlers, n_operateurs);
+    build_t_arr_dic_str(&shell->bcmd, all_builtins, builtin_handlers, n_builtins);
 }
