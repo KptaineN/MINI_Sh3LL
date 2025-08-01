@@ -16,6 +16,7 @@ int	is_numeric(const char *str)
 	}
 	return (1);
 }
+
 int builtin_exit(t_shell *shell, char **argv)
 {
     long code = 0;

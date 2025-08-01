@@ -1,0 +1,250 @@
+.debug_combined/gdb_script.gdb:6: Error in sourced command file:
+Process record: the program is not being run.
+Breakpoint 1 at 0x402d06: file SRC/main/main.c, line 98.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+98		if (argc != 1 || argv[1])
+#0  main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+        shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+rax            0x402ce7            4205799
+rbx            0x7fffffffd9c8      140737488345544
+rcx            0x40edf0            4255216
+rdx            0x7fffffffd9d8      140737488345560
+rsi            0x7fffffffd9c8      140737488345544
+rdi            0x1                 1
+rbp            0x7fffffffd8a0      0x7fffffffd8a0
+rsp            0x7fffffffd800      0x7fffffffd800
+r8             0x0                 0
+r9             0x7ffff7fca1e0      140737353916896
+r10            0x7fffffffd5e0      140737488344544
+r11            0x203               515
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x402d06            0x402d06 <main+31>
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+=> 0x402d06 <main+31>:	cmpl   $0x1,-0x84(%rbp)
+   0x402d0d <main+38>:	jne    0x402d22 <main+59>
+   0x402d0f <main+40>:	mov    -0x90(%rbp),%rax
+   0x402d16 <main+47>:	add    $0x8,%rax
+   0x402d1a <main+51>:	mov    (%rax),%rax
+   0x402d1d <main+54>:	test   %rax,%rax
+   0x402d20 <main+57>:	je     0x402d3b <main+84>
+   0x402d22 <main+59>:	mov    $0x2,%esi
+   0x402d27 <main+64>:	mov    $0x40b010,%edi
+   0x402d2c <main+69>:	call   0x4085f0 <ft_putstr_fd>
+A debugging session is active.
+
+	Inferior 1 [process 24206] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+Breakpoint 1 at 0x402d06: file SRC/main/main.c, line 98.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+98		if (argc != 1 || argv[1])
+"
+=== Backtrace complète ===
+"#0  main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+        shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+"
+=== Variables locales ===
+"shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+"
+=== Registres ===
+"rax            0x402ce7            4205799
+rbx            0x7fffffffd9c8      140737488345544
+rcx            0x40edf0            4255216
+rdx            0x7fffffffd9d8      140737488345560
+rsi            0x7fffffffd9c8      140737488345544
+rdi            0x1                 1
+rbp            0x7fffffffd8a0      0x7fffffffd8a0
+rsp            0x7fffffffd800      0x7fffffffd800
+r8             0x0                 0
+r9             0x7ffff7fca1e0      140737353916896
+r10            0x7fffffffd5e0      140737488344544
+r11            0x203               515
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x402d06            0x402d06 <main+31>
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+"
+=== Disassembly autour du PC ===
+"=> 0x402d06 <main+31>:	cmpl   $0x1,-0x84(%rbp)
+   0x402d0d <main+38>:	jne    0x402d22 <main+59>
+   0x402d0f <main+40>:	mov    -0x90(%rbp),%rax
+   0x402d16 <main+47>:	add    $0x8,%rax
+   0x402d1a <main+51>:	mov    (%rax),%rax
+   0x402d1d <main+54>:	test   %rax,%rax
+   0x402d20 <main+57>:	je     0x402d3b <main+84>
+   0x402d22 <main+59>:	mov    $0x2,%esi
+   0x402d27 <main+64>:	mov    $0x40b010,%edi
+   0x402d2c <main+69>:	call   0x4085f0 <ft_putstr_fd>
+A debugging session is active.
+
+	Inferior 1 [process 24950] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+Breakpoint 1 at 0x402d06: file SRC/main/main.c, line 98.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+98		if (argc != 1 || argv[1])
+"
+=== Backtrace complète ===
+"#0  main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+        shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+"
+=== Variables locales ===
+"shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+"
+=== Registres ===
+"rax            0x402ce7            4205799
+rbx            0x7fffffffd9c8      140737488345544
+rcx            0x40edf0            4255216
+rdx            0x7fffffffd9d8      140737488345560
+rsi            0x7fffffffd9c8      140737488345544
+rdi            0x1                 1
+rbp            0x7fffffffd8a0      0x7fffffffd8a0
+rsp            0x7fffffffd800      0x7fffffffd800
+r8             0x0                 0
+r9             0x7ffff7fca1e0      140737353916896
+r10            0x7fffffffd5e0      140737488344544
+r11            0x203               515
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x402d06            0x402d06 <main+31>
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+"
+=== Disassembly autour du PC ===
+"=> 0x402d06 <main+31>:	cmpl   $0x1,-0x84(%rbp)
+   0x402d0d <main+38>:	jne    0x402d22 <main+59>
+   0x402d0f <main+40>:	mov    -0x90(%rbp),%rax
+   0x402d16 <main+47>:	add    $0x8,%rax
+   0x402d1a <main+51>:	mov    (%rax),%rax
+   0x402d1d <main+54>:	test   %rax,%rax
+   0x402d20 <main+57>:	je     0x402d3b <main+84>
+   0x402d22 <main+59>:	mov    $0x2,%esi
+   0x402d27 <main+64>:	mov    $0x40b010,%edi
+   0x402d2c <main+69>:	call   0x4085f0 <ft_putstr_fd>
+A debugging session is active.
+
+	Inferior 1 [process 27061] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+Breakpoint 1 at 0x402d06: file SRC/main/main.c, line 98.
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.fedoraproject.org/>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+98		if (argc != 1 || argv[1])
+"
+=== Backtrace complète ===
+"#0  main (argc=1, argv=0x7fffffffd9c8, envp=0x7fffffffd9d8) at SRC/main/main.c:98
+        shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+"
+=== Variables locales ===
+"shell = {input = 0x480000 <error: Cannot access memory at address 0x480000>, args = 0x480000, parsed_args = 0x480000, n_tokens = 9437184, n_cmd = 0, tokens = 0x900000, cmd_tail = 0x7fffffffd878, cmd_head = 0x9e00000006, env = 0x0, fd_in = 0, fd_out = 0, bcmd = 0x0, oper = 0x0, pids = 0x0, fd_pid = {0, 0}, heredoc = 0x0, exit_status = 0}
+"
+=== Registres ===
+"rax            0x402ce7            4205799
+rbx            0x7fffffffd9c8      140737488345544
+rcx            0x40edf0            4255216
+rdx            0x7fffffffd9d8      140737488345560
+rsi            0x7fffffffd9c8      140737488345544
+rdi            0x1                 1
+rbp            0x7fffffffd8a0      0x7fffffffd8a0
+rsp            0x7fffffffd800      0x7fffffffd800
+r8             0x0                 0
+r9             0x7ffff7fca1e0      140737353916896
+r10            0x7fffffffd5e0      140737488344544
+r11            0x203               515
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x402d06            0x402d06 <main+31>
+eflags         0x206               [ PF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+"
+=== Disassembly autour du PC ===
+"=> 0x402d06 <main+31>:	cmpl   $0x1,-0x84(%rbp)
+   0x402d0d <main+38>:	jne    0x402d22 <main+59>
+   0x402d0f <main+40>:	mov    -0x90(%rbp),%rax
+   0x402d16 <main+47>:	add    $0x8,%rax
+   0x402d1a <main+51>:	mov    (%rax),%rax
+   0x402d1d <main+54>:	test   %rax,%rax
+   0x402d20 <main+57>:	je     0x402d3b <main+84>
+   0x402d22 <main+59>:	mov    $0x2,%esi
+   0x402d27 <main+64>:	mov    $0x40b010,%edi
+   0x402d2c <main+69>:	call   0x4085f0 <ft_putstr_fd>
+A debugging session is active.
+
+	Inferior 1 [process 28838] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

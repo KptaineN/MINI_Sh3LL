@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-08-01T15:57:34+02:00",
+  "suspect_location": "",
+  "gdb": {
+    "segfault_detected": false
+  },
+  "valgrind": {
+    "memory_errors": false,
+    "memory_leaks": false
+  },
+  "minishell_tester": {
+    "summary": "N/A",
+    "status": "skipped"
+  }
+}

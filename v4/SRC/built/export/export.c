@@ -1,5 +1,6 @@
-#include "../../include/minishell.h"
+//#include "../../include/minishell.h"
 
+#include "export.h"
 /*
 static size_t env_count(t_shell *shell)
 {

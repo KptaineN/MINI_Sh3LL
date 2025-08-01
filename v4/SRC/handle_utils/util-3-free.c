@@ -134,20 +134,30 @@ void free_tokens(t_shell *shell)
                     {
                         // Si tu as fait ft_substr ou ft_strdup sur parts[k].p, free-le
                         if (cont->parts[k].p)
+                        {
+                            printf("[DEBUG] free_tokens 138: freeing part %d of token '%s'\n", k, tok->value);
+                            printf("[DEBUG] free_tokens: freeing part %d of token '%s' (p: %p, val: %.10s)\n", 
+                                k, tok->value ? tok->value : "(null)", cont->parts[k].p, cont->parts[k].p);
                             free(cont->parts[k].p);
+                            printf("[DEBUG] free_tokens 140: freed part %d of token '%s'\n", k, tok->value);
+                        }
                     }
                     free(cont->parts);
+                    printf("[DEBUG] free_tokens 144: freed parts of token '%s'\n", tok->value);
                 }
             }
             free(tok->cmd_args_parts);
+            printf("[DEBUG] free_tokens 148: freed cmd_args_parts of token '%s'\n", tok->value);
         }
         // Si value = strdup/ft_substr => free, sinon ne pas toucher
         // (mais dans ton parsing c’est souvent juste un pointeur du split, donc ne rien faire)
     }
 
     free(shell->tokens);
+    printf("[DEBUG] free_tokens 155: freed all tokens\n");
     shell->tokens   = NULL;
     shell->n_tokens = 0;
+    
 }
 
 

@@ -317,8 +317,13 @@ void attribute_token_type(t_shell *shell)
     while (i < shell->parsed_args->len && idx_token < shell->n_tokens)
     {
         t_token *token = &shell->tokens[idx_token];
-        token->value = arr[i]; // If arr[i] is reused elsewhere, consider duplicating with strdup(arr[i])
-
+        //token->value = arr[i]; // If arr[i] is reused elsewhere, consider duplicating with strdup(arr[i])
+        token->value = ft_strdup(arr[i]);
+        if (!token->value)
+        {
+            perror("Erreur allocation token value");
+            exit(EXIT_FAILURE);
+        }
         if (is_in_t_arr_dic_str(shell->oper, arr[i]) != -1)
         {
             token->type = TOKEN_OPER;

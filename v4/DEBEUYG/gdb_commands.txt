@@ -1,8 +1,7 @@
 set pagination off
-set logging file gdb_output.log
+set logging file $GDB_LOG
 set logging on
 run < test_commands.txt
 bt
 info registers
 quit
-y

@@ -1,0 +1,16 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 19011]
+[Detaching after fork from child process 19012]
+[Detaching after fork from child process 19013]
+[Inferior 1 (process 19008) exited normally]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+[Detaching after fork from child process 19492]
+[Detaching after fork from child process 19493]
+[Detaching after fork from child process 19494]
+[Inferior 1 (process 19489) exited normally]
+gdb_commands.txt:5: Error in sourced command file:
+No stack.

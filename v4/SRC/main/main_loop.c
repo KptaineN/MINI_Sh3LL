@@ -238,11 +238,11 @@ int looping(t_shell *shell)
         shell->parsed_args = NULL;
 
         /* 2) Les tokens (tableau) */
-        free_tokens(shell);
+		free_cmd_list(shell);
+ 		free_tokens(shell);
 
         /* 3) La liste des commandes (noeuds t_list) */
-        free_cmd_list(shell);
-
+        
         /* 4) Le tableau des pids */
         free(shell->pids);
         shell->pids = NULL;

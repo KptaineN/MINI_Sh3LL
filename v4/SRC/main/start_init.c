@@ -12,7 +12,7 @@
 
 #include "../../include/minishell.h"
 
-#include "minishell.h"
+
 
 /* Initialise les champs de base du shell */
 void init_idx(t_shell *shell, char **envp)
