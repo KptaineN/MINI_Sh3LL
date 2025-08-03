@@ -1,4 +1,0 @@
-pwd
-ls
-echo "Hello World"
-exit

@@ -1,0 +1,1410 @@
+TEST ft_echo vs bash
+=====================
+[KO ] echo
+   Bash : ''
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo test
+   Bash : 'test'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo test1 test2
+   Bash : 'test1 test2'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo -n test
+   Bash : 'test'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo -n -n test
+   Bash : 'test'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo -nnnnn test
+   Bash : 'test'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo -n
+   Bash : ''
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo ""
+   Bash : ''
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo "a    b"
+   Bash : 'a    b'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo 'abc'
+   Bash : 'abc'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo "abc"
+   Bash : 'abc'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo "a   b"
+   Bash : 'a   b'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo "" ""
+   Bash : ' '
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo "   a  b  c   "
+   Bash : '   a  b  c   '
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo a b c
+   Bash : 'a b c'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo a    b     c
+   Bash : 'a b c'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo $USER
+   Bash : 'kiefer'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo "$USER"
+   Bash : 'kiefer'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+[KO ] echo '$USER'
+   Bash : '$USER'
+   Mini : '
+test
+test1 test2
+testtesttest
+a    b
+'abc'
+"abc"
+"a   b"
+"" ""
+   a  b  c   
+a b c
+a     b      c
+$USER
+"$USER"
+'$USER'
+
+=== TEST: echo ===
+[END]
+
+=== TEST: echo test ===
+[END]
+
+=== TEST: echo test1 test2 ===
+[END]
+
+=== TEST: echo -n test ===
+[END]
+
+=== TEST: echo -n -n test ===
+[END]
+
+=== TEST: echo -nnnnn test ===
+[END]
+
+=== TEST: echo -n ===
+[END]
+
+=== TEST: echo "" ===
+[END]
+
+=== TEST: echo "a    b" ===
+[END]
+
+=== TEST: echo 'abc' ===
+[END]
+
+=== TEST: echo "abc" ===
+[END]
+
+=== TEST: echo "a   b" ===
+[END]
+
+=== TEST: echo "" "" ===
+[END]
+
+=== TEST: echo "   a  b  c   " ===
+[END]
+
+=== TEST: echo a b c ===
+[END]
+
+=== TEST: echo a    b     c ===
+[END]
+
+=== TEST: echo $USER ===
+[END]
+
+=== TEST: echo "$USER" ===
+[END]
+
+=== TEST: echo '$USER' ===
+[END]'
+=====================
+ Résultat : 0 OK, 19 KO
