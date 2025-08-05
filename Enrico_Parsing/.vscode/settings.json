@@ -13,6 +13,12 @@
         "type_traits": "c",
         "utility": "c",
         "wait.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "bitset": "c",
+        "string_view": "c",
+        "hash_map": "c",
+        "hash_set": "c",
+        "initializer_list": "c",
+        "span": "c"
     }
 }

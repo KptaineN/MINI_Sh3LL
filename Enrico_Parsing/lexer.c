@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:20:55 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/28 10:49:25 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/05 20:55:37 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static int count_args_cmd(t_shell *shell, int i)
 	int len = shell->parsed_args->len;
 	
 	int idx_oper;
-	print_dic(shell->oper);
+	//print_dic(shell->oper);
 	while (1)
 	{
 		if (i==len)
@@ -83,7 +83,7 @@ static int count_args_cmd(t_shell *shell, int i)
 		if (arr[i] != NULL)
 		{
 			printf("arg%d %s\n", i, arr[i]);
-			idx_oper = is_in_t_arr_str(shell->oper, arr[i]);
+			idx_oper = is_in_t_arr_dic_str(shell->oper, arr[i]);
 			if (idx_oper != -1)
 				return n_args;
 			n_args++;
@@ -95,21 +95,15 @@ static int count_args_cmd(t_shell *shell, int i)
 
 void subtoken_of_cmd(t_subtoken_conainter *container, char *arg)
 {
-	if (!container || !arg)
-        return;
 	t_subtoken *parts;
 	char *head = arg;
 	int idx_tail;
 	int n_parts = container->n_parts;
-    if (n_parts <= 0)
-        return;
 	container->parts = malloc(sizeof(t_subtoken)*n_parts);
-	 if (!container->parts)
-        return;
-	//parts = container->parts;
-	//if (!parts)
-	//	return;
 	parts = container->parts;
+	if (!parts)
+		return;
+
 	int i = 0;
 	int idx = 0;
 	while(head[idx])
@@ -238,4 +232,5 @@ void attribute_token_type(t_shell *shell)
 		}
 		idx_token++;
 	}
+	shell->cmd_tail = shell->cmd_head;
 }

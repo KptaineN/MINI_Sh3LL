@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/25 16:22:03 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/08/05 20:58:58 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void add_pid_env(t_shell *shell, int fd)
 {
-    pid_t received_pid;
+    pid_t received_pid = 0;
     char s[20]; //PID= + sizeof(pid_t) =
     if (read(fd, s, 20) > 0)
         perror("add_pid_func");   
@@ -29,7 +29,7 @@ void send_pid(int fd, int pid)
 }
 
 
-int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd)
+int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe)
 {
 
     if (shell->fd_in == -1)
@@ -52,7 +52,7 @@ int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd)
         close(curr_pipe[1]);
         close(fd_pid[0]);
         close(fd_pid[1]);
-        execute(shell,curr_cmd->content);
+        execute(shell,shell->cmd_tail->content);
         exit(1);
     }
 
@@ -64,14 +64,12 @@ int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd)
     close(fd_pid[1]);
     prev_pipe[0] = curr_pipe[0];
     prev_pipe[1] = curr_pipe[1];
-    curr_cmd = curr_cmd->next;
-  
+    shell->cmd_tail = shell->cmd_tail->next;
     return pid;
 }
 
-int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
+int end_cmd(t_shell *shell,int *prev_pipe)
 {
-    (void) curr_cmd;
     if (shell->fd_out == -1)
         shell->fd_out = STDOUT_FILENO;
     int fd_pid[2];
@@ -90,11 +88,9 @@ int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd)
         dup2(prev_pipe[0], STDIN_FILENO);
         close(prev_pipe[0]);
         close(prev_pipe[1]);
-    
         dup2(shell->fd_out, STDOUT_FILENO);
         close(shell->fd_out);
-        // Execute
-        exit(1);
+        execute(shell,shell->cmd_tail->content);
     }
     send_pid(fd_pid[1],pid);
     close(fd_pid[0]);
@@ -159,12 +155,12 @@ void one_command(t_shell *shell)
 
 void launch_process(t_shell *shell)
 {
+    int *t_pid;
     int i;
     int *pid;
     int prev_pipe[2] = {-1,-1};
     int curr_pipe[2];
     int fd_pid[2];
-    t_list *curr_cmd = shell->cmd_head;
 
     if (shell->n_cmd == 1)
     {    
@@ -178,11 +174,13 @@ void launch_process(t_shell *shell)
     i = 0;
     if(pipe(curr_pipe) < 0)
         perror("pipe");
-    pid[i++] = start_cmd(shell, prev_pipe,curr_pipe,curr_cmd);
-    while(curr_cmd->next != NULL)
+    pid[i++] = start_cmd(shell, prev_pipe,curr_pipe);
+    while(shell->cmd_tail->next != NULL)
     {
         if (pipe(fd_pid) == -1)
             perror("fd_pid");
+        t_pid = &pid[i];
+        (void) t_pid;
         pid[i] = fork();
         if (pid[i] < 0)
             perror("Forks");
@@ -194,20 +192,16 @@ void launch_process(t_shell *shell)
             close(prev_pipe[1]);
             close(fd_pid[0]);
             close(fd_pid[1]);
-
-
             dup2(curr_pipe[1], STDOUT_FILENO);
             close(curr_pipe[0]);
             close(curr_pipe[1]);
-            // execute
-            exit(1);
+            execute(shell,shell->cmd_tail->content);
         }
         else
         {
             send_pid(fd_pid[1], (int) pid[i]);
             close(fd_pid[0]);
             close(fd_pid[1]);
-
             close(prev_pipe[0]);
             close(prev_pipe[1]);
             prev_pipe[0] = curr_pipe[0];
@@ -215,10 +209,10 @@ void launch_process(t_shell *shell)
             if(pipe(curr_pipe) == -1)
                 perror("pipe"); //ERROR
         }
-        curr_cmd = curr_cmd->next;
+        shell->cmd_tail = shell->cmd_tail->next;
         i++;
     }
-    pid[i++] = end_cmd(shell, prev_pipe,curr_cmd);
+    pid[i++] = end_cmd(shell, prev_pipe);
     while(i--)
         waitpid(pid[i], NULL, 0);
     free(pid);

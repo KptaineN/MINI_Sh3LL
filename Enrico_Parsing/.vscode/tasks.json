@@ -12,6 +12,7 @@
                 "-Werror",
                 "-g",
                 "${workspaceFolder}/*.c",
+                "-lreadline",
                 "-o",
                 "${workspaceFolder}/minishell"
             ],

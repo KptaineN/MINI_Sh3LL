@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:24:17 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/25 15:53:28 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/08/05 20:40:32 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,8 @@ int count_subtokens(const char *str)
 
 int count_tokens(t_shell *shell)
 {
-    int count = 1;
+    int count = 0;
+	bool cmd = 0;
     int i = 0;
     void **arr = shell->parsed_args->arr;
     int len = shell->parsed_args->len;
@@ -107,12 +108,16 @@ int count_tokens(t_shell *shell)
 				else				
 				{
 					count++;
+					count+=cmd;
+					cmd = 0;
 					i++;
 					break;
 				}
 			}
+			else 
+				cmd = 1;
 			i++;
 		}
 	}
-    return count+(idx_oper == -1);
+    return count + cmd;
 }

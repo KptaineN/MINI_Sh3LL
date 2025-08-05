@@ -59,24 +59,24 @@ typedef enum e_quote_type
 // for quoted unquoted and double quoted
 typedef struct s_subtoken
 {
-	t_quote_type	type;
+	t_quote_type	type; //double, single, unquote
 	char			*p; // pointer
 	int 			len; // size
 }					t_subtoken;
 
 typedef struct s_subtoken_conainter
 {
-	t_subtoken		*parts;		// "\"hamman\"asd\'Papa\'"
-	int				n_parts;
+	t_subtoken		*parts;		// "\"hamman\"asd\'Papa\'" -> "hamman", asd, ’Papa’ 
+	int				n_parts;	// 3
 }	t_subtoken_conainter;
 
 // tokens
 typedef struct s_token
 {
-	char			type;
-	char			*value; 	// if command, then here is the path
-	t_subtoken_conainter	*cmd_args_parts;				//cmd
-	int n_parts;
+	char			type; // command 
+	char			*value; 	// echo "\"hamman\"asd\'Papa\'"
+	t_subtoken_conainter	*cmd_args_parts;	// array {echo, \"hamman\"asd\'Papa\'}
+	int n_parts;	// 2
 }					t_token;
 
 typedef struct s_shell
@@ -84,17 +84,18 @@ typedef struct s_shell
 	t_arr			*parsed_args;
 	int				n_tokens;
 	int 			n_cmd;
-	t_token			*tokens;
-	t_list			*cmd_tail;
-	t_list			*cmd_head;
+	t_token			*tokens;		// array de token
+	t_list			*cmd_tail;		//type: t_token, dernier pour iterer  
+	t_list			*cmd_head;		//type: t_token, liste chainé des , premier
 	t_list			*env;
 	int				fd_in;
 	int				fd_out;
 	//t_cmd			*tree;
-	t_arr			*bcmd;
-	t_arr			*oper;
-	pid_t			*pids;
-	//int             (**oper_handlers)(void *, int);		//voir init_oper_handlers
+	
+	// REGARDE t_arr, array de pointer + len
+	t_arr			*bcmd;		// type: array de type dic            
+	t_arr			*oper;		// type: array de type dic
+	pid_t			*pids;		//array de pids
 }					t_shell;
 
 //str_utils
@@ -144,8 +145,8 @@ void attribute_subtoken_type(t_token *token);
 void attribute_token_type(t_shell *shell);
 
 //launch
-int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe, t_list *curr_cmd);
-int end_cmd(t_shell *shell,int *prev_pipe, t_list *curr_cmd);
+int start_cmd(t_shell *shell, int *prev_pipe, int *curr_pipe);
+int end_cmd(t_shell *shell,int *prev_pipe);
 void launch_process(t_shell *shell);
 void one_command(t_shell *shell);
 

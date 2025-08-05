@@ -128,9 +128,7 @@ static char	*extract_arg(const char *str, int *start, t_shell *shell)
 		return (NULL);
 	token_end = token_start;
 	// Find the end of the token
-	const char * tmp;
-	tmp = (char *)shell->oper->arr[6];
-	(void)tmp;
+	
 	while (str[token_end])
 	{	
 		char c = str[token_end];
