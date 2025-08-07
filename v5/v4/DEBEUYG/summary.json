@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-08-01T22:11:41+02:00",
+  "suspect_location": "",
+  "gdb": {
+    "segfault_detected": false
+  },
+  "valgrind": {
+    "memory_errors": false,
+    "memory_leaks": false
+  }
+}

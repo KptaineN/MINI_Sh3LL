@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Rapport debug combiné</title>
+  <style>
+    body { font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif; padding:1rem; background:#f5f7fa; }
+    h1 { margin-top:0; }
+    .box { background:white; border-radius:8px; padding:1rem; margin-bottom:1rem; box-shadow:0 8px 24px rgba(0,0,0,0.08); }
+    .status { font-weight:bold; }
+    .ok { color: green; }
+    .warn { color: orange; }
+    .fail { color: red; }
+    pre { background:#1e1e28; color:#f0f6fc; padding:0.5rem; overflow:auto; border-radius:4px; }
+    code { background:#eef; padding:2px 4px; border-radius:3px; }
+  </style>
+</head>
+<body>
+  <h1>Rapport de débogage combiné</h1>
+  <p>Généré le <strong>2025-08-01T22:11:41+02:00</strong></p>
+
+  <div class="box">
+    <h2>Résumé</h2>
+    <ul>
+      <li>Suspect location: <code></code></li>
+      <li>Segfault détecté (GDB): <span class="ok">false</span></li>
+      <li>Erreurs mémoire (Valgrind): <span class="ok">false</span></li>
+      <li>Fuites mémoire (Valgrind): <span class="ok">false</span></li>
+    </ul>
+  </div>
+
+  <div class="box">
+    <h2>Valgrind (extrait)</h2>
+    <pre></pre>
+  </div>
+
+  <div class="box">
+    <h2>GDB (extrait)</h2>
+    <pre>"#0  0x0000000000402d2e in main ()</pre>
+  </div>
+
+  <div class="box">
+    <h2>Logs bruts</h2>
+    <p>Valgrind: <code>.debug_combined/valgrind.log</code></p>
+    <p>GDB: <code>.debug_combined/gdb_combined.log</code></p>
+    <p>Résumé machine: <code>summary.json</code></p>
+  </div>
+</body>
+</html>

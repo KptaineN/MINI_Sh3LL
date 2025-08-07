@@ -144,6 +144,7 @@ int is_pipeline(t_ast *ast);
 
 //...
 char **env_to_envp(t_env *env);
+char **env_to_envp(t_list *env);
 //...
 void handle_error(const char *message);
 

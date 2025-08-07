@@ -1,0 +1,57 @@
+Breakpoint 1 at 0x402d2e
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Breakpoint 1, 0x0000000000402d2e in main ()
+"
+=== Backtrace complète ===
+"#0  0x0000000000402d2e in main ()
+No symbol table info available.
+"
+=== Variables locales ===
+"No symbol table info available.
+"
+=== Registres ===
+"rax            0x402d2a            4205866
+rbx            0x7fffffffd948      140737488345416
+rcx            0x40edf0            4255216
+rdx            0x7fffffffd958      140737488345432
+rsi            0x7fffffffd948      140737488345416
+rdi            0x1                 1
+rbp            0x7fffffffd820      0x7fffffffd820
+rsp            0x7fffffffd820      0x7fffffffd820
+r8             0x0                 0
+r9             0x7ffff7fca1e0      140737353916896
+r10            0x7fffffffd560      140737488344416
+r11            0x203               515
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x402d2e            0x402d2e <main+4>
+eflags         0x246               [ PF ZF IF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+"
+=== Disassembly autour du PC ===
+"=> 0x402d2e <main+4>:	sub    $0xa0,%rsp
+   0x402d35 <main+11>:	mov    %edi,-0x84(%rbp)
+   0x402d3b <main+17>:	mov    %rsi,-0x90(%rbp)
+   0x402d42 <main+24>:	mov    %rdx,-0x98(%rbp)
+   0x402d49 <main+31>:	cmpl   $0x1,-0x84(%rbp)
+   0x402d50 <main+38>:	jne    0x402d65 <main+59>
+   0x402d52 <main+40>:	mov    -0x90(%rbp),%rax
+   0x402d59 <main+47>:	add    $0x8,%rax
+   0x402d5d <main+51>:	mov    (%rax),%rax
+   0x402d60 <main+54>:	test   %rax,%rax
+A debugging session is active.
+
+	Inferior 1 [process 83816] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

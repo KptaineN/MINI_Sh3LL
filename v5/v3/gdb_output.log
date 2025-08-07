@@ -1,0 +1,165 @@
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000000000408108 in ft_strlen ()
+#0  0x0000000000408108 in ft_strlen ()
+#1  0x00000000004060fe in is_in_t_arr_dic_str ()
+#2  0x00000000004050b1 in attribute_token_type ()
+#3  0x0000000000403175 in looping ()
+#4  0x0000000000403496 in start_minishell ()
+#5  0x0000000000402fb7 in main ()
+rax            0x6f686365          1869112165
+rbx            0x7fffffffd958      140737488345432
+rcx            0x0                 0
+rdx            0x0                 0
+rsi            0x44f520            4519200
+rdi            0x6f686365          1869112165
+rbp            0x7fffffffd680      0x7fffffffd680
+rsp            0x7fffffffd680      0x7fffffffd680
+r8             0x50                80
+r9             0x1                 1
+r10            0x4                 4
+r11            0x202               514
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x408108            0x408108 <ft_strlen+24>
+eflags         0x10206             [ PF IF RF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+A debugging session is active.
+
+	Inferior 1 [process 50722] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000000000040606a in is_in_t_arr_dic_str ()
+#0  0x000000000040606a in is_in_t_arr_dic_str ()
+#1  0x0000000000405068 in attribute_token_type ()
+#2  0x0000000000403175 in looping ()
+#3  0x0000000000403496 in start_minishell ()
+#4  0x0000000000402fb7 in main ()
+rax            0xa2                162
+rbx            0x7fffffffd958      140737488345432
+rcx            0x44f5b0            4519344
+rdx            0xa1                161
+rsi            0xa1                161
+rdi            0x414320            4277024
+rbp            0x7fffffffd6c0      0x7fffffffd6c0
+rsp            0x7fffffffd690      0x7fffffffd690
+r8             0x20                32
+r9             0x1                 1
+r10            0x4                 4
+r11            0x202               514
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x40606a            0x40606a <is_in_t_arr_dic_str+67>
+eflags         0x10202             [ IF RF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+A debugging session is active.
+
+	Inferior 1 [process 51893] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x00000000004060a5 in is_in_t_arr_dic_str ()
+#0  0x00000000004060a5 in is_in_t_arr_dic_str ()
+#1  0x0000000000405068 in attribute_token_type ()
+#2  0x0000000000403175 in looping ()
+#3  0x0000000000403496 in start_minishell ()
+#4  0x0000000000402fb7 in main ()
+rax            0xa2                162
+rbx            0x7fffffffd958      140737488345432
+rcx            0x44f630            4519472
+rdx            0xa1                161
+rsi            0xa1                161
+rdi            0x414320            4277024
+rbp            0x7fffffffd6c0      0x7fffffffd6c0
+rsp            0x7fffffffd690      0x7fffffffd690
+r8             0x20                32
+r9             0x1                 1
+r10            0x4                 4
+r11            0x202               514
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x4060a5            0x4060a5 <is_in_t_arr_dic_str+67>
+eflags         0x10202             [ IF RF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+A debugging session is active.
+
+	Inferior 1 [process 53215] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000000000406147 in is_in_t_arr_dic_str ()
+#0  0x0000000000406147 in is_in_t_arr_dic_str ()
+#1  0x0000000000404e54 in attribute_token_type ()
+#2  0x0000000000402e03 in looping ()
+#3  0x0000000000403113 in start_minishell ()
+#4  0x0000000000402c45 in main ()
+rax            0xa2                162
+rbx            0x7fffffffd958      140737488345432
+rcx            0x44d5f0            4511216
+rdx            0xa1                161
+rsi            0xa1                161
+rdi            0x4122e0            4268768
+rbp            0x7fffffffd6c0      0x7fffffffd6c0
+rsp            0x7fffffffd690      0x7fffffffd690
+r8             0x20                32
+r9             0x1                 1
+r10            0x4                 4
+r11            0x202               514
+r12            0x1                 1
+r13            0x0                 0
+r14            0x7ffff7ffd000      140737354125312
+r15            0x40edf0            4255216
+rip            0x406147            0x406147 <is_in_t_arr_dic_str+67>
+eflags         0x10202             [ IF RF ]
+cs             0x33                51
+ss             0x2b                43
+ds             0x0                 0
+es             0x0                 0
+fs             0x0                 0
+gs             0x0                 0
+fs_base        0x7ffff7d28740      140737351157568
+gs_base        0x0                 0
+A debugging session is active.
+
+	Inferior 1 [process 71234] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
