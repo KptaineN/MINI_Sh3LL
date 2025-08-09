@@ -15,15 +15,8 @@
 
 
 /* Initialise les champs de base du shell */
-void init_idx(t_shell *shell, char **envp)
+void init_idx(t_shell *shell)
 {
-    /* Environnement */
-    shell->env = init_env(envp);
-    if (!shell->env)
-    {
-        perror("Error initializing environment");
-        exit(EXIT_FAILURE);
-    }
 
     /* Descripteurs par défaut */
     shell->fd_in  = STDIN_FILENO;
@@ -46,6 +39,22 @@ void init_idx(t_shell *shell, char **envp)
     shell->oper       = NULL;
 }
 
+static void init_pwd_home(t_shell *shell)
+{
+    char buf[4096];
+
+    if (!find_env_value(shell->env, "PWD")) {
+        if (getcwd(buf, sizeof(buf)))
+            set_env_value(&shell->env, "PWD", buf);
+    }
+    if (!find_env_value(shell->env, "HOME")) {
+        const char *sys_home = getenv("HOME");
+        if (sys_home && *sys_home)
+            set_env_value(&shell->env, "HOME", (char*)sys_home);
+    }
+}
+
+
 /* Initialise le shell avant la boucle */
 void init_shell(t_shell *shell, char **envp)
 {
@@ -57,7 +66,15 @@ void init_shell(t_shell *shell, char **envp)
     shell->input       = NULL;
 
     /* On passe shell, pas &shell */
-    init_idx(shell, envp);
+    init_idx(shell);
+      /* Environnement */
+    shell->env = init_env(envp);
+    if (!shell->env)
+    {
+        perror("Error initializing environment");
+        exit(EXIT_FAILURE);
+    }
+    init_pwd_home(shell);
     init_all_t_arr(shell);
 }
 
@@ -70,5 +87,6 @@ int start_shell(t_shell *shell, char **envp)
     ft_bzero(shell, sizeof(t_shell));
     init_signals();
     init_shell(shell, envp);
+
     return 1;
 }

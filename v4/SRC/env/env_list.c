@@ -12,7 +12,6 @@
 
 #include "../../include/minishell.h"
 
-#include <stdlib.h>
 
 int env_len(t_list *env)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_loop.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:16 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/28 14:01:14 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/09 10:57:48 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,6 +164,30 @@ int looping(t_shell *shell)
 	}
 	return (0);
 }*/
+
+void build_cmd_list_from_tokens(t_shell *sh)
+{
+    free_cmd_list(sh);  // vide cmd_head/tail + free si nécessaire
+    sh->cmd_head = NULL;
+    sh->cmd_tail = NULL;
+    sh->n_cmd = 0;
+
+    for (int i = 0; i < sh->n_tokens; i++) {
+        t_token *tok = &sh->tokens[i];
+        if (tok->type == TOKEN_CMD || tok->type == TOKEN_BCMD) {
+            t_list *node = ft_lstnew(tok);
+            if (!node) {
+                perror("ft_lstnew");
+                exit(EXIT_FAILURE);
+            }
+            ft_lstadd_back(&sh->cmd_head, node);
+            if (!sh->cmd_tail)
+                sh->cmd_tail = node;
+            sh->n_cmd++;
+        }
+    }
+}
+
 int looping(t_shell *shell)
 {
     char  *input;
@@ -212,8 +236,10 @@ int looping(t_shell *shell)
 
         /* Attribution des types */
         attribute_token_type(shell);
+		//fprintf(stderr, "[PARSER] n_tokens=%d n_cmd=%d\n", shell->n_tokens, shell->n_cmd);
 
-        /* Reset & fallback commande unique */
+		/*
+        // Reset & fallback commande unique 
         shell->n_cmd   = 0;
         shell->cmd_head = NULL;
         shell->cmd_tail = NULL;
@@ -226,11 +252,27 @@ int looping(t_shell *shell)
             shell->cmd_tail = fallback;
         }
 
-        /* Allocation & exécution */
+        // Allocation & exécution 
         shell->pids = malloc(sizeof(pid_t) * shell->n_cmd);
         if (!shell->pids) perror("malloc pids");
         launch_process(shell);
+		*/
+		
+        /* 4) Construire la liste de commandes (ignore les TOKEN_OPER) */
+        build_cmd_list_from_tokens(shell);      // remplit shell->cmd_head/ cmd_tail / n_cmd
+        //fprintf(stderr, "[PARSER] n_cmd=%d\n", shell->n_cmd);
 
+        /* 5) Dispatcher -> launch_process fait aussi le cas 1-cmd */
+        if (shell->n_cmd > 0)
+		{
+            if (shell->n_cmd > 1)
+			{
+                shell->pids = malloc(sizeof(pid_t) * shell->n_cmd);
+                if (!shell->pids) perror("malloc pids");
+            }
+            launch_process(shell);              // ↙ voit n_cmd==1 => one_command()
+        }
+	
         /* ========== CLEANUP ========== */
         /* 1) Les chaînes de parsed_args */
         free_str_array((char **)shell->parsed_args->arr);
@@ -244,8 +286,11 @@ int looping(t_shell *shell)
         /* 3) La liste des commandes (noeuds t_list) */
         
         /* 4) Le tableau des pids */
-        free(shell->pids);
-        shell->pids = NULL;
+        if(shell->pids)
+		{
+			free(shell->pids);
+        	shell->pids = NULL;
+		}
 
         /* 5) Les buffers */
         free(step2);

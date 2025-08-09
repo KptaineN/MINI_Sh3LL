@@ -755,6 +755,11 @@ void execute_cmd(t_shell *shell, t_token *cmd)
 
 		if (handler)
         {
+           // shell->current_token = cmd;                 // expose le token courant aux builtins
+           // int rc = handler(shell, args);              // exécute le builtin
+            //shell->current_token = NULL;                // propre: on nettoie le pointeur
+
+            //shell->exit_status = rc;
             shell->exit_status = handler(shell, args);
             exit_shell(shell, shell->exit_status);
         }

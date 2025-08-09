@@ -9,6 +9,7 @@
 
 //int builtin_echo(t_shell *parser, t_token *token);
 int builtin_echo(t_shell *shell, char **argv);
+char    *find_env_value(t_list *env, const char *key);
 
 char *get_dollar_value(const char *arg, int *pos, t_shell *sh);
 char *replace_variables(const char *arg, t_shell *sh);

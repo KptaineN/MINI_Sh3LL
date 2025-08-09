@@ -1,5 +1,44 @@
 
 #include "echo.h"
+
+// echo_value.c (par exemple)
+char *echo_join_with_expansion(t_shell *sh, t_subtoken_container *cont)
+{
+    char *out = ft_strdup("");
+    if (!out || !cont) return out;
+
+    int i = 0;
+    while (i < cont->n_parts)
+    {
+        t_subtoken part = cont->parts[i];
+        // slice courant
+        char *slice = ft_substr(part.p, 0, part.len);
+        if (!slice) { free(out); return NULL; }
+
+        char *expanded = NULL;
+
+        if (part.type == QUOTE_SINGLE) {
+            // PAS d’expansion en quotes simples
+            expanded = slice;          // garder tel quel
+            slice = NULL;
+        } else {
+            // NONE ou QUOTE_DOUBLE : on expanse
+            expanded = replace_variables(slice, sh);
+            free(slice);
+            if (!expanded) { free(out); return NULL; }
+        }
+
+        char *tmp = ft_strjoin(out, expanded);
+        free(out);
+        free(expanded);
+        if (!tmp) return NULL;
+        out = tmp;
+        i++;
+    }
+    return out;
+}
+
+
 static int	is_echo_n_flag(const char *s)
 {
     int	i = 0;
@@ -17,6 +56,38 @@ static int	is_echo_n_flag(const char *s)
 }
 
 int	builtin_echo(t_shell *shell, char **argv)
+{
+    int i = 1;
+    int newline = 1;
+
+    while (argv[i] && is_echo_n_flag(argv[i]))
+    {
+        newline = 0;
+        i++;
+    }
+
+    while (argv[i])
+    {
+        char *expanded = replace_variables(argv[i], shell);
+        if (!expanded)
+            expanded = ft_strdup(argv[i]); // fallback par sécurité
+
+        ft_putstr_fd(expanded, STDOUT_FILENO);
+        free(expanded);
+
+        if (argv[i + 1])
+            ft_putchar_fd(' ', STDOUT_FILENO);
+        i++;
+    }
+
+    if (newline)
+        ft_putchar_fd('\n', STDOUT_FILENO);
+    return 0;
+}
+
+
+
+/*int	builtin_echo(t_shell *shell, char **argv)
 {
     int	i = 0;
     int	newline = 0;
@@ -39,7 +110,7 @@ int	builtin_echo(t_shell *shell, char **argv)
         ft_putchar_fd('\n', STDOUT_FILENO);
     (void)shell;
     return (0);
-}
+}*/
 
 //#include "../../include/minishell.h"
 

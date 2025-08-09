@@ -1,3 +1,4 @@
+
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -186,6 +187,88 @@ int end_cmd(t_shell *shell, int *prev_pipe, t_list *curr_cmd)
     return pid;
 }
 
+
+static int is_stateful_builtin_name(const char *name)
+{
+    if (!name) return 0;
+    return (!ft_strcmp(name, "cd") || !ft_strcmp(name, "export")
+         || !ft_strcmp(name, "unset") || !ft_strcmp(name, "exit"));
+}
+
+static int (*get_builtin_handler_ptr(t_shell *sh, const char *name))(t_shell*, char**)
+{
+    if (!name || !sh || !sh->bcmd || !sh->bcmd->arr) return NULL;
+    for (int i = 0; i < sh->bcmd->len; i++) {
+        t_dic *dic = (t_dic *)sh->bcmd->arr[i];
+        if (!dic || !dic->key) continue;
+        if (ft_strcmp((char*)dic->key, name) == 0)
+            return dic->value;
+    }
+    return NULL;
+}
+
+void one_command(t_shell *shell)
+{
+    if (shell->fd_in == -1)  shell->fd_in  = STDIN_FILENO;
+    if (shell->fd_out == -1) shell->fd_out = STDOUT_FILENO;
+
+    t_token *tok = (t_token *)shell->cmd_head->content;
+
+    // 1) argv depuis le token
+    char **argv = token_to_argv(shell, tok);
+    if (!argv || !argv[0]) {
+        free_argv(argv);
+        shell->exit_status = 0;
+        return;
+    }
+
+    // 2) builtin stateful ? -> exécuter DANS LE PARENT (redirs OK)
+    if (is_stateful_builtin_name(argv[0])) {
+        t_fd_sav sav;
+        if (apply_parent_redirs(shell, &sav) != 0) {
+            free_argv(argv);
+            shell->exit_status = 1;
+            return;
+        }
+        int (*fn)(t_shell*,char**) = get_builtin_handler_ptr(shell, argv[0]);
+        if (!fn) {
+            restore_parent_redirs(shell, &sav);
+            free_argv(argv);
+            shell->exit_status = 127;
+            return;
+        }
+        shell->exit_status = fn(shell, argv);
+        restore_parent_redirs(shell, &sav);
+
+        replace_or_add_env(&shell->env, "PID", "0"); // optionnel
+        free_argv(argv);
+        return;
+    }
+
+    // 3) Sinon: path normal (fork + execute_cmd)
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        free_argv(argv);
+        shell->exit_status = 1;
+        return;
+    }
+    if (pid == 0) {
+        if (shell->fd_in  != STDIN_FILENO)  { dup2(shell->fd_in,  STDIN_FILENO);  close(shell->fd_in);  }
+        if (shell->fd_out != STDOUT_FILENO) { dup2(shell->fd_out, STDOUT_FILENO); close(shell->fd_out); }
+        execute_cmd(shell, (t_token *)shell->cmd_head->content);
+        _exit(1);
+    }
+    int status; waitpid(pid, &status, 0);
+    shell->exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+
+    char pid_str[20]; snprintf(pid_str, sizeof(pid_str), "%d", (int)pid);
+    replace_or_add_env(&shell->env, "PID", pid_str);
+
+    free_argv(argv);
+}
+
+/**
 void one_command(t_shell *shell)
 {
 
@@ -209,7 +292,7 @@ void one_command(t_shell *shell)
     }
 
     if (pid == 0)
-    {/*
+    {
         // Redirections
         if (shell->parser.fd_in != STDIN_FILENO)
         {
@@ -226,7 +309,7 @@ void one_command(t_shell *shell)
         // Exécute la commande (1 seule dans cmd_head)
         execute_cmd(shell, shell->parser.cmd_head);
         exit(0); // On quitte le process enfant
-    }*/
+    }
         int d; //debug
         scanf("%d", &d); // debug
         
@@ -254,6 +337,7 @@ void one_command(t_shell *shell)
 
     waitpid(pid, NULL, 0); // On attend le process
 }
+*/
 
 /*
 void    execute_cmd(t_shell *shell, t_list *curr_cmd)
@@ -524,17 +608,24 @@ void launch_process(t_shell *shell)
          waitpid(shell->pids[j], NULL, 0);
      free(pid);
 }*/
-
-void launch_process(t_shell *shell)
+void launch_process(t_shell *sh)
 {
-    t_list  *curr_cmd = shell->cmd_head;
+    if (sh->n_cmd <= 0 || !sh->cmd_head) return;
+
+    /* ✅ Cas 1 commande : exécuter le builtin stateful dans le parent */
+    if (sh->n_cmd == 1) {
+        one_command(sh);   // fait apply_parent_redirs -> builtin -> restore
+        return;
+    }
+
+    t_list  *curr_cmd = sh->cmd_head;
     int      prev_fd  = -1;
     int      pipe_fd[2];
 
-    for (int i = 0; i < shell->n_cmd; i++)
+    for (int i = 0; i < sh->n_cmd; i++)
     {
         /* Si ce n'est pas la dernière commande, on crée un pipe */
-        if (i < shell->n_cmd - 1)
+        if (i < sh->n_cmd - 1)
         {
             if (pipe(pipe_fd) < 0)
             {
@@ -557,19 +648,19 @@ void launch_process(t_shell *shell)
                 dup2(prev_fd, STDIN_FILENO);
                 close(prev_fd);
             }
-            if (i < shell->n_cmd - 1)
+            if (i < sh->n_cmd - 1)
             {
                 dup2(pipe_fd[1], STDOUT_FILENO);
                 close(pipe_fd[0]);
                 close(pipe_fd[1]);
             }
-            execute_cmd(shell, (t_token *)curr_cmd->content);
+            execute_cmd(sh, (t_token *)curr_cmd->content);
             exit(EXIT_FAILURE);
         }
 
         /* ——— Le PARENT ——— */
-        shell->pids[i] = pid;
-        if (i < shell->n_cmd - 1)
+        sh->pids[i] = pid;
+        if (i < sh->n_cmd - 1)
         {
             close(pipe_fd[1]);
             if (prev_fd != -1)
@@ -580,15 +671,15 @@ void launch_process(t_shell *shell)
     }
 
     /* On attend tous les enfants */
-    for (int i = 0; i < shell->n_cmd; i++)
-        waitpid(shell->pids[i], NULL, 0);
+    for (int i = 0; i < sh->n_cmd; i++)
+        waitpid(sh->pids[i], NULL, 0);
 
     /* On met à jour $PID avec le dernier PID */
     char pid_str[20];
-    snprintf(pid_str, sizeof(pid_str), "%d", (int)shell->pids[shell->n_cmd - 1]);
-    replace_or_add_env(&shell->env, "PID", pid_str);
+    snprintf(pid_str, sizeof(pid_str), "%d", (int)sh->pids[sh->n_cmd - 1]);
+    replace_or_add_env(&sh->env, "PID", pid_str);
 
-    /* Plus de free(shell->pids) ici : c'est fait dans looping() */
+    /* Plus de free(sh->pids) ici : c'est fait dans looping() */
 }
 
 

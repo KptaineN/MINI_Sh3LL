@@ -162,6 +162,7 @@ int builtin_cd(char **args, t_shell *shell)
     }
     return (shell->exit_status = 0);
 }*/
+/*
 int builtin_cd(t_shell *shell, char **args)
 {
     char old_pwd[4096];
@@ -185,7 +186,89 @@ int builtin_cd(t_shell *shell, char **args)
     set_env_value((t_list **)&shell->env, "PWD", new_pwd);
 
     return (shell->exit_status = 0);
+}*/
+
+
+static void cd_print_err(const char *msg)
+{
+    write(2, "minishell: cd: ", 15);
+    write(2, msg, strlen(msg));
+    write(2, "\n", 1);
 }
+
+static int expand_tilde(t_shell *sh, const char *arg, char *out, size_t outsz)
+{
+    // gère "~" et "~/..."
+    const char *home = find_env_value(sh->env, "HOME");
+    if (!home || !*home)
+        return cd_print_err("HOME not set"), 1;
+
+    size_t hlen = strlen(home);
+    size_t tail = strlen(arg + 1);
+    if (hlen + tail >= outsz)
+        return cd_print_err("path too long"), 1;
+
+    memcpy(out, home, hlen);
+    memcpy(out + hlen, arg + 1, tail + 1);
+    return 0;
+}
+
+int builtin_cd(t_shell *sh, char **argv)
+{
+    char oldpwd[PATH_MAX];
+    char newpwd[PATH_MAX];
+    char target_buf[PATH_MAX];
+    const char *arg = argv[1];
+    const char *target;
+
+    // récupérer ancien pwd (depuis env interne si possible)
+    const char *pwd_env = find_env_value(sh->env, "PWD");
+    if (pwd_env && *pwd_env)
+        ft_strlcpy(oldpwd, pwd_env, sizeof(oldpwd));
+    else if (!getcwd(oldpwd, sizeof(oldpwd)))
+        return perror("minishell: cd: getcwd"), sh->exit_status = 1;
+
+    // résoudre destination
+    if (!arg || !*arg) {
+        target = find_env_value(sh->env, "HOME");
+        if (!target || !*target)
+            return cd_print_err("HOME not set"), sh->exit_status = 1;
+    } else if (!ft_strcmp(arg, "-")) {
+        target = find_env_value(sh->env, "OLDPWD");
+        if (!target || !*target)
+            return cd_print_err("OLDPWD not set"), sh->exit_status = 1;
+    } else if (arg[0] == '~') {
+        if (expand_tilde(sh, arg, target_buf, sizeof(target_buf)) != 0)
+            return sh->exit_status = 1;
+        target = target_buf;
+    } else {
+        target = arg;
+    }
+
+    // chdir réel
+    if (chdir(target) != 0) {
+        fprintf(stderr, "minishell: cd: %s: ", target);
+        perror(NULL);
+        return sh->exit_status = 1;
+    }
+
+    // récupérer nouveau cwd (mode -P)
+    if (!getcwd(newpwd, sizeof(newpwd))) {
+        perror("minishell: cd: getcwd");
+        return sh->exit_status = 1;
+    }
+
+    // MAJ env (OLDPWD -> ancien, PWD -> nouveau)
+    set_env_value(&sh->env, "OLDPWD", oldpwd);
+    set_env_value(&sh->env, "PWD", newpwd);
+
+    // "cd -" doit afficher le nouveau cwd
+    if (arg && !ft_strcmp(arg, "-"))
+        printf("%s\n", newpwd);
+
+    return sh->exit_status = 0;
+}
+
 
 
 int builtin_pwd(t_shell *shell, char **argv)

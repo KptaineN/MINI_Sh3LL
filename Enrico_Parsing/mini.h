@@ -7,8 +7,8 @@
 # include <dirent.h>            // opendir, readdir (for wildcard expansion)
 # include <errno.h>             // errno, error handling
 # include <fcntl.h>             // open, O_RDONLY, O_WRONLY, O_CREAT, O_TRUNC,
-# include <readline/history.h>  // History functionality
-# include <readline/readline.h> // GNU Readline (if allowed in your project)
+//# include <readline/history.h>  // History functionality
+//# include <readline/readline.h> // GNU Readline (if allowed in your project)
 # include <signal.h>            // signal handling (Ctrl+C, etc.)
 # include <stdbool.h>           // opendir, readdir (for wildcard expansion)
 

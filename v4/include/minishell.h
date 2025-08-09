@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/07/28 14:26:58 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/09 13:13:53 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
+# include <limits.h>
 
 
 
@@ -103,6 +104,7 @@ typedef struct s_shell
     int             n_tokens;
     int             n_cmd;
     t_token         *tokens;
+    t_token         *current_token; // token en cours d'exec pour les builtins
     t_list          *cmd_tail;
     t_list          *cmd_head;
     t_list          *env;
@@ -234,6 +236,21 @@ int handle_redirect_out(t_shell *shell, char **argv);
 typedef int (*builtin_fptr)(t_shell *, char **);
 
 void free_t_arr_dic(t_arr *array);
+
+//new
+// minishell.h (ajoute ces deux protos)
+char **token_to_argv(t_shell *sh, t_token *tok);
+void   free_argv(char **argv);
+// minishell.h (ajoute en bas)
+typedef struct s_fd_sav {
+    int saved_stdin;
+    int saved_stdout;
+    int closed_in;
+    int closed_out;
+} t_fd_sav;
+
+int  apply_parent_redirs(t_shell *sh, t_fd_sav *sav);
+void restore_parent_redirs(t_shell *sh, t_fd_sav *sav);
 
 
 # endif // MINISHELL_H

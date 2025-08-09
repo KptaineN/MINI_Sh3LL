@@ -2,6 +2,18 @@
 
 #include "echo.h"
 
+char *find_env_value(t_list *env, const char *key)
+{
+    size_t keylen = ft_strlen(key);
+    while (env)
+    {
+        char *entry = (char *)env->content;
+        if (ft_strncmp(entry, key, keylen) == 0 && entry[keylen] == '=')
+            return entry + keylen + 1; // pointeur INTERNE (pas strdup)
+        env = env->next;
+    }
+    return NULL;
+}
 
 static int handle_dollar(char *res, const char *arg, int *i, t_shell *sh)
 {
