@@ -126,11 +126,10 @@ int execute_builtin(t_ast *ast, t_minishell *shell)
 	}
 	if (ft_strcmp(ast->args[0], "Quack!") == 0)
 		return (builtin_quack(ast->args));
-
-	if (ft_strcmp(ast->args[0], "unset") == 0)
-		return (builtin_unset(ast->args, shell));
-	if (ft_strcmp(ast->args[0], "env") == 0)
-		return (builtin_env(shell->args, shell));
+        if (ft_strcmp(ast->args[0], "unset") == 0)
+                return (builtin_unset(ast->args, shell));
+        if (ft_strcmp(ast->args[0], "env") == 0)
+                return (builtin_env(ast->args, shell));
 	// Si on arrive ici, c'est que la commande n'est pas un builtin reconnu
 	//ft_putstr_fd("minishell: ", STDERR_FILENO);
 	//ft_putstr_fd(ast->args[0], STDERR_FILENO);
