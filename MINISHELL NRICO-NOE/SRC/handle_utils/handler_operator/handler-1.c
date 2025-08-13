@@ -1,34 +1,18 @@
 #include "../../../include/minishell.h"
 
 
-int handle_heredoc(void *shell, int token_idx)
+int handle_and(t_shell *shell, char **argv)
 {
-    (void) shell;
-    printf("Handling HEREDOC (<<) at token %d\n", token_idx);
-    // TODO: Implement heredoc logic
+    (void)shell;
+    (void)argv;
+    printf("Handling AND (&&)\n");
     return (0);
 }
 
-int handle_append(void *shell, int token_idx)
+int handle_or(t_shell *shell, char **argv)
 {
-    (void) shell;
-    printf("Handling APPEND (>>) at token %d\n", token_idx);
-    // TODO: Implement append redirection logic
-    return (0);
-}
-
-int handle_and(void *shell, int token_idx)
-{
-    (void) shell;
-    printf("Handling AND (&&) at token %d\n", token_idx);
-    // TODO: Implement logical AND logic
-    return (0);
-}
-
-int handle_or(void *shell, int token_idx)
-{
-    (void) shell;
-    printf("Handling OR (||) at token %d\n", token_idx);
-    // TODO: Implement logical OR logic
+    (void)shell;
+    (void)argv;
+    printf("Handling OR (||)\n");
     return (0);
 }

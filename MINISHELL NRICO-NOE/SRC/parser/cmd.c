@@ -1,36 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   util-0.c                                           :+:      :+:    :+:   */
+/*   cmd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 16:13:07 by nkiefer          ###   ########.fr       */
+/*   Created: 2025/06/25 22:41:19 by eganassi          #+#    #+#             */
+/*   Updated: 2025/08/13 16:20:12 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a)
+bool	is_command(char *str, t_list *env)
 {
-	char	*tmp;
-	char	*res;
+	char	*cmd_path;
 
-	if (!a || !b || !c)
-		return (NULL);
-	tmp = ft_strjoin(a, b);
-	if (!tmp)
-		return (NULL);
-	res = ft_strjoin(tmp, c);
-	free(tmp);
-	if (free_a)
-		free(a);
-	return (res);
-}
-
-void	handle_error(const char *message)
-{
-	perror(message);
-	exit(EXIT_FAILURE);
+	cmd_path = find_command_path(str, env);
+	if (cmd_path)
+	{
+		free(cmd_path);
+		return (1);
+	}
+	return (0);
 }

@@ -6,67 +6,50 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:27:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/07/03 01:56:20 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 16:19:49 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-
-
-void	free_args(char **args)
+void	free_t_arr_dic(t_arr *array)
 {
-	int	i = 0;
+	t_dic	*dic;
 
-	if (!args)
-		return;
-	while (args[i])
+	if (!array)
+		return ;
+	if (array->arr)
 	{
-		free(args[i]);
-		i++;
+		for (int i = 0; i < array->len; i++)
+		{
+			dic = (t_dic *)array->arr[i];
+			if (dic)
+			{
+				if (dic->key)
+					free(dic->key);
+				free(dic);
+			}
+		}
+		free(array->arr);
 	}
-	free(args);
+	free(array);
 }
 
-void ft_free_array(char **arr)
-{
-    int i = 0;
-    if (!arr) return;
-    while (arr[i]) free(arr[i++]);
-    free(arr);
-}
-
-void	ft_free_split(char **tab)
+void	free_tab(char **tab)
 {
 	int	i;
 
-	i = 0;
 	if (!tab)
 		return ;
-	while (tab[i])
-		free(tab[i++]);
-	free(tab);
-}
-
-void free_tab(char **tab)
-{
-	int i;
-
-	if (!tab)
-		return;
-	i = 0;
-	while (tab[i])
-	{
+	for (i = 0; tab[i]; i++)
 		free(tab[i]);
-		i++;
-	}
 	free(tab);
 }
 
-void free_t_arr(t_arr *array)
+void	free_t_arr(t_arr *array)
 {
 	if (!array)
-		return;
+		return ;
 	if (array->arr)
 	{
 		for (int i = 0; i < array->len; i++)
@@ -76,107 +59,187 @@ void free_t_arr(t_arr *array)
 	free(array);
 }
 
-
-void	free_ast(t_ast *node)
+void	free_list_str(t_list *lst)
 {
-	if (!node)
-		return;
+	t_list	*tmp;
 
-	// Libère récursivement les sous-arbres
-	free_ast(node->left);
-	free_ast(node->right);
-
-	// Libère le tableau d'arguments (pour les commandes)
-	free_args(node->args);
-
-	// Libère le nom de fichier (pour les redirections)
-	if (node->filename)
-		free(node->filename);
-
-	// Libère le nœud lui-même
-	free(node);
-}
-void	clean_exit(char **cmd_args, char *msg, int code)
-{
-	if (msg)
-		ft_putendl_fd(msg, 2);
-	if (cmd_args)
-		ft_free_split(cmd_args);
-	exit(code);
+	while (lst)
+	{
+		tmp = lst->next;
+		if (lst->content)
+			free(lst->content);
+		free(lst);
+		lst = tmp;
+	}
 }
 
- //* Libère toute la mémoire de la structure minishell.
- //* À compléter selon l'évolution de ta structure.
+void	free_env(t_list *env)
+{
+	free_list_str(env);
+}
 
- void	free_minishell(t_minishell *shell)
+void	free_str_array(char **arr)
+{
+	if (!arr)
+	{
+		printf("[DEBUG] free_str_array: arr == NULL\n");
+		return ;
+	}
+	for (int i = 0; arr[i]; i++)
+		free(arr[i]);
+	free(arr);
+}
+
+void	free_cmd_list(t_shell *shell)
+{
+	t_list	*node;
+	t_list	*next;
+
+	node = shell->cmd_head;
+	while (node)
+	{
+		next = node->next;
+		free(node);
+		node = next;
+	}
+	shell->cmd_head = NULL;
+	shell->cmd_tail = NULL;
+	shell->n_cmd = 0;
+}
+
+void	free_tokens(t_shell *shell)
+{
+	int						i;
+	t_token					*tok;
+	int						j;
+	t_subtoken_container	*cont;
+	int						k;
+
+	if (!shell || !shell->tokens)
+		return ;
+	i = 0;
+	while (i < shell->n_tokens)
+	{
+		tok = &shell->tokens[i];
+		if (tok->cmd_args_parts)
+		{
+			j = 0;
+			while (j < tok->n_args)
+			{
+				cont = &tok->cmd_args_parts[j];
+				if (cont->parts)
+				{
+					k = 0;
+					while (k < cont->n_parts)
+					{
+						// Si tu as fait ft_substr ou ft_strdup sur parts[k].p,free-le
+						if (cont->parts[k].p)
+						{
+							 /* printf("[DEBUG] free_tokens 138: freeing part
+								%d of token '%s'\n", k, tok->value);
+						   printf("[DEBUG] free_tokens: freeing part
+								%d of token '%s' (p: %p, val: %.10s)\n",
+							     k, tok->value ? tok->value : "(null)",
+								cont->parts[k].p, cont->parts[k].p);
+							  free(cont->parts[k].p);
+							 printf("[DEBUG] free_tokens 140: freed part
+								%d of token '%s'\n", k, tok->value);*/
+						}
+						k++;
+					}
+					free(cont->parts);
+				}
+				j++;
+			}
+			free(tok->cmd_args_parts);
+			if (tok->value)
+			{
+				free(tok->value);
+				tok->value = NULL;
+			}
+		}
+		if (tok->r)
+		{
+			j = 0;
+			while (j < tok->r_count)
+			{
+				free(tok->r[j].arg);
+				j++;
+			}
+			free(tok->r);
+			tok->r = NULL;
+		}
+		i++;
+	}
+	free(shell->tokens);
+	shell->tokens = NULL;
+	shell->n_tokens = 0;
+}
+
+void	free_subtoken_container(t_subtoken_container *container)
+{
+	t_subtoken	*sub;
+
+	if (!container)
+		return ;
+	if (container->parts)
+	{
+		for (int i = 0; i < container->n_parts; i++)
+		{
+			sub = &container->parts[i];
+			if (sub->p)
+				free(sub->p);
+		}
+		free(container->parts);
+	}
+	free(container);
+}
+
+void	free_parser(t_shell *parser)
+{
+	if (!parser)
+		return ;
+	if (parser->parsed_args)
+		free_t_arr(parser->parsed_args);
+	parser->parsed_args = NULL;
+	if (parser->bcmd)
+		free_t_arr_dic(parser->bcmd);
+	parser->bcmd = NULL;
+	if (parser->oper)
+		free_t_arr_dic(parser->oper);
+	parser->oper = NULL;
+	if (parser->env)
+		free_list_str(parser->env);
+	parser->env = NULL;
+}
+
+void	free_minishell(t_shell *shell)
 {
 	if (!shell)
-        return;
-    // Libère la ligne d'entrée utilisateur
-    // input et args sont déjà libérés dans cleanup_after_exec
-    // S'il reste un input en cas d'erreur, free ici :
-    if (shell->input)
-        free(shell->input);
-		// Libère le tableau d'arguments (ft_free_array est un helper type free_split)
-    if (shell->args)
-        ft_free_array(shell->args);
-
-    // AST : peut être NULL si déjà nettoyée 
-	// Libère l'AST
-    if (shell->ast)
-    {
-        free_ast(shell->ast);
-        shell->ast = NULL;
-    }
-
-    // Env : idem, free ici et nullifier
-	 // Libère la liste chaînée des variables d'environnement
-
-    if (shell->env)
-    {
-        free_env(shell->env);
-        shell->env = NULL;
-    }
-
-    // Tout autre champ à libérer…
-
-	 // (OPTIONNEL selon évolution de la struct)
-	 // if (shell->env_list)
-	 //     free_env_list(shell->env_list);
-	 // (OPTIONNEL plus tard) : libère l'historique ou d'autres ressources globales
-	 // free_history(shell->history);
-	 // (OPTIONNEL plus tard) : libère des fd ou autres buffers
-	 // if (shell->some_fd != -1) close(shell->some_fd);
-	 // (OPTIONNEL plus tard) : libère des structures temporaires
-	 // if (shell->tmp_data) free_tmp_data(shell->tmp_data);
-/*
-	Quand tu ajouteras un nouveau champ à t_minishell, par exemple :
-
-	 un buffer (char *buffer)
-
-	 une nouvelle liste (t_list *jobs)
-
-	 un tableau de file descriptors (int *fd_tab)
-
-Ajoute la ligne de libération dans free_minishell comme ceci :
-
-if (shell->buffer)
-	free(shell->buffer);
-
-if (shell->jobs)
-	free_job_list(shell->jobs);
-
-if (shell->fd_tab)
-	free(shell->fd_tab);
- */
-	 // ... ajoute ici tout ce que tu ajoutes dans la struct plus tard !
+		return ;
+	free_parser(shell);
+	if (shell->args)
+		free_str_array(shell->args);
+	shell->args = NULL;
 }
 
+void	child_exit(char **args, char *cmd_path, char **envp, t_list *candidates,
+		int code)
+{
+	if (envp)
+		free_str_array(envp);
+	if (args)
+		free_str_array(args);
+	if (cmd_path)
+		free(cmd_path);
+	if (candidates)
+		free_list_str(candidates);
+	_exit(code);
+}
 
-// Fichier : exit_utils.c par exemple
-void	exit_shell(t_minishell *shell, int exit_code)
+void	exit_shell(t_shell *shell, int exit_code)
 {
 	free_minishell(shell);
-	rl_clear_history(); // nettoie readline
+	rl_clear_history();
 	exit(exit_code);
 }

@@ -1,337 +1,98 @@
-#include "../../include/minishell.h"
-
-/*** Helpers pour env ***/
-
-
-/*** Gestion $...
-// remplace $?, $VAR, touche perso $N
-// récupère la valeur associée à $…
-
-
-// Renvoie une chaîne allouée pour les variables “spéciales”
-//- si key == "NOE"    → la touche perso
- // - si key == "ENRICO" → on ne fait rien (on renvoie NULL)
- // - sinon             → NULL
-
-static char *get_special_var(const char *key)
-{
-    if (ft_strncmp(key, "NRICO", ft_strlen("NRICO") + 1) == 0)
-        return ft_strdup("le 2 eme meilleur dev de la galaxie 🚀");;
-    if (ft_strncmp(key, "NOE", ft_strlen("NOE") + 1) == 0)
-        return ft_strdup("le meilleur dev de la galaxie 🚀");
-    return NULL;
-}
-
-//Récupère la valeur après $…
-//
-static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
-{
-    int  k = *pos + 1;
-    char *key;
-    char *val_env;
-    char *val;
-
-    if (arg[k] == '?')
-    {
-        val = ft_itoa(sh->exit_status);
-        *pos = k + 1;
-        return val;
-    }
-
-    //on lit l’identifiant [A-Za-z0-9_]
-    int len = 0;
-    while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
-        len++;
-    if (len == 0)
-    {
-         // clé vide → on ne touche pas à res, on avance d’1
-        *pos = k;
-        return NULL;
-    }
-    key = ft_substr(arg, k, len);
-
-    // d’abord dans l’env
-    val_env = find_env_value(sh->env, key);
-    if (val_env)
-        val = ft_strdup(val_env);
-    / sinon, test “spécial”
-    else
-        val = get_special_var(key);
-
-    free(key);
-    *pos = k + len;
-    return val;
-}*/
-
-/*
-    int len = 0;
-    while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
-        len++;
-    if (len == 0)
-    {
-        *pos = k;
-        return NULL;
-    }
-    key = ft_substr(arg, k, len);
-    val_env = find_env_value(sh->env, key);
-    if (val_env)
-        val = ft_strdup(val_env);
-    else
-        val = get_special_var(key);
-    free(key);
-    *pos = k + len;
-    return val;
-*/
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   echo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/13 15:35:07 by nkiefer           #+#    #+#             */
+/*   Updated: 2025/08/13 15:50:05 by nkiefer          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "echo.h"
 
-char *remove_quotes(const char *arg);
-
-static bool is_n_flag(const char *arg)
+int	is_valid_key_char(char c)
 {
-    return ft_strcmp(arg, "-n") == 0;
+	return (ft_isalnum(c) || c == '_');
 }
 
-static void print_echo_args(char **args, int start, t_minishell *sh)
+static int	is_echo_n_flag(const char *s)
 {
-    bool first = true;
+	int	i;
 
-    for (int i = start; args[i]; i++)
-    {
-        if (!first)
-            write(1, " ", 1);
-        first = false;
-
-        char *tmp = replace_variables(args[i], sh);
-        char *out = remove_quotes(tmp);
-        free(tmp);
-
-        write(1, out, ft_strlen(out));
-        free(out);
-    }
+	i = 0;
+	if (!s || s[0] != '-')
+		return (0);
+	i = 1;
+	while (s[i])
+	{
+		if (s[i] != 'n')
+			return (0);
+		i++;
+	}
+	return (s[1] != '\0');
 }
 
-int builtin_echo(char **args, t_minishell *sh)
+int	builtin_echo(t_shell *shell, char **argv)
 {
-    int i = 1;
-    bool no_nl = false;
+	int	i;
+	int	newline;
 
-    while (args[i] && is_n_flag(args[i]))
-    {
-        no_nl = true;
-        i++;
-    }
-
-    print_echo_args(args, i, sh);
-
-    if (!no_nl)
-        write(1, "\n", 1);
-
-    sh->exit_status = 0;
-    return 0;
+	i = 0;
+	newline = 0;
+	i = 1;
+	newline = 1;
+	while (argv[i] && is_echo_n_flag(argv[i]))
+	{
+		newline = 0;
+		i++;
+	}
+	while (argv[i])
+	{
+		ft_putstr_fd(argv[i], STDOUT_FILENO);
+		if (argv[i + 1])
+			ft_putchar_fd(' ', STDOUT_FILENO);
+		i++;
+	}
+	if (newline)
+		ft_putchar_fd('\n', STDOUT_FILENO);
+	(void)shell;
+	return (0);
 }
 
-/*
-static char *find_env_value(t_env *env, const char *key)
+char	*remove_quotes(const char *arg)
 {
-    while (env)
-    {
-        if (ft_strncmp(env->key, key, ft_strlen(key) + 1) == 0)
-            return (env->value);
-        env = env->next;
-    }
-    return (NULL);
+	size_t	i;
+	size_t	j;
+	bool	in_sq;
+	bool	in_dq;
+	char	*res;
+
+	i = 0;
+	j = 0;
+	in_sq = false;
+	in_dq = false;
+	res = malloc(ft_strlen(arg) + 1);
+	if (!res)
+		return (NULL);
+	while (arg[i])
+	{
+		if (arg[i] == '\'' && !in_dq)
+		{
+			in_sq = !in_sq;
+			i++;
+		}
+		else if (arg[i] == '"' && !in_sq)
+		{
+			in_dq = !in_dq;
+			i++;
+		}
+		else
+		{
+			res[j++] = arg[i++];
+		}
+	}
+	res[j] = '\0';
+	return (res);
 }
-
-
-
-// Gestion $...
-// remplace $?, $VAR, touche perso $N
-// Récupère la valeur associée à $…
-
-
-// Renvoie une chaîne allouée pour les variables “spéciales”
-// - si key == "NOE"    → la touche perso
- * - si key == "ENRICO" → on ne fait rien (on renvoie NULL)
- * - sinon             → NULL
-
-static char *get_special_var(const char *key)
-{
-    if (ft_strncmp(key, "NRICO", ft_strlen("NRICO") + 1) == 0)
-        return ft_strdup("le 2 eme meilleur dev de la galaxie 🚀");;
-    if (ft_strncmp(key, "NOE", ft_strlen("NOE") + 1) == 0)
-        return ft_strdup("le meilleur dev de la galaxie 🚀");
-    return NULL;
-}
-
-// Récupère la valeur après $… **
-static char *get_dollar_value(const char *arg, int *pos, t_minishell *sh)
-{
-    int  k = *pos + 1;
-    char *key;
-    char *val_env;
-    char *val;
-
-    if (arg[k] == '?')
-    {
-        val = ft_itoa(sh->exit_status);
-        *pos = k + 1;
-        return val;
-    }
-
-    //on lit l’identifiant [A-Za-z0-9_]
-    int len = 0;
-    while (ft_isalnum(arg[k + len]) || arg[k + len] == '_')
-        len++;
-    if (len == 0)
-    {
-         // clé vide → on ne touche pas à res, on avance d’1
-        *pos = k;
-        return NULL;
-    }
-    key = ft_substr(arg, k, len);
-
-    // d’abord dans l’env
-    val_env = find_env_value(sh->env, key);
-    if (val_env)
-        val = ft_strdup(val_env);
-    // sinon, test “spécial”
-    else
-        val = get_special_var(key);
-
-    free(key);
-    *pos = k + len;
-    return val;
-}
-
-** Gestion $... *
-static int handle_dollar(char *res, const char *arg, int *i, t_minishell *sh)
-{
-    char *val;
-    int  nb = 0;
-
-    val = get_dollar_value(arg, i, sh);
-    if (val)
-    {
-        ft_strcpy(res, val);
-        nb = ft_strlen(val);
-        free(val);
-    }
-    return nb;
-}
-
-
-// Fonction corrigée pour replace_variables
-char *replace_variables(const char *arg, t_minishell *sh)
-{
-    int  i = 0, j = 0;
-    bool in_sq = false, in_dq = false;
-    // on alloue un buffer généreux
-    char *res = malloc(ft_strlen(arg) * 50 + 1);
-    if (!res) return NULL;
-
-    while (arg[i])
-    {
-        // ouverture/fermeture de quotes
-        if (arg[i] == '\'' && !in_dq)
-        {
-            in_sq = !in_sq;
-            res[j++] = arg[i++]; // On copie la quote
-        }
-        else if (arg[i] == '"' && !in_sq)
-        {
-            in_dq = !in_dq;
-            res[j++] = arg[i++]; // On copie la quote
-        }
-        // cas d'un '$' hors quotes simples
-        else if (arg[i] == '$' && !in_sq)
-        {
-            int written = handle_dollar(&res[j], arg, &i, sh);
-            if (written > 0)
-            {
-                // on a développé une variable
-                j += written;
-            }
-            else
-            {
-                // pas de variable valide → on copie le '$' tel quel
-                res[j++] = arg[i++];
-            }
-        }
-        else
-        {
-            // caractère normal (ou '$' dans simple quote)
-            res[j++] = arg[i++];
-        }
-    }
-    res[j] = '\0';
-    return res;
-}*/
-char *remove_quotes(const char *arg)
-{
-    size_t i = 0, j = 0;
-    bool in_sq = false, in_dq = false;
-    char *res = malloc(ft_strlen(arg) + 1);
-    if (!res)
-        return NULL;
-
-    while (arg[i])
-    {
-        if (arg[i] == '\'' && !in_dq)
-        {
-            // Cette quote simple est un délimiteur (pas dans des doubles quotes)
-            in_sq = !in_sq;
-            i++; // On l'ignore (délimiteur)
-        }
-        else if (arg[i] == '"' && !in_sq)
-        {
-            // Cette quote double est un délimiteur (pas dans des simples quotes)
-            in_dq = !in_dq;
-            i++; // On l'ignore (délimiteur)
-        }
-        else
-        {
-            // Tout autre caractère, y compris les quotes qui ne sont PAS des délimiteurs
-            res[j++] = arg[i++];
-        }
-    }
-    res[j] = '\0';
-    return res;
-}
-
-/*
-int builtin_echo(char **args, t_minishell *sh)
-{
-    int  i       = 1;
-    bool no_nl   = false;
-
-    // 2) Détection stricte de -n
-    while (args[i] && ft_strcmp(args[i], "-n") == 0) {
-        no_nl = true;
-        i++;
-    }
-
-    // 3) Affichage des arguments (expansion + suppression de quotes)
-    bool first = true;
-    while (args[i])
-    {
-        if (!first)
-            write(1, " ", 1);
-        first = false;
-        //printf("DEBUG argument original: '%s'\n", args[i]);
-        char *tmp = replace_variables(args[i], sh);
-       // printf("DEBUG après replace_variables: '%s'\n", tmp);
-        char *out = remove_quotes(tmp);
-       // printf("DEBUG après remove_quotes: '%s'\n", out);
-        free(tmp);
-        write(1, out, ft_strlen(out));
-        free(out);
-        i++;
-    }
-
-    if (!no_nl)
-        write(1, "\n", 1);
-
-    sh->exit_status = 0;
-    return 0;
-}*/

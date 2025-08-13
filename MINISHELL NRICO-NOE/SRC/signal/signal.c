@@ -1,31 +1,7 @@
-/*
 
-full gpt vue que je connais pas trop cette shit
-
-*/
+/* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-/*
-int execute_external(t_ast *ast, t_minishell *shell)
-{
-    (void)shell;
-	pid_t pid = fork();
-	if (pid == 0)
-	{
-		execvp(ast->args[0], ast->args);
-		perror("execvp");
-		exit(127);
-	}
-	else if (pid > 0)
-	{
-		int status;
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-	}
-	return (1);
-}*/
 
 void	handle_sigint(int sig)
 {

@@ -6,138 +6,120 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:29 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/25 16:58:12 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 15:24:14 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-#include <stdlib.h>
-
-int env_len(t_env *env)
+int env_len(t_list *env)
 {
-	int count = 0;
+    int count;
 
-	while (env)
-	{
-		count++;
-		env = env->next;
-	}
-	return count;
-}
-
-/*
-char	**env_to_envp(t_env *env)
-{
-    t_env	*curr;
-    int		count = 0;
-    char	**envp;
-    int		i;
-
-    curr = env;
-    while (curr)
+    count = 0;
+    while (env)
     {
         count++;
-        curr = curr->next;
+        env = env->next;
     }
+    return (count);
+}
+
+char    **list_to_envp(t_list *env)
+{
+    int     count;
+    int     i;
+    char    **envp;
+    t_env   *cur;
+    int     klen;
+    int     vlen;
+
+    count = 0;
+    for (t_list *it = env; it; it = it->next)
+        if (((t_env *)it->content)->value)
+            count++;
     envp = malloc(sizeof(char *) * (count + 1));
     if (!envp)
-        handle_error("malloc");
+        return (NULL);
     i = 0;
-    curr = env;
-    while (curr)
+    while (env)
     {
-        envp[i] = ft_strjoin_3(curr->key, "=", curr->value);
-        i++;
-        curr = curr->next;
+        cur = env->content;
+        if (cur->value)
+        {
+            klen = ft_strlen(cur->key);
+            vlen = ft_strlen(cur->value);
+            envp[i] = malloc(klen + 1 + vlen + 1);
+            if (!envp[i])
+            {
+                while (i > 0)
+                    free(envp[--i]);
+                free(envp);
+                return (NULL);
+            }
+            ft_strcpy(envp[i], cur->key);
+            envp[i][klen] = '=';
+            ft_strcpy(envp[i] + klen + 1, cur->value);
+            i++;
+        }
+        env = env->next;
     }
     envp[i] = NULL;
     return (envp);
-}*/
-
-// parse la string "KEY=VALUE" en t_env
-// Dans ton create_env (ou équivalent) :
-/*
-t_env	*create_env(char *env_str)
-{
-	t_env	*node;
-	char	*equal;
-	size_t	key_len;
-
-	node = malloc(sizeof(t_env));
-	if (!node)
-		return (NULL);
-	equal = ft_strchr(env_str, '=');
-	if (!equal)
-	{
-		free(node);
-		return (NULL);
-	}
-	key_len = equal - env_str;
-	node->key = malloc(key_len + 1);
-	if (!node->key)
-	{
-		free(node);
-		return (NULL);
-	}
-	if (ft_strlcpy(node->key, env_str, key_len + 1) != key_len)
-		handle_error("ft_strlcpy error copying key");
-	node->value = ft_strdup(equal + 1);
-	node->next = NULL;
-	return (node);
-}*/
-t_env	*create_env(char *env_str)
-{
-	t_env	*node;
-	char	*equal;
-	size_t	key_len;
-
-	node = malloc(sizeof(t_env));
-	if (!node)
-		return (NULL);
-	equal = ft_strchr(env_str, '=');
-	if (!equal)
-	{
-		free(node);
-		return (NULL);
-	}
-	key_len = equal - env_str;
-	node->key = malloc(key_len + 1);
-	if (!node->key)
-	{
-		free(node);
-		return (NULL);
-	}
-	ft_memcpy(node->key, env_str, key_len);
-	node->key[key_len] = '\0'; // ajout du null terminator manuellement
-
-	node->value = ft_strdup(equal + 1);
-	if (!node->value)
-	{
-		free(node->key);
-		free(node);
-		return (NULL);
-	}
-	node->next = NULL;
-	return (node);
 }
 
-
-
-// construit toute la liste à partir de envp
-t_env	*init_env(char **envp)
+void print_env(t_list *env)
 {
-	t_env *head = NULL, *tmp = NULL;
-	int i = 0;
-	while (envp[i])
-	{
-		t_env *node = create_env(envp[i]); // ← ici
-		if (!head)
-			head = node;
-		else
-			tmp->next = node;
-		tmp = node;
-		i++;
-	}
-	return (head);
+    while (env)
+    {
+        t_env *cur = env->content;
+        if (cur->value)
+            printf("%s=%s\n", cur->key, cur->value);
+        else
+            printf("%s=\n", cur->key);
+        env = env->next;
+    }
+}
+
+t_list *init_env(char **envp)
+{
+    t_list *head = NULL;
+    t_list *tail = NULL;
+    int     i = 0;
+
+    while (envp[i])
+    {
+        char *eq = ft_strchr(envp[i], '=');
+        t_env *env;
+        t_list *node;
+
+        if (!eq)
+        {
+            i++;
+            continue;
+        }
+        env = malloc(sizeof(t_env));
+        if (!env)
+            return NULL;
+        env->key = ft_substr(envp[i], 0, eq - envp[i]);
+        env->value = ft_strdup(eq + 1);
+        node = malloc(sizeof(t_list));
+        if (!node || !env->key || !env->value)
+        {
+            free(env->key);
+            free(env->value);
+            free(env);
+            free(node);
+            return NULL;
+        }
+        node->content = env;
+        node->next = NULL;
+        if (!head)
+            head = node;
+        else
+            tail->next = node;
+        tail = node;
+        i++;
+    }
+    return head;
 }

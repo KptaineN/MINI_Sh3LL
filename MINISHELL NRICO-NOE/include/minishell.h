@@ -6,192 +6,295 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/07/07 16:51:10 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 16:26:32 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
 #ifndef MINISHELL_H
-#define MINISHELL_H
+# define MINISHELL_H
 
-#define _POSIX_C_SOURCE 200809L
+# define _POSIX_C_SOURCE 200809L
+
+# include "LIBFT/libft.h"
 
 
-#include "LIBFT/libft.h"
-#include "ast.h"
-#include "env.h"
-#include "parsing.h"
-#include "../SRC/built/echo/echo.h"
-#include "../SRC/built/export/export.h"
-#include <errno.h>
-#include <fcntl.h>
-#include <readline/history.h>
-#include <readline/readline.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <signal.h>
+# include <stdbool.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <string.h>
+# include <sys/stat.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <unistd.h>
 
-// use in mini.h
-// ************************************************************************** */
-# include <stdio.h>             // printf, perror, etc.
 
-# include <dirent.h>            // opendir, readdir (for wildcard expansion)
-# include <errno.h>             // errno, error handling
-# include <fcntl.h>             // open, O_RDONLY, O_WRONLY, O_CREAT, O_TRUNC,
-# include <readline/history.h>  // History functionality
-# include <readline/readline.h> // GNU Readline (if allowed in your project)
-# include <signal.h>            // signal handling (Ctrl+C, etc.)
-# include <stdbool.h>           // opendir, readdir (for wildcard expansion)
 
-# include <stdlib.h>            // malloc, free, exit, getenv, setenv
-# include <string.h>            // strcmp, strlen, strcpy, strdup, strtok
-# include <sys/ioctl.h>         // Terminal size, ioctl calls
-# include <sys/stat.h>          // stat, access (for checking file existence)
-# include <sys/types.h>         // pid_t, size_t (often included by others)
-# include <sys/wait.h>          // wait, waitpid, WIFEXITED, WEXITSTATUS
-# include <termios.h>           // Terminal control (if doing line editing)
-# include <unistd.h>            // fork, execve, pipe, dup, dup2, close, chdir,
-// ************************************************************************** */
-
-typedef struct s_minishell
+/* =============================
+ * STRUCTURES GENERALES
+ * ============================= */
+typedef struct s_list
 {
-	t_shell parser; // Structure pour le parser
-	char **args; // Arguments de la commande courante
-	char *input; // Ligne utilisateur brute
-	int exit_status;
-	t_ast *ast; // Arbre syntaxique abstrait (AST)
-	t_env *env; // Liste chainée de l'environnement
-	
-} t_minishell;
+    void            *content;
+    struct s_list   *next;
+}   t_list;
 
-// Fonctions globales d'initialisation
-int start_minishell(t_minishell *shell, char **envp);
-void init_minishell(t_minishell *shell, char **envp);
-// int		main_loop(t_minishell *shell);
-int looping(t_minishell *shell);
+typedef struct s_env
+{
+    char    *key;
+    char    *value;
+}   t_env;
 
-void free_minishell(t_minishell *shell);
+typedef struct s_arr
+{
+    void            **arr;
+    int             len;
+}   t_arr;
 
-// Gestion du prompt et boucle utilisateur
-void print_prompt(t_minishell *shell);
+struct s_shell;
+typedef struct s_shell t_shell;
+typedef struct s_dic
+{
+    void *key;
+    int (*value)(t_shell *, char **);
+}   t_dic;
 
-void execute_command(t_minishell *shell);
+typedef enum e_toktype
+{
+    TOKEN_WORD,
+    TOKEN_BCMD,
+    TOKEN_CMD,
+    TOKEN_OPER
+}   t_toktype;
 
-char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a);
+typedef enum e_quote_type
+{
+    QUOTE_NONE,
+    QUOTE_SINGLE,
+    QUOTE_DOUBLE
+}   t_quote_type;
 
-int  builtin_export(char **args, t_minishell *shell);
+typedef struct s_subtoken
+{
+    t_quote_type    type;
+    char            *p;
+    int             len;
+}   t_subtoken;
+
+typedef struct s_subtoken_container
+{
+    t_subtoken      *parts;
+    int             n_parts;
+}   t_subtoken_container;
+
+/* Forward declaration to allow pointers before full definition */
+typedef struct s_redir t_redir;
+
+typedef struct s_token
+{
+    char                    type;
+    char                    *value;
+    t_subtoken_container    *cmd_args_parts;
+    struct s_token          *next;
+   int                     n_args;
+   t_redir                 *r;
+   int                     r_count;
+}   t_token;
+
+/* =============================
+ * Command & Redirection structures
+ * ============================= */
+typedef enum e_rtype
+{
+    R_IN,
+    R_OUT_TRUNC,
+    R_OUT_APPEND,
+    R_HEREDOC
+}   t_rtype;
+
+typedef struct s_redir
+{
+    t_rtype type;
+    char    *arg; /* filename or delimiter */
+}   t_redir;
+
+typedef struct s_cmd
+{
+    char    **argv;
+    t_redir *r;
+    int     r_count;
+    int     is_builtin;
+}   t_cmd;
+
+typedef struct s_delim
+{
+    char *raw;
+    char *clean;
+    int   quoted;
+}   t_delim;
+
+typedef struct s_shell
+{
+    char            *input;
+    char            **args;
+    t_arr           *parsed_args;
+    int             n_tokens;
+    int             n_cmd;
+    t_token         *tokens;
+    t_list          *cmd_tail;
+    t_list          *cmd_head;
+    t_list          *env;
+    int             fd_in;
+    int             fd_out;
+    t_arr           *bcmd;
+    t_arr           *oper;
+    pid_t           *pids;
+    int             fd_pid[2];
+    t_subtoken_container *heredoc;
+    int             exit_status;
+}   t_shell;
+
+/* =============================
+ * PROTOTYPES
+ * ============================= */
+
+/* -- main  -- */
+
+void	print_header_emote(void);
 
 
-// Divers utilitaires
-void handle_error(const char *message);
+/* prototypes manquants */
+char    *replace_exit_code(const char *input, int exit_status);
+char    *replace_variables(const char *input, t_shell *shell);
+void    launch_process(t_shell *shell);
 
-//  Function prototypes
+void free_cmd_list(t_shell *shell);
 
-void handle_signal(int signal);
-void print_prompt(t_minishell *shell);
-void handle_cd(t_minishell *shell);
-void handle_exit(t_minishell *shell);
-void handle_env(t_minishell *shell);
-void handle_export(t_minishell *shell);
-void handle_unset(t_minishell *shell);
-void handle_echo(t_minishell *shell);
-void handle_pipes(t_minishell *shell);
-void handle_redirection(t_minishell *shell);
-void handle_builtin(t_minishell *shell);
-void handle_external(t_minishell *shell);
-void handle_error(const char *message);
-void free_ast(t_ast *ast);
-//void execute_ast(t_ast *ast, t_env *env);
-void execute_ast_pipeline(t_ast *ast, t_env *env, int input_fd);
+/* --- Core --- */
+int     start_shell(t_shell *shell, char **envp);
+void    init_minishell(t_shell *shell, char **envp);
+int     looping(t_shell *shell);
+void    free_minishell(t_shell *shell);
+void    execute_command(t_shell *shell);
+int     is_builtin(const char *cmd);
+void    exit_shell(t_shell *shell, int exit_code);
 
-//int is_builtin(const char *cmd);
-// int		is_builtin(t_ast *ast);
-//int execute_builtin(t_ast *cmd, t_env *env);
-// void	execute_builtin(t_minishell *shell, t_ast *ast);
+/* --- Builtins --- */
+/* --- Builtins (execution) --- */
+void handle_cd(t_shell *shell);
+void handle_exit(t_shell *shell);
+void handle_env(t_shell *shell);
+void handle_export(t_shell *shell);
+void handle_unset(t_shell *shell);
+void handle_echo(t_shell *shell);
 
-void execute_simple(t_ast *ast, t_env *env);
-// void    execute_command(t_ast *ast, t_env *env);
-void execute_pipeline(t_ast *ast, t_env *env);
-void execute_simple_command(t_ast *ast, t_env *env);
-void setup_redirections(t_ast *ast);
-void exec_cmd_node(t_ast *ast, t_env *env, int input_fd);
-void exec_pipe_node(t_ast *ast, t_env *env, int input_fd);
-// void    first_child(t_pipex *pipex, t_exec *exec, char *cmd);
-// void    second_child(t_pipex *pipex, t_exec *exec, char *cmd);
-// void    child_process(t_pipex *pipex, t_exec *exec, t_child *child_data);
-void initialize_positions_forsplitdemesc(int pos[3]);
+/* --- Builtins (parser) --- */
+int   builtin_echo(t_shell *shell, char **argv);
+int   builtin_cd(t_shell *shell, char **argv);
+int   builtin_export(t_shell *shell, char **argv);
+int   builtin_env(t_shell *shell, char **argv);
+int   builtin_exit(t_shell *shell, char **argv);
+int builtin_pwd(t_shell *shell, char **argv);
+int builtin_unset(t_shell *shell, char **argv);
 
-void ft_free_array(char **array);
-// void	ft_free_split(char **ft_split);
-char *get_env_value(t_env *env, const char *name);
-// char	*find_cmd(char *cmd, t_env *env);
-//char *ft_strjoin_3(const char *a, const char *b, const char *c);
-char *get_valid_path(char *cmd, t_env *envp);
-char *search_in_paths(char **paths, char *cmd);
+int   export_no_arguments(t_shell *shell);
+int   process_export_argument(char *arg, t_shell *shell);
+/* --- Env --- */
+char    *get_env_value(t_list *env, const char *name);
+char    **list_to_envp(t_list *env);
+int     env_len(t_list *env);
+void    print_env(t_list *env);
+t_list  *init_env(char **envp);
+int     set_env_value(t_list **env, const char *key, const char *value);
+char    *find_env_value(t_list *env, const char *key);
 
-//char *find_command_path(char *cmd, t_env *env);
-char *find_command_path(char *cmd, t_minishell *shell);
+/* --- Parsing --- */
+t_arr   *custom_split(const char *str, t_shell *shell);
+int     count_tokens(t_shell *shell, t_arr *parsed_args, t_arr *oper);
+void    attribute_token_type(t_shell *shell);
+void    assign_redirs(t_shell *shell);
+int     count_args_cmd(t_shell *shell, int i);
+int     attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token, int idx, int len);
+int     count_subtokens(const char *str);
+void    subtoken_of_cmd(t_subtoken_container *container, char *arg);
+int     find_c_nonescaped(const char *str, char *needle, int size_needle);
+bool    escape_check(const char *str, int idx);
 
+//void    file_access_redirection(t_shell *shell, void **arr, int t_arr_index, int i);
+void    build_cmd_list(t_shell *shell);
+int     file_access_redirection(t_shell *shell, void **arr, int t_arr_index, int i);
 
-char *get_env_value(t_env *env, const char *name);
-// char	*ft_strjoin_3(const char *a, const char *b, const char *c);
-// char	*find_cmd(char *cmd, t_env *env);
-void ft_free_split(char **tab);
+char *find_command_path(char *cmd, t_list *env);
+void     execute_cmd(t_shell *shell, t_token *cmd);
+//void     ft_itoa_inplace(char *buf, int n);
+char *ft_itoa_inplace(char *buf, int n);
+void child_exit(char **args, char *cmd_path, char **envp, t_list *candidates, int code);
 
-int is_pipeline(t_ast *ast);
+/* --- Utils --- */
+size_t  t_arrlen(void **arr);
+int     is_in_t_arr_str(t_arr *arr, const char *arg);
+int     is_in_t_arr_dic_str(t_arr *arr, const char *arg);
+void    build_t_arr_str(t_arr **dst, char **arr_str, int len);
+void    init_all_t_arr(t_shell *shell);
+void    free_tab(char **tab);
+void    ft_free(void **thing);
+void    init_signals(void);
+void    handle_error(const char *message);
 
-//...
-char **env_to_envp(t_env *env);
-char **env_to_envp(t_list *env);
-//...
-void handle_error(const char *message);
+/* --- Listes --- */
+t_list  *ft_lstnew(void *content);
+void    ft_lstadd_back(t_list **lst, t_list *new);
+void    ft_lstadd_front(t_list **lst, void *content);
+t_list  *search_lst(t_list *lst, const char *target);
+void    replace_or_add_env(t_list **env, const char *key, const char *value);
+void    free_list_str(t_list *lst);
+/* --- Listes & Chaînes --- */
 
-// signal.c
-void init_signals(void);
-//
+//void    push_lst(t_list **lst, char *value);
+void    push_lst(t_list **lst, void *content);
 
-// from_pipex de me c
-char *get_env_path(char **envp, const char *name);
-char *join_with_slash(const char *prefix, const char *suffix);
-char *pwd_path(char *cmd, t_env *env);
+char    *ft_strdup_count(const char *src, int *count);
 
-//
-char *find_cmd(const char *cmd, t_env *env);
+char    **expand_cmd(t_token *token, t_list *env);
+int (*get_builtin_handler(t_arr *bcmd, int idx))(t_shell *, char **);
 
-// char **split_on_pipes(const char *input);
-t_ast *parse_redirection(char **args);
-void free_strtab(char **tab);
+void free_str_array(char **arr);
 
-//
-void print_ast(t_ast *node, int level);
-//
+/* --- Debug --- */
+void    print_all_parts(t_shell *shell);
+void    print_dic(t_arr *arr);
 
-int builtin_pwd(void);
-int builtin_cd(char **args, t_minishell *shell);
-int builtin_echo(char **args, t_minishell *sh);
-void execute_command(t_minishell *shell);
-int execute_builtin(t_ast *ast, t_minishell *shell);
+void free_tokens(t_shell *parser);
+int ft_echo(t_shell *shell, char **argv);
+int ft_cd(t_shell *shell, char **argv);
+int ft_pwd(t_shell *shell, char **argv);
+int ft_export(t_shell *shell, char **argv);
+int ft_unset(t_shell *shell, char **argv);
+int ft_env(t_shell *shell, char **argv);
+int ft_exit(t_shell *shell, char **argv);
+int handle_heredoc(t_shell *shell, char **argv);
+int handle_append(t_shell *shell, char **argv);
 
-int is_builtin(t_ast *ast);
+int handle_and(t_shell *shell, char **argv);
+int handle_or(t_shell *shell, char **argv);
+int handle_pipe(t_shell *shell, char **argv);
+int handle_redirect_in(t_shell *shell, char **argv);
+int handle_redirect_out(t_shell *shell, char **argv);
 
-int execute_external(t_ast *ast, t_minishell *shell);
-void free_t_arr(t_arr *array);
-void free_tab(char **tab);
-char **env_to_envp(t_list *env); // à mettre dans minishell.h
-int env_list(t_env *env);
-void execute_ast(t_ast *node, t_minishell *shell);
-void	exit_shell(t_minishell *shell, int exit_code);
-int	builtin_exit(t_ast *node, t_minishell *shell);
+typedef int (*builtin_fptr)(t_shell *, char **);
 
-char	*replace_exit_code(const char *input, int exit_code);
-char *replace_variables(const char *arg, t_minishell *shell);
-int builtin_unset(char **args, t_minishell *shell);
-int builtin_env(char **args, t_minishell *shell);
-bool	is_n_option(const char *arg);
-char	*expand_argument(const char *arg, t_minishell *sh);
+void free_t_arr_dic(t_arr *array);
+/* ----- Redirection & heredoc ----- */
+t_delim parse_delim(const char *raw);
+char    *expand_vars_in_line(const char *line, t_shell *sh);
+int     build_heredoc_fd(t_delim d, t_shell *sh);
+int     apply_redirs_in_child(t_cmd *c, t_shell *sh);
+void    child_exec_maillon(t_cmd *c, t_shell *sh, int i, int ncmd, int p[][2]);
 
-#endif // MINISHELL_H
-
-// ************************************************************************** */
+# endif // MINISHELL_H

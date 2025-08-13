@@ -1,36 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   util-0.c                                           :+:      :+:    :+:   */
+/*   builtin_func.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 16:13:07 by nkiefer          ###   ########.fr       */
+/*   Created: 2025/06/28 07:38:32 by eganassi          #+#    #+#             */
+/*   Updated: 2025/08/13 15:33:45 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a)
+int	ft_echo(t_shell *shell, char **argv)
 {
-	char	*tmp;
-	char	*res;
-
-	if (!a || !b || !c)
-		return (NULL);
-	tmp = ft_strjoin(a, b);
-	if (!tmp)
-		return (NULL);
-	res = ft_strjoin(tmp, c);
-	free(tmp);
-	if (free_a)
-		free(a);
-	return (res);
+	return (builtin_echo(shell, argv));
 }
 
-void	handle_error(const char *message)
+int	ft_cd(t_shell *shell, char **argv)
 {
-	perror(message);
-	exit(EXIT_FAILURE);
+	return (builtin_cd(shell, argv));
+}
+
+int	ft_pwd(t_shell *shell, char **argv)
+{
+	return (builtin_pwd(shell, argv));
+}
+
+int	ft_export(t_shell *shell, char **argv)
+{
+	return (builtin_export(shell, argv));
+}
+
+int	ft_unset(t_shell *shell, char **argv)
+{
+	return (builtin_unset(shell, argv));
 }

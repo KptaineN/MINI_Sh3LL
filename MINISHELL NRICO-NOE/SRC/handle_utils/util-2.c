@@ -6,46 +6,33 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:45 by eganassi          #+#    #+#             */
-/*   Updated: 2025/06/17 14:23:50 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 16:15:57 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	handle_echo(t_minishell *shell)
+void	handle_echo(t_shell *shell)
 {
-	// Handle the 'echo' command
+	int	i;
+
+	i = 0;
 	if (shell->args && shell->args[1])
 	{
-		for (int i = 1; shell->args[i]; i++)
+		i = 1;
+		while (shell->args[i])
 		{
 			printf("%s ", shell->args[i]);
+			i++;
 		}
 		printf("\n");
 	}
 	else
-	{
-		printf("\n"); // Just print a newline if no arguments
-	}
-}
-/*
-void	handle_pipes(t_minishell *shell)
-{
-	// Handle pipes in the command
-	// This is a placeholder function; you would implement actual pipe handling here
-	printf("Handling pipes...\n");
+		printf("\n");
 }
 
-void	handle_redirection(t_minishell *shell)
+void	handle_builtin(t_shell *shell)
 {
-	// Handle redirection in the command
-	// This is a placeholder function; you would implement actual redirection handling here
-	printf("Handling redirection...\n");
-}*/
-
-void	handle_builtin(t_minishell *shell)
-{
-	// Handle built-in commands like cd, exit, env, export, unset, echo
 	if (ft_strncmp(shell->args[0], "cd", ft_strlen("cd") + 1) == 0)
 		handle_cd(shell);
 	else if (ft_strncmp(shell->args[0], "exit", ft_strlen("exit") + 1) == 0)
@@ -61,11 +48,3 @@ void	handle_builtin(t_minishell *shell)
 	else
 		fprintf(stderr, "%s: command not found\n", shell->args[0]);
 }
-/*
-void	handle_external(t_minishell *shell)
-{
-	// Handle external commands (not built-in)
-	// This is a placeholder function; you would implement actual command execution here
-	printf("Handling external command: %s\n", shell->args[0]);
-	// You would typically use execvp or similar functions to execute the command
-}*/
