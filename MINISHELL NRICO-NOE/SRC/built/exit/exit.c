@@ -3,14 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:26:26 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 15:26:36 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 18:13:14 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "exit.h"
+
+size_t	compute_out_len(size_t input_len, size_t count, size_t code_len)
+{
+	size_t	pattern_len;
+
+	pattern_len = 2;
+	if (count == 0)
+		return (input_len);
+	return (input_len + count * (code_len - pattern_len));
+}
 
 int	is_numeric(const char *str)
 {
@@ -40,12 +50,13 @@ int	builtin_exit(t_shell *shell, char **argv)
 	{
 		if (!is_numeric(argv[1]))
 		{
-			ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
-			exit_shell(shell, 255);
+			ft_putstr_fd("┐(￣ ヘ￣)┌minishell: exit: numeric argument required\n",
+				2);
+			exit_shell(shell, 2);
 		}
 		if (argv[2])
 		{
-			ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+			ft_putstr_fd("╮(╯ _╰ )╭minishell: exit: too many arguments\n", 2);
 			return (1);
 		}
 		code = ft_atoi(argv[1]);
@@ -57,70 +68,24 @@ int	builtin_exit(t_shell *shell, char **argv)
 
 char	*replace_exit_code(const char *input, int code)
 {
-	bool	in_sq;
-	bool	in_dq;
-	size_t	i;
-	size_t	j;
-	size_t	count;
 	char	*code_str;
 	size_t	code_len;
+	size_t	count;
+	size_t	out_len;
 	char	*res;
 
+	code_len = 0;
+	count = 0;
+	out_len = 0;
 	if (!input)
 		return (NULL);
 	code_str = ft_itoa(code);
 	if (!code_str)
 		return (NULL);
 	code_len = ft_strlen(code_str);
-	in_sq = false;
-	in_dq = false;
-	count = 0;
-	i = 0;
-	while (input[i])
-	{
-		if (input[i] == '\'' && !in_dq)
-			in_sq = !in_sq;
-		else if (input[i] == '"' && !in_sq)
-			in_dq = !in_dq;
-		else if (input[i] == '$' && input[i + 1] == '?' && !in_sq)
-		{
-			count++;
-			i++;
-		}
-		i++;
-	}
-	res = malloc(ft_strlen(input) + count * (code_len - 2) + 1);
-	if (!res)
-	{
-		free(code_str);
-		return (NULL);
-	}
-	in_sq = false;
-	in_dq = false;
-	i = 0;
-	j = 0;
-	while (input[i])
-	{
-		if (input[i] == '\'' && !in_dq)
-		{
-			in_sq = !in_sq;
-			res[j++] = input[i++];
-		}
-		else if (input[i] == '"' && !in_sq)
-		{
-			in_dq = !in_dq;
-			res[j++] = input[i++];
-		}
-		else if (input[i] == '$' && input[i + 1] == '?' && !in_sq)
-		{
-			ft_memcpy(res + j, code_str, code_len);
-			j += code_len;
-			i += 2;
-		}
-		else
-			res[j++] = input[i++];
-	}
-	res[j] = '\0';
+	count = count_exit_patterns(input);
+	out_len = compute_out_len(ft_strlen(input), count, code_len);
+	res = fill_with_replacement(input, code_str, out_len);
 	free(code_str);
 	return (res);
 }

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 16:26:32 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 23:22:02 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,9 @@ typedef struct s_shell
     int             fd_pid[2];
     t_subtoken_container *heredoc;
     int             exit_status;
+    char    **exec_envp_tmp;
+    char    *exec_cmd_path_tmp;
+    t_list  *exec_candidates_tmp;
 }   t_shell;
 
 /* =============================
@@ -234,8 +237,7 @@ char *find_command_path(char *cmd, t_list *env);
 void     execute_cmd(t_shell *shell, t_token *cmd);
 //void     ft_itoa_inplace(char *buf, int n);
 char *ft_itoa_inplace(char *buf, int n);
-void child_exit(char **args, char *cmd_path, char **envp, t_list *candidates, int code);
-
+void	exit_child_process(t_shell *sh, int code);
 /* --- Utils --- */
 size_t  t_arrlen(void **arr);
 int     is_in_t_arr_str(t_arr *arr, const char *arg);

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:56:01 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 16:11:02 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 22:00:53 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,7 @@ char	**env_to_array(t_shell *shell)
 		env = (t_env *)node->content;
 		arr[i] = create_env_entry(env);
 		if (!arr[i])
-		{
-			free_export_arr(arr);
-			return (NULL);
-		}
+			return (free_export_arr(arr), NULL);
 		i++;
 		node = node->next;
 	}

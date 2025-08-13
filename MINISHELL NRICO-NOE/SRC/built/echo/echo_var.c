@@ -6,11 +6,21 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:36:18 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 15:52:27 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 21:57:30 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "echo.h"
+
+static int	write_dollar(char *dst, int *i)
+{
+	int	written;
+
+	written = 1;
+	dst[0] = '$';
+	(*i)++;
+	return (written);
+}
 
 static int	handle_dollar(char *res, const char *arg, int *i, t_shell *sh)
 {
@@ -29,44 +39,29 @@ static int	handle_dollar(char *res, const char *arg, int *i, t_shell *sh)
 	return (nb);
 }
 
-static void	toggle_quotes(char c, bool *in_sq, bool *in_dq)
-{
-	if (c == '\'' && !(*in_dq))
-		*in_sq = !(*in_sq);
-	else if (c == '"' && !(*in_sq))
-		*in_dq = !(*in_dq);
-}
-
-static int	process_dollar(char *dst, const char *arg, int *i, t_shell *sh)
+int	dollar_edge_cases(char *dst, const char *arg, int *i, t_shell *sh)
 {
 	int		k;
 	char	c;
-	char	*s;
-	int		n;
 
 	k = *i + 1;
 	c = arg[k];
 	if (c == '\0')
-	{
-		dst[0] = '$';
-		(*i)++;
-		return (1);
-	}
+		return (write_dollar(dst, i));
 	if (c == '?')
-	{
-		s = ft_itoa(sh->exit_status);
-		n = ft_strlen(s);
-		ft_memcpy(dst, s, n);
-		free(s);
-		*i = k + 1;
-		return (n);
-	}
+		return (write_and_free(dst, ft_itoa(sh->exit_status), i, k + 1));
 	if (!is_valid_key_char((unsigned char)c))
-	{
-		dst[0] = '$';
-		(*i)++;
-		return (1);
-	}
+		return (write_dollar(dst, i));
+	return (-1);
+}
+
+int	process_dollar(char *dst, const char *arg, int *i, t_shell *sh)
+{
+	int	handled;
+
+	handled = dollar_edge_cases(dst, arg, i, sh);
+	if (handled >= 0)
+		return (handled);
 	return (handle_dollar(dst, arg, i, sh));
 }
 
@@ -82,8 +77,6 @@ char	*replace_variables(const char *arg, t_shell *sh)
 	in_dq = false;
 	i = 0;
 	j = 0;
-	in_sq = false;
-	in_dq = false;
 	res = malloc(ft_strlen(arg) * 50 + 1);
 	if (!res)
 		return (NULL);

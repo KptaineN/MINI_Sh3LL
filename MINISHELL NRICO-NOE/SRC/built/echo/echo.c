@@ -6,18 +6,31 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:35:07 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 15:50:05 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/13 21:55:44 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "echo.h"
+
+int	write_and_free(char *dst, char *s, int *i, int new_i)
+{
+	size_t	len;
+
+	if (!s)
+		return (0);
+	len = ft_strlen(s);
+	ft_memcpy(dst, s, len);
+	free(s);
+	*i = new_i;
+	return ((int)len);
+}
 
 int	is_valid_key_char(char c)
 {
 	return (ft_isalnum(c) || c == '_');
 }
 
-static int	is_echo_n_flag(const char *s)
+int	is_echo_n_flag(const char *s)
 {
 	int	i;
 
@@ -59,40 +72,4 @@ int	builtin_echo(t_shell *shell, char **argv)
 		ft_putchar_fd('\n', STDOUT_FILENO);
 	(void)shell;
 	return (0);
-}
-
-char	*remove_quotes(const char *arg)
-{
-	size_t	i;
-	size_t	j;
-	bool	in_sq;
-	bool	in_dq;
-	char	*res;
-
-	i = 0;
-	j = 0;
-	in_sq = false;
-	in_dq = false;
-	res = malloc(ft_strlen(arg) + 1);
-	if (!res)
-		return (NULL);
-	while (arg[i])
-	{
-		if (arg[i] == '\'' && !in_dq)
-		{
-			in_sq = !in_sq;
-			i++;
-		}
-		else if (arg[i] == '"' && !in_sq)
-		{
-			in_dq = !in_dq;
-			i++;
-		}
-		else
-		{
-			res[j++] = arg[i++];
-		}
-	}
-	res[j] = '\0';
-	return (res);
 }

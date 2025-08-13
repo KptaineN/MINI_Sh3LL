@@ -26,7 +26,7 @@ int set_env_value(t_list **env, const char *key, const char *value)
     return 0;
 }
 
-char *get_env_value(t_list *env, const char *key)
+/*char *get_env_value(t_list *env, const char *key)
 {
     while (env)
     {
@@ -36,7 +36,7 @@ char *get_env_value(t_list *env, const char *key)
         env = env->next;
     }
     return NULL;
-}
+}*/
 
 char *get_value_env(t_list *env, char *value, int len)
 {
@@ -322,14 +322,14 @@ void execute_cmd(t_shell *shell, t_token *cmd)
     char      **envp;
 
     if (!cmd || !cmd->value)
-        child_exit(NULL, NULL, NULL, NULL, 1);
+        exit_child_process(shell, 1);
 
     // Expansion des arguments
     args = expand_cmd(cmd, shell->env);
     if (!args || !args[0])
     {
         fprintf(stderr, "%s: command not found\n", cmd->value);
-        child_exit(args, NULL, NULL, NULL, 127);
+        exit_child_process(shell, 127);
     }
 
     /* 1) Built-ins */
@@ -342,7 +342,7 @@ void execute_cmd(t_shell *shell, t_token *cmd)
             shell->exit_status = handler(shell, args);
             _exit(shell->exit_status);
         }
-        child_exit(args, NULL, NULL, NULL, 1);
+        exit_child_process(shell, 1);
     }
 
     /* 2) Recherche du PATH */
@@ -350,7 +350,7 @@ void execute_cmd(t_shell *shell, t_token *cmd)
     if (!cmd_path)
     {
         fprintf(stderr, "%s: command not found\n", args[0]);
-        child_exit(args, NULL, NULL, NULL, 127);
+        exit_child_process(shell, 127);
     }
 
     /* 3) Préparation de l'envp et exec */
@@ -359,7 +359,7 @@ void execute_cmd(t_shell *shell, t_token *cmd)
 
     /* 4) Si execve échoue, afficher l’erreur et cleanup */
     perror("execve");
-    child_exit(args, cmd_path, envp, NULL, 127);
+    exit_child_process(shell, 127);
 }
 
 
