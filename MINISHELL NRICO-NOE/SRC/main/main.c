@@ -48,7 +48,7 @@ int	main(int argc, char **argv, char **envp)
 		ft_putstr_fd("Usage: ./minishell\n", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
-	//print_header_emote();
+	print_header_emote();
 	if (!start_shell(&shell, envp))
 	{
 		ft_putstr_fd("Failed to start minishell\n", STDERR_FILENO);
@@ -58,8 +58,3 @@ int	main(int argc, char **argv, char **envp)
 	free_minishell(&shell);
 	return (shell.exit_status);
 }
-/*
-pour etre conforme a la norminette ajouter soi meme le header
-// print_header_emote();
-apres la 1er condition
-*/
