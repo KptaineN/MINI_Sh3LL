@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit.h                                             :+:      :+:    :+:   */
+/*   go_away.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkiefer <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/13 18:30:36 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 18:40:21 by nkiefer          ###   ########.fr       */
+/*   Created: 2025/08/16 12:46:02 by nkiefer           #+#    #+#             */
+/*   Updated: 2025/08/16 12:46:04 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef EXIT_H
-# define EXIT_H
+#ifndef GO_AWAY_H
+# define GO_AWAY_H
 
-# include "../../../include/minishell.h"
+# include "../../include/minishell.h"
 
 typedef struct s_ctx
 {
@@ -29,17 +29,16 @@ typedef struct s_rep
 	size_t		clen;
 }				t_rep;
 
-char			*replace_exit_code(const char *input, int code);
-size_t			count_exit_patterns(const char *s);
+int				try_quote(const char *s, t_stx *c, char *out);
+int				try_exit(const char *s, t_stx *c, char *out, t_rep *r);
+char			*expand_input(char *input, t_shell *sh);
+void			ctx_init(t_stx *c);
 char			*fill_with_replacement(const char *input, const char *code_str,
 					size_t out_len);
-int				is_numeric(const char *str);
-int				builtin_exit(t_shell *shell, char **argv);
+char			*replace_exit_code(const char *input, int code);
+size_t			count_exit_patterns(const char *s);
 size_t			compute_out_len(size_t input_len, size_t count,
 					size_t code_len);
 void			update_quotes(bool *in_sq, bool *in_dq, char c);
-void			ctx_init(t_stx *c);
-int				try_quote(const char *s, t_stx *c, char *out);
-int				try_exit(const char *s, t_stx *c, char *out, t_rep *r);
 
-#endif // EXIT_H
+#endif

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 23:22:02 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/16 16:51:08 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,6 +248,53 @@ void    free_tab(char **tab);
 void    ft_free(void **thing);
 void    init_signals(void);
 void    handle_error(const char *message);
+void cleanup_shell_iter(t_shell *sh);
+int  process_input(t_shell *sh, char *in);
+void	exit_shell(t_shell *shell, int exit_code);
+char *get_value_env(t_list *env, char *value, int len);
+void	build_t_arr_dic_str(t_arr **dst, char **keys, int (**values)(t_shell *,
+			char **), int len);
+void	free_t_arr_dic(t_arr *array);
+char *join_path(char *dir, char *cmd);
+
+void    free_t_arr(t_arr *arr);
+void    free_list(t_list *lst);
+void	build_t_arr_str(t_arr **dst, char **arr_str, int len);
+void	init_builtins_t_arr(t_shell *shell);
+int	run_builtin_if_any(t_shell *shell, char **args);
+
+/* ================= EXEC / BUILTINS ================= */
+void	execute_cmd(t_shell *shell, t_token *cmd);
+void	prepare_or_run_builtin(t_shell *shell, t_token *cmd, char ***out_args);
+void	print_cmd_not_found(const char *s);
+char	*resolve_cmd_path_or_die(t_shell *shell, char *name);
+int		(*get_builtin_handler(t_arr *arr, int idx))(t_shell *, char **);
+
+/* ================= PATH RESOLVER =================== */
+char	*find_command_path(char *cmd, t_list *env);
+char	*search_in_path(char *cmd, char *path_env);
+char	*scan_path_copy(char *cmd, char *copy);
+char	*check_dir_for_cmd(char *dir, char *cmd);
+char	*join_path(char *dir, char *cmd);
+char	*get_path_env(t_list *env);
+int count_exp_len(t_subtoken *b, int *k);
+int	sum_parts_len(t_subtoken_container *a);
+void add_redir(t_token *tok, t_rtype type, const char *arg);
+
+
+/* ================== ENVIRONNEMENT ================== */
+//char	*get_value_env(t_list *env, const char *key);
+int		set_env_value(t_list **env, const char *key, const char *value);
+char	**list_to_envp(t_list *env);
+
+/* ================== EXPANSIONS ===================== */
+char	**expand_cmd(t_token *cmd, t_list *env);
+
+/* ================== UTIL / EXIT =================== */
+void	exit_child_process(t_shell *shell, int code);
+
+/* ================== TABLE LOOKUP =================== */
+int		is_in_t_arr_str(t_arr *arr, const char *arg);
 
 /* --- Listes --- */
 t_list  *ft_lstnew(void *content);
@@ -298,5 +345,8 @@ char    *expand_vars_in_line(const char *line, t_shell *sh);
 int     build_heredoc_fd(t_delim d, t_shell *sh);
 int     apply_redirs_in_child(t_cmd *c, t_shell *sh);
 void    child_exec_maillon(t_cmd *c, t_shell *sh, int i, int ncmd, int p[][2]);
+
+char *expand_input(char *input, t_shell *sh);
+
 
 # endif // MINISHELL_H

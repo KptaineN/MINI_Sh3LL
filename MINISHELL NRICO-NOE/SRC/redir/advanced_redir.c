@@ -48,14 +48,13 @@ char *expand_vars_in_line(const char *line, t_shell *sh)
 }
 
 /* helpers for filename expansion / ambiguity */
-static void ambiguous(const char *original)
+void ambiguous(const char *original)
 {
     ft_putstr_fd((char *)"minishell: ", STDERR_FILENO);
     ft_putstr_fd((char *)original, STDERR_FILENO);
     ft_putstr_fd((char *)": ambiguous redirect\n", STDERR_FILENO);
 }
-
-static int is_ambiguous(const char *fname)
+int is_ambiguous(const char *fname)
 {
     int i;
 
@@ -71,7 +70,7 @@ static int is_ambiguous(const char *fname)
     return 0;
 }
 
-static char *expand_filename_if_needed(char *arg, t_shell *sh)
+char *expand_filename_if_needed(char *arg, t_shell *sh)
 {
     char *tmp;
     char *res;
@@ -82,172 +81,14 @@ static char *expand_filename_if_needed(char *arg, t_shell *sh)
     return res;
 }
 
-/* ----- création d’un pipe heredoc et remplissage via readline ----- */
-int build_heredoc_fd(t_delim d, t_shell *sh)
-{
-    int     hd[2];
-    pid_t   pid;
-
-    struct sigaction    sa_ignore;
-
-    sa_ignore.sa_handler = SIG_IGN;
-    sigemptyset(&sa_ignore.sa_mask);
-    sa_ignore.sa_flags = 0;
-    sigaction(SIGINT, &sa_ignore, NULL);
-    sigaction(SIGQUIT, &sa_ignore, NULL);
-
-    if (pipe(hd) < 0)
-    {
-        perror("pipe");
-        init_signals();
-        return -1;
-    }
-    pid = fork();
-    if (pid < 0)
-    {
-        perror("fork");
-        close(hd[0]);
-        close(hd[1]);
-        init_signals();
-        return -1;
-    }
-    if (pid == 0)
-    {
-        char    *line;
-
-        signal(SIGINT, SIG_DFL);
-        signal(SIGQUIT, SIG_IGN);
-        rl_catch_signals = 0;
-        close(hd[0]);
-        while (1)
-        {
-            line = readline("> ");
-            if (!line)
-                break;
-            if (ft_strcmp(line, d.clean) == 0)
-            {
-                free(line);
-                break;
-            }
-            if (!d.quoted)
-            {
-                char *exp = expand_vars_in_line(line, sh);
-                free(line);
-                line = exp;
-            }
-            write(hd[1], line, ft_strlen(line));
-            write(hd[1], "\n", 1);
-            free(line);
-        }
-        close(hd[1]);
-        _exit(0);
-    }
-    close(hd[1]);
-    int status;
-    waitpid(pid, &status, 0);
-    init_signals();
-    if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-    {
-        close(hd[0]);
-        return -2;
-    }
-    return hd[0];
-}
-
-/* ----- appliquer redirections dans l’enfant du maillon ----- */
-int apply_redirs_in_child(t_cmd *c, t_shell *sh)
-{
-    int i;
-    int fd;
-
-    i = 0;
-    while (i < c->r_count)
-    {
-        t_redir *r = &c->r[i];
-        if (r->type == R_IN)
-        {
-            char *file = expand_filename_if_needed(r->arg, sh);
-            if (is_ambiguous(file))
-            {
-                ambiguous(r->arg);
-                free(file);
-                return 1;
-            }
-            fd = open(file, O_RDONLY);
-            free(file);
-            if (fd < 0)
-            {
-                perror(r->arg);
-                return 1;
-            }
-            dup2(fd, STDIN_FILENO);
-            close(fd);
-        }
-        else if (r->type == R_OUT_TRUNC)
-        {
-            char *file = expand_filename_if_needed(r->arg, sh);
-            if (is_ambiguous(file))
-            {
-                ambiguous(r->arg);
-                free(file);
-                return 1;
-            }
-            fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-            free(file);
-            if (fd < 0)
-            {
-                perror(r->arg);
-                return 1;
-            }
-            dup2(fd, STDOUT_FILENO);
-            close(fd);
-        }
-        else if (r->type == R_OUT_APPEND)
-        {
-            char *file = expand_filename_if_needed(r->arg, sh);
-            if (is_ambiguous(file))
-            {
-                ambiguous(r->arg);
-                free(file);
-                return 1;
-            }
-            fd = open(file, O_CREAT | O_WRONLY | O_APPEND, 0644);
-            free(file);
-            if (fd < 0)
-            {
-                perror(r->arg);
-                return 1;
-            }
-            dup2(fd, STDOUT_FILENO);
-            close(fd);
-        }
-        else if (r->type == R_HEREDOC)
-        {
-            t_delim d = parse_delim(r->arg);
-            int hfd = build_heredoc_fd(d, sh);
-            free(d.clean);
-            if (hfd == -2)
-                exit(130);
-            if (hfd < 0)
-                return 1;
-            dup2(hfd, STDIN_FILENO);
-            close(hfd);
-        }
-        i++;
-    }
-    return 0;
-}
-
-/* placeholders for external helpers */
-static int run_builtin(t_cmd *c, t_shell *sh)
+int run_builtin(t_cmd *c, t_shell *sh)
 {
     (void)c;
     (void)sh;
     return 0;
 }
 
-
-static char *resolve_path(const char *cmd, t_shell *sh)
+char *resolve_path(const char *cmd, t_shell *sh)
 {
     (void)sh;
     return (char *)cmd;
@@ -260,10 +101,12 @@ void child_exec_maillon(t_cmd *c, t_shell *sh, int i, int ncmd, int p[][2])
         dup2(p[i - 1][0], STDIN_FILENO);
     if (i < ncmd - 1)
         dup2(p[i][1], STDOUT_FILENO);
-    for (int k = 0; k < ncmd - 1; k++)
+    int k = 0;
+    while (k < ncmd - 1)
     {
         close(p[k][0]);
         close(p[k][1]);
+        k++;
     }
     if (apply_redirs_in_child(c, sh))
         _exit(1);

@@ -1,0 +1,164 @@
+1) Crash & invalid read dans make_kv_cstr (envp)
+
+Symptôme : segfault dans ft_strlen → make_kv_cstr → list_to_envp avec une adresse qui “épelle” PID=4333… (petits bouts “P I D = 4 3 3 3” inversés) → tu passes à make_kv_cstr un pointeur invalide (stack buffer ou valeur packée) au lieu d’une vraie C-string heap dupée.
+Cause la plus probable : dans replace_or_add_env (appelée depuis launch_process), tu mets PID dans l’environnement avec une valeur non-dupliquée (ex: buffer local, number casté, etc.). On le voit dans la trace replace_or_add_env juste avant list_to_envp/execute_cmd.
+// utils_env.c
+static char *safe_strdup(const char *s)
+{
+    size_t n = 0;
+    char *r;
+    if (!s) s = "";
+    while (s[n]) n++;
+    r = malloc(n + 1);
+    if (!r) return NULL;
+    for (size_t i = 0; i < n; ++i) r[i] = s[i];
+    r[n] = '\0';
+    return r;
+}
+
+char *make_kv_cstr(const char *k, const char *v)
+{
+    size_t kl = 0, vl = 0, i = 0, j = 0;
+    if (!k) k = "";
+    while (k[kl]) kl++;
+    if (v) while (v[vl]) vl++;  // v peut être NULL ⇒ traite comme vide
+    char *s = malloc(kl + 1 + vl + 1);
+    if (!s) return NULL;
+    for (; i < kl; ++i) s[i] = k[i];
+    s[i++] = '=';
+    for (; j < vl; ++j) s[i + j] = v[j];
+    s[i + j] = '\0';
+    return s;
+}
+
+// replace_or_add_env.c
+int replace_or_add_env(t_shell *sh, const char *key, const char *val) {
+    t_env *node = find_env_node(sh->env, key);
+    char *k = safe_strdup(key);
+    char *v = safe_strdup(val);            // toujours heap-dup
+    if (!k || !v) { free(k); free(v); return 1; }
+    if (node) {
+        free(node->key); free(node->value);
+        node->key = k; node->value = v;
+    } else {
+        t_env *new = new_env_node_take(k, v); // prend ownership
+        if (!new) { free(k); free(v); return 1; }
+        ft_lstadd_back(&sh->env, ft_lstnew(new));
+    }
+    return 0;
+}
+
+// Dans launch_process.c (mise à jour PID)
+{
+    char *pid = ft_itoa(getpid());        // ou du pid enfant selon ta logique
+    if (pid) { replace_or_add_env(shell, "PID", pid); free(pid); }
+}
+
+Avec ça, list_to_envp → make_kv_cstr n’appellera plus ft_strlen sur des pointeurs foireux, donc plus de SIGSEGV/invalid read.
+
+// execute_cmd.c (chemin d’erreur après execve)
+static void free_envp(char **envp) {
+    if (!envp) return;
+    for (int i = 0; envp[i]; ++i) free(envp[i]);
+    free(envp);
+}
+
+// ...
+if (execve(path, argv, envp) == -1) {
+    perror("execve");
+    free_envp(envp);        // évite leaks si execve fail
+    // free argv si alloué dynamiquement, etc.
+    exit(126);
+}
+2) Leaks “definitely lost” depuis ft_substr → subtoken_of_cmd
+
+Symptôme : petits blocs “definitely lost” (5/10/15/20 bytes) venant de ft_substr dans subtoken_of_cmd, appelé via attribute_cmd_subtokens/attribute_token_type.
+Cause : les ft_substr créés pour chaque “part” (sous-token) ne sont pas tous libérés après utilisation (join, expand, etc.). C’est ton souci déjà identifié le 03/08.
+
+Fix simple et uniforme : garantir que tous les parts[i].p sont des dup heap (pas des pointeurs vers la string d’origine), puis les free systématiquement.
+
+Dans subtoken_of_cmd → assure-toi de toujours faire un ft_substr(...) pour chaque part, même les non-quotés.
+
+Ajoute un free utilitaire :
+// tokenizer_free.c
+void free_subtoken_container(t_subtoken_conainter *c)
+{
+    if (!c || !c->parts) return;
+    for (int i = 0; i < c->count; ++i) {
+        free(c->parts[i].p);    // OK car on a uniformisé en heap-dup
+    }
+    free(c->parts);
+    c->parts = NULL;
+    c->count = 0;
+}
+
+Appelle-le dès que tu as fini d’exploiter le container (après expand_container/expand_cmd ou quand tu construis l’argv).
+
+Ça éliminera les definitely lost signalés dans ces frames.
+) Petites fuites dans custom_split/extract_arg et expand_cmd
+
+Symptôme : “still reachable” de quelques octets alloués dans extract_arg/custom_split, expand_container/expand_cmd, et ajouts ponctuels d’éléments de liste de commandes.
+Fix : ajoute une phase de destruction par itération à la fin de chaque boucle de looping :
+
+libérer toute la cmd_list (chaque t_cmd, son argv (chaque argv[i] + le tableau), redirections (paths), et tous les buffers d’expansion).
+
+libérer les buffers retournés par custom_split (si tu en gardes un tableau).
+
+si tu construis une envp dans le parent pour autre chose, free-la aussi (normalement envp est pour le child uniquement).
+
+Checklist minimaliste d’un destructeur “post-exec” :
+// free_cmd.c
+static void free_argv(char **argv) {
+    if (!argv) return;
+    for (int i = 0; argv[i]; ++i) free(argv[i]);
+    free(argv);
+}
+
+void free_cmd(t_cmd *c) {
+    if (!c) return;
+    free_argv(c->argv);
+    // free redirections: paths, heredoc buffers si existants
+    // free structures parsing/expansion associées
+    free(c);
+}
+
+void clear_cmd_list(t_list **head) {
+    t_list *it = *head, *nx;
+    while (it) {
+        nx = it->next;
+        free_cmd((t_cmd*)it->content);
+        free(it);
+        it = nx;
+    }
+    *head = NULL;
+}
+et dans loop
+// looping.c
+// ... après exécution / wait des enfants :
+clear_cmd_list(&shell->cmd_head);
+Ces petites “still reachable” disparaîtront quand tout sera libéré entre deux lectures d’input. (Les grosses “still reachable” readlines sont déjà suppressed dans tes logs, c’est ok.)
+4) “still reachable” d’init statique (tables d’opérateurs/builtins/env init)
+
+Symptôme : blocs “still reachable” venant de build_t_arr_dic_str, init_all_t_arr, parse_entry/init_env (dup de clés/valeurs). Ce n’est pas dramatique, mais si tu veux un Valgrind 100% propre à l’exit, ajoute un destructor global sur exit :
+
+free des arrays t_arr (free chaque key, value dupés + arr).
+
+free de la liste env (chaque node->key, node->value, le node et le maillon t_list).
+
+Les origines exactes sont listées ici : build_t_arr_dic_str, parse_entry/new_env_node_take, etc
+Résumé express des points clés (priorité ↓)
+
+(Bloquant crash) Sécure replace_or_add_env + make_kv_cstr, et duplique toujours key/value (heap). Libère envp si execve échoue.
+(Leaks sûrs) Uniformise subtoken_of_cmd pour que tous les parts[i].p soient heap-dup, puis free_subtoken_container partout où pertinent.
+(Nettoyage boucle) clear_cmd_list + free de tout ce qui est créé pour une ligne (argv, redirs, expansions, tableaux de split).
+(Finition) Destructor global pour t_arr (opérateurs/builtins) + env.
+test
+Vérifie sans exec : echo/export/env pour tester la construction d’envp sans lancer de binaire externe.
+
+Ensuite : valgrind --leak-check=full --track-origins=yes ./minishell
+
+Teste une commande externe simple (/usr/bin/true, ls)
+
+Teste un execve volontairement en échec (chemin invalide) pour valider le free_envp.
+
+Tes rapports montrent déjà les chemins d’alloc et où intervenir précisément, d’où les patchs ci-dessus. Si tu veux, envoie-moi les signatures de tes structures t_env, t_dic, t_subtoken_conainter et l’implémentation actuelle de replace_or_add_env/list_to_envp/subtoken_of_cmd — je te renvoie les patchs diff pile-poil adaptés à tes fichiers.

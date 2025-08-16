@@ -1,16 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exit_util.c                                        :+:      :+:    :+:   */
+/*   replace_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/13 18:28:54 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 19:42:53 by nkiefer          ###   ########.fr       */
+/*   Created: 2025/08/13 17:28:49 by nkiefer           #+#    #+#             */
+/*   Updated: 2025/08/16 12:39:45 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "exit.h"
+#include "go_away.h"
+
+void	ctx_init(t_stx *c)
+{
+	c->in_sq = false;
+	c->in_dq = false;
+	c->i = 0;
+	c->j = 0;
+}
 
 int	try_quote(const char *s, t_stx *c, char *out)
 {
@@ -45,4 +53,30 @@ int	try_exit(const char *s, t_stx *c, char *out, t_rep *r)
 		c->j++;
 	c->i += 2;
 	return (1);
+}
+
+char	*fill_with_replacement(const char *input, const char *code_str,
+		size_t out_len)
+{
+	t_stx	c;
+	t_rep	r;
+	char	*res;
+	bool	handled;
+
+	ctx_init(&c);
+	r.code = code_str;
+	r.clen = ft_strlen(code_str);
+	res = (char *)malloc(out_len + 1);
+	if (!res)
+		return (NULL);
+	while (input[c.i])
+	{
+		handled = try_quote(input, &c, res);
+		if (!handled)
+			handled = try_exit(input, &c, res, &r);
+		if (!handled)
+			res[c.j++] = input[c.i++];
+	}
+	res[c.j] = '\0';
+	return (res);
 }

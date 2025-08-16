@@ -6,20 +6,17 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:26:26 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 18:13:14 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/16 13:56:40 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "exit.h"
+#include "../../include/minishell.h"
 
-size_t	compute_out_len(size_t input_len, size_t count, size_t code_len)
+void	exit_shell(t_shell *shell, int exit_code)
 {
-	size_t	pattern_len;
-
-	pattern_len = 2;
-	if (count == 0)
-		return (input_len);
-	return (input_len + count * (code_len - pattern_len));
+	free_minishell(shell);
+	rl_clear_history();
+	exit(exit_code);
 }
 
 int	is_numeric(const char *str)
@@ -64,28 +61,4 @@ int	builtin_exit(t_shell *shell, char **argv)
 	}
 	exit_shell(shell, 0);
 	return (0);
-}
-
-char	*replace_exit_code(const char *input, int code)
-{
-	char	*code_str;
-	size_t	code_len;
-	size_t	count;
-	size_t	out_len;
-	char	*res;
-
-	code_len = 0;
-	count = 0;
-	out_len = 0;
-	if (!input)
-		return (NULL);
-	code_str = ft_itoa(code);
-	if (!code_str)
-		return (NULL);
-	code_len = ft_strlen(code_str);
-	count = count_exit_patterns(input);
-	out_len = compute_out_len(ft_strlen(input), count, code_len);
-	res = fill_with_replacement(input, code_str, out_len);
-	free(code_str);
-	return (res);
 }

@@ -6,17 +6,24 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 23:21:07 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/16 12:54:21 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-void	exit_shell(t_shell *shell, int exit_code)
+void	cleanup_shell_iter(t_shell *sh)
 {
-	free_minishell(shell);
-	rl_clear_history();
-	exit(exit_code);
+	if (sh->parsed_args)
+	{
+		free_str_array((char **)sh->parsed_args->arr);
+		free(sh->parsed_args);
+		sh->parsed_args = NULL;
+	}
+	free_cmd_list(sh);
+	free_tokens(sh);
+	free(sh->pids);
+	sh->pids = NULL;
 }
 
 char	*ft_strjoin3(char *a, const char *b, const char *c, int free_a)

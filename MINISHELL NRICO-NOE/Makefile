@@ -5,10 +5,10 @@
 PROJECT_DIR  := .
 SRC_DIR      := $(PROJECT_DIR)/SRC
 INC_DIR      := $(PROJECT_DIR)/include
-SUBDIRS      := main built env exec parser signal redir pipe \
-                handle_utils pwd \
-                handle_utils/handler \
-                built/echo built/export built/exit built/cd 
+SUBDIRS      := main built env exec parser redir pipe init \
+                handle_utils pwd expand init/t_arr parser/env_p \
+                handle_utils/handler parser/expand_p fck_split parser/token \
+                built/echo built/export built/cd parser/launch parser/lexer
 LIBFT_INC    := $(INC_DIR)/LIBFT
 LIBFT_DIR    := $(INC_DIR)/LIBFT
 LIBFT_A      := $(LIBFT_DIR)/libft.a

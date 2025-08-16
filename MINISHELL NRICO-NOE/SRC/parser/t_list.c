@@ -6,12 +6,11 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:01:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 16:25:12 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/16 14:24:14 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
 
 t_list	*ft_lstnew(void *content)
 {
@@ -44,20 +43,19 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 
 void	push_lst(t_list **tail, void *content)
 {
-	t_list *new;
+	t_list	*new;
 
 	if (!*tail)
 		return ;
 	new = malloc(sizeof(t_list));
 	if (!new)
 		perror("MALLOC push_list");
-	
 	(*tail)->next = new;
-	(*tail) = (*tail)->next; 
+	(*tail) = (*tail)->next;
 	new->content = content;
 	new->next = NULL;
 }
-
+/**
 t_list	*set_linked_path(char **env)
 {
 	t_list	*head;
@@ -77,61 +75,60 @@ t_list	*set_linked_path(char **env)
 	return (head);
 }
 
-void ft_lstadd_front(t_list **lst, void *content)
+void	ft_lstadd_front(t_list **lst, void *content)
 {
-    t_list *new_node;
+	t_list	*new_node;
 
-    if (!lst || !content)
-        return;
-    new_node = malloc(sizeof(t_list));
-    if (!new_node)
-        return; 
-    new_node->content = ft_strdup((char *)content);
-    if (!new_node->content)
-    {
-        free(new_node);
-        return;
-    }
-    new_node->next = *lst;
-    *lst = new_node;
+	if (!lst || !content)
+		return ;
+	new_node = malloc(sizeof(t_list));
+	if (!new_node)
+		return ;
+	new_node->content = ft_strdup((char *)content);
+	if (!new_node->content)
+	{
+		free(new_node);
+		return ;
+	}
+	new_node->next = *lst;
+	*lst = new_node;
 }
 
-t_list *search_lst(t_list *lst, const char *target)
+t_list	*search_lst(t_list *lst, const char *target)
 {
-    size_t target_len;
+	size_t	target_len;
+	char	*s;
 
-    if (!lst || !target)
-        return NULL;
-
-    target_len = strlen(target);
-
-    while (lst)
-    {
-        char *s  = (char *)lst->content;
-        (void)s;
-        if (lst->content && strncmp((char *)lst->content, target, target_len) == 0)
-            return lst;
-        lst = lst->next;
-    }
-
-    return NULL;
+	if (!lst || !target)
+		return (NULL);
+	target_len = ft_strlen(target);
+	while (lst)
+	{
+		s = (char *)lst->content;
+		(void)s;
+		if (lst->content && ft_strncmp((char *)lst->content, target,
+				target_len) == 0)
+			return (lst);
+		lst = lst->next;
+	}
+	return (NULL);
 }
 
 
-void replace_or_add(t_list **lst, const char *old, const char *new)
+void	replace_or_add(t_list **lst, const char *old, const char *new)
 {
-    t_list *node;
+	t_list *node;
 
-    if (!*lst || !old || !new)
-        return;
-    node = search_lst(*lst, old);
-    if (node)
-    {
-        free(node->content);
-        node->content = strdup(new);
-        if (!node->content)
-            node->content = NULL;
-        return;
-    }
-    ft_lstadd_front(lst, (void *)new);
-}
+	if (!*lst || !old || !new)
+		return ;
+	node = search_lst(*lst, old);
+	if (node)
+	{
+		free(node->content);
+		node->content = ft_strdup(new);
+		if (!node->content)
+			node->content = NULL;
+		return ;
+	}
+	ft_lstadd_front(lst, (void *)new);
+}*/
