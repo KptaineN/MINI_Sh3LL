@@ -1,32 +1,19 @@
-#include "../../../include/minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   asign_redir_lex.c                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nkiefer <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/18 01:22:52 by nkiefer           #+#    #+#             */
+/*   Updated: 2025/08/18 01:22:58 by nkiefer          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-/* helper: test si c'est un opérateur de redirection (pas | ni sépa) */
-static int	is_redir_op(int op_idx)
-{
-	return (op_idx < 2 || op_idx > 4);
-}
-
-/* helper: récupérer la chaîne opérateur depuis le dictionnaire */
-static char	*op_key(t_shell *sh, int op_idx)
-{
-	t_dic	*d;
-
-	d = (t_dic *)sh->oper->arr[op_idx];
-	return (d->key);
-}
-
-/* message d'erreur + statut quand nom manquant */
-static int	report_missing_fname(t_shell *sh)
-{
-	ft_putstr_fd("minishell: missing file name for redirection\n",
-		STDERR_FILENO);
-	sh->exit_status = 1;
-	sh->n_tokens = 0;
-	return (0);
-}
+#include "lexer.h"
 
 /* extrait le nom de fichier et avance i ; NULL si manquant */
-static char	*extract_fname(t_shell *sh, char **arr, int *i, int op_idx)
+char	*extract_fname(t_shell *sh, char **arr, int *i, int op_idx)
 {
 	char	*op;
 	int		len;
@@ -72,21 +59,6 @@ static int	validate_open(int op_idx, char *fname, t_shell *sh)
 	return (1);
 }
 
-/* pousse la redirection dans le token courant (si présent) */
-static void	push_redir_if_current(t_token *cur, int op_idx, char *fname)
-{
-	if (!cur)
-		return ;
-	if (op_idx == 5)
-		add_redir(cur, R_IN, fname);
-	else if (op_idx == 6)
-		add_redir(cur, R_OUT_TRUNC, fname);
-	else if (op_idx == 1)
-		add_redir(cur, R_OUT_APPEND, fname);
-	else if (op_idx == 0)
-		add_redir(cur, R_HEREDOC, fname);
-}
-
 /* affecte le token courant si nécessaire */
 static void	maybe_pick_current(t_shell *sh, t_token **cur, int *cmd_idx)
 {
@@ -94,8 +66,7 @@ static void	maybe_pick_current(t_shell *sh, t_token **cur, int *cmd_idx)
 		*cur = &sh->tokens[(*cmd_idx)++];
 }
 
-static int	assign_redirs_iter(t_shell *sh, t_token **current,
-					int *cmd_idx, int *i)
+int	assign_redirs_iter(t_shell *sh, t_token **current, int *cmd_idx, int *i)
 {
 	char	**arr;
 	int		op_idx;
@@ -141,4 +112,3 @@ void	assign_redirs(t_shell *sh)
 			return ;
 	}
 }
-

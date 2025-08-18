@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/16 14:39:11 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/18 01:47:00 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,12 @@ int	ft_exit(t_shell *shell, char **argv)
 	return (builtin_exit(shell, argv));
 }
 
-int (*get_builtin_handler(t_arr *bcmd, int idx))(t_shell *, char **)
+int	(*get_builtin_handler(t_arr *bcmd, int idx))(t_shell *shell, char **argv)
 {
-    if (!bcmd || idx < 0 || idx >= bcmd->len)
-        return NULL;
-    t_dic *dic = (t_dic *)bcmd->arr[idx];
-    return dic->value;
+	t_dic	*dic;
+
+	if (!bcmd || idx < 0 || idx >= bcmd->len)
+		return (NULL);
+	dic = (t_dic *)bcmd->arr[idx];
+	return (dic->value);
 }

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 16:51:08 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/18 02:28:19 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,6 +280,8 @@ char	*get_path_env(t_list *env);
 int count_exp_len(t_subtoken *b, int *k);
 int	sum_parts_len(t_subtoken_container *a);
 void add_redir(t_token *tok, t_rtype type, const char *arg);
+void	push_redir_if_current(t_token *cur, int op_idx, char *fname);
+void	add_cmd(t_shell *shell, t_token *token);
 
 
 /* ================== ENVIRONNEMENT ================== */
@@ -344,7 +346,7 @@ t_delim parse_delim(const char *raw);
 char    *expand_vars_in_line(const char *line, t_shell *sh);
 int     build_heredoc_fd(t_delim d, t_shell *sh);
 int     apply_redirs_in_child(t_cmd *c, t_shell *sh);
-void    child_exec_maillon(t_cmd *c, t_shell *sh, int i, int ncmd, int p[][2]);
+//void    child_exec_maillon(t_cmd *c, t_shell *sh, int i, int ncmd, int p[][2]);
 
 char *expand_input(char *input, t_shell *sh);
 

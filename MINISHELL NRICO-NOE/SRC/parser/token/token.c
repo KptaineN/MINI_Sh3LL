@@ -6,102 +6,112 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 17:04:27 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 17:05:40 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/18 01:20:47 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../include/minishell.h"
+#include "token.h"
 
-
-/* =============================
- * Compte le nombre de commandes
- * ============================= */
-int count_tokens(t_shell *shell, t_arr *parsed_args, t_arr *oper)
+/* opérateur → avance l'index comme dans la version d'origine */
+int	count_tokens(t_shell *sh, t_arr *parsed_args, t_arr *oper)
 {
-    int count;
-    int i;
-    int idx_oper;
-    int n_args;
+	char	**args;
+	int		count;
+	int		i;
+	int		op_idx;
 
-    if (!parsed_args || !parsed_args->arr)
-        return 0;
-    count = 0;
-    i = 0;
-    while (i < parsed_args->len)
-    {
-        idx_oper = is_in_t_arr_dic_str(oper, parsed_args->arr[i]);
-        if (idx_oper != -1)
-        {
-            count++;
-            if (idx_oper < 2 || idx_oper > 4)
-            {
-                int consumed = file_access_redirection(shell, parsed_args->arr, idx_oper, i);
-                i += consumed;
-                continue;
-            }
-            else
-                i++;
-        }
-        else
-        {
-            count++;
-            n_args = count_args_cmd(shell, i);
-            i += n_args;
-        }
-    }
-    return count;
+	if (!parsed_args || !parsed_args->arr)
+		return (0);
+	args = (char **)parsed_args->arr;
+	count = 0;
+	i = 0;
+	while (i < parsed_args->len)
+	{
+		op_idx = is_in_t_arr_dic_str(oper, args[i]);
+		if (op_idx != -1)
+		{
+			count++;
+			i = advance_after_operator(sh, parsed_args, i, op_idx);
+		}
+		else
+		{
+			count++;
+			i = advance_after_command(sh, i);
+		}
+	}
+	return (count);
 }
 
-/* =============================
- * Attribution du type de token
- * ============================= */
-void attribute_token_type(t_shell *shell)
+/* -- helpers -- */
+
+int	setup_tokens_or_return(t_shell *sh)
 {
-    int i = 0, idx_token = 0;
-    void **arr = shell->parsed_args->arr;
+	void	**arr;
 
-    if (!arr || shell->parsed_args->len <= 0)
-    {
-        shell->n_tokens = 0;
-        return;
-    }
-
-    shell->n_tokens = count_tokens(shell, shell->parsed_args, shell->oper);
-    shell->tokens = (t_token *)calloc(shell->n_tokens, sizeof(t_token));
-    if (!shell->tokens)
-    {
-        perror("Erreur allocation tokens");
-        exit(EXIT_FAILURE);
-    }
-
-    while (i < shell->parsed_args->len && idx_token < shell->n_tokens)
-    {
-        t_token *token = &shell->tokens[idx_token];
-        //token->value = arr[i]; // If arr[i] is reused elsewhere, consider duplicating with strdup(arr[i])
-        token->value = ft_strdup(arr[i]);
-        if (!token->value)
-        {
-            perror("Erreur allocation token value");
-            exit(EXIT_FAILURE);
-        }
-        if (is_in_t_arr_dic_str(shell->oper, arr[i]) != -1)
-        {
-            token->type = TOKEN_OPER;
-            i++;
-        }
-        else
-        {
-            token->type = (is_in_t_arr_str(shell->bcmd, arr[i]) != -1) ? TOKEN_BCMD : TOKEN_CMD;
-
-            int nb_args = count_args_cmd(shell, i);
-            //printf("[DEBUG] attribute_token_type: token '%s' has %d args\n", token->value, nb_args);
-            if (nb_args <= 0) nb_args = 1;
-
-            int new_i = attribute_cmd_subtokens(shell, token, i, nb_args);
-            //printf("[DEBUG] attribute_token_type: new_i = %d, i = %d\n", new_i, i);
-            i = (new_i > i) ? new_i : i + 1;
-        }
-        idx_token++;
-    }
+	if (!sh || !sh->parsed_args || !sh->parsed_args->arr)
+	{
+		if (sh)
+			sh->n_tokens = 0;
+		return (0);
+	}
+	arr = sh->parsed_args->arr;
+	if (sh->parsed_args->len <= 0)
+	{
+		sh->n_tokens = 0;
+		return (0);
+	}
+	sh->n_tokens = count_tokens(sh, sh->parsed_args, sh->oper);
+	sh->tokens = (t_token *)calloc(sh->n_tokens, sizeof(t_token));
+	if (!sh->tokens)
+	{
+		perror("Erreur allocation tokens");
+		exit(EXIT_FAILURE);
+	}
+	return (1);
 }
 
+int	process_cmd_or_bcmd(t_shell *sh, t_token *tok, int i)
+{
+	char	**args;
+	int		nb_args;
+	int		new_i;
+
+	args = (char **)sh->parsed_args->arr;
+	if (is_in_t_arr_str(sh->bcmd, args[i]) != -1)
+		tok->type = TOKEN_BCMD;
+	else
+		tok->type = TOKEN_CMD;
+	nb_args = count_args_cmd(sh, i);
+	if (!(nb_args > 0))
+		nb_args = 1;
+	new_i = attribute_cmd_subtokens(sh, tok, i, nb_args);
+	if (new_i > i)
+		return (new_i);
+	else
+		return (i + 1);
+}
+
+/* -- fonction principale -- */
+void	attribute_token_type(t_shell *sh)
+{
+	char	**args;
+	int		i;
+	int		idx_token;
+	t_token	*tok;
+
+	if (!setup_tokens_or_return(sh))
+		return ;
+	args = (char **)sh->parsed_args->arr;
+	i = 0;
+	idx_token = 0;
+	while (i < sh->parsed_args->len && idx_token < sh->n_tokens)
+	{
+		tok = &sh->tokens[idx_token];
+		token_set_value_or_die(tok, args, i);
+		if (is_operator_here(sh, args, i))
+			i = process_operator_token(tok, i);
+		else
+			i = process_cmd_or_bcmd(sh, tok, i);
+		idx_token++;
+	}
+}
