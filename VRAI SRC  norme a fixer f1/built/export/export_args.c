@@ -77,15 +77,15 @@ int	export_no_arguments(t_shell *shell)
 {
 	char	**arr;
 
-        arr = env_to_array(shell);
-        if (!arr)
-        {
-                shell->exit_status = 1;
-                return (1);
-        }
-       ft_bubble_str_sort(arr);
-       print_export_arr(arr);
-       free_str_array(arr);
-       shell->exit_status = 0;
-       return (0);
+	arr = env_to_array(shell);
+	if (!arr)
+	{
+		shell->exit_status = 1;
+		return (1);
+	}
+	ft_bubble_str_sort(arr);
+	print_export_arr(arr);
+	free_str_array(arr);
+	shell->exit_status = 0;
+	return (0);
 }
