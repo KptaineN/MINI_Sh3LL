@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   util-2-free.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:45 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 23:01:55 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/20 12:03:30 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
+#include "../env/env.h"
 
 void	free_t_arr_dic(t_arr *array)
 {
@@ -85,7 +86,7 @@ void	free_parser(t_shell *parser)
 		free_t_arr_dic(parser->oper);
 	parser->oper = NULL;
 	if (parser->env)
-		free_list_str(parser->env);
+		free_env_list(parser->env);
 	parser->env = NULL;
 }
 

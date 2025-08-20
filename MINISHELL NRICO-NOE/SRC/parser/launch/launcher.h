@@ -13,7 +13,7 @@
 #ifndef LAUNCHER_H
 # define LAUNCHER_H
 
-# include "../../../include/minishell.h"
+# include "minishell.h"
 
 typedef struct s_exec_ctx
 {
@@ -32,7 +32,6 @@ void		parent_after_fork(t_exec_ctx *c, pid_t pid);
 void		wait_all_update_status(t_shell *sh);
 void		update_last_pid_env(t_shell *sh);
 void		launch_process(t_shell *sh);
-void		update_last_pid_env(t_shell *sh);
 ssize_t		read_pid_exact(int fd, pid_t *out);
 void		set_env_pid(t_shell *shell, pid_t pid);
 void		add_pid_env(t_shell *shell, int fd);
@@ -40,8 +39,6 @@ t_list		*find_env_entry(t_list *env, const char *key);
 char		*build_kv_string(const char *key, const char *value);
 void		replace_or_add_env(t_list **env, const char *key,
 				const char *value);
-
-/* util déjà fournie plus haut */
 char		*ft_itoa_inplace(char *s, int n);
 
-#endif // !LAUNCHER_H
+#endif // LAUNCHER_H

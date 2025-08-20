@@ -80,22 +80,12 @@ int	export_no_arguments(t_shell *shell)
 	arr = env_to_array(shell);
 	if (!arr)
 	{
-		printf("env_to_array → NULL\n");
-		shell->exit_status = 1;
-		return (1);
-	}
-	else
-	{
-		printf("env_to_array → OK\n");
-	}
-	if (!arr)
-	{
 		shell->exit_status = 1;
 		return (1);
 	}
 	ft_bubble_str_sort(arr);
 	print_export_arr(arr);
-	free_export_arr(arr);
+	free_str_array(arr);
 	shell->exit_status = 0;
 	return (0);
 }

@@ -13,7 +13,7 @@
 #ifndef LEXER_H
 # define LEXER_H
 
-# include "../../../include/minishell.h"
+# include "minishell.h"
 
 void	assign_redirs(t_shell *sh);
 char	*op_key(t_shell *sh, int op_idx);
@@ -25,6 +25,5 @@ char	*extract_fname(t_shell *sh, char **arr, int *i, int op_idx);
 void	push_redir_if_current(t_token *cur, int op_idx, char *fname);
 bool	escape_check(const char *str, int idx);
 int		find_c_nonescaped(const char *str, char *needle, int size_needle);
-char	*extract_fname(t_shell *sh, char **arr, int *i, int op_idx);
 
-#endif // !LEXER_H
+#endif // LEXER_H

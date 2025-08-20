@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_lexer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 01:25:24 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/18 01:40:39 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/20 11:42:34 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
  * produced during parsing. Only command or builtin tokens are kept
  * and the resulting list is stored in shell->cmd_head.
  */
+
 void	build_cmd_list(t_shell *shell)
 {
 	t_token	*prev;
@@ -35,12 +36,8 @@ void	build_cmd_list(t_shell *shell)
 		tok = &shell->tokens[i];
 		if (tok->type == TOKEN_CMD || tok->type == TOKEN_BCMD)
 		{
-			if (prev)
-				prev->next = tok;
-			tok->next = NULL;
-			add_cmd(shell, tok);
-			prev = tok;
-			shell->n_cmd++;
+			if (!process_cmd_token(shell, tok, &prev))
+				return ;
 		}
 		i++;
 	}

@@ -13,7 +13,7 @@
 #ifndef ECHO_H
 # define ECHO_H
 
-# include "../../../include/minishell.h"
+# include "minishell.h"
 
 int		builtin_echo(t_shell *shell, char **argv);
 char	*get_dollar_value(const char *arg, int *pos, t_shell *sh);
@@ -27,4 +27,4 @@ char	*find_env_value(t_list *env, const char *key);
 int		write_and_free(char *dst, char *s, int *i, int new_i);
 void	toggle_quotes(char c, bool *in_sq, bool *in_dq);
 
-#endif
+#endif // ECHO_H

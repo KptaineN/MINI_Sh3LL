@@ -12,7 +12,7 @@
 
 #include "export.h"
 
-size_t	env_count(t_shell *shell)
+static size_t	env_count(t_shell *shell)
 {
 	size_t	count;
 	t_list	*current;
@@ -27,7 +27,7 @@ size_t	env_count(t_shell *shell)
 	return (count);
 }
 
-char	*create_env_entry(t_env *env)
+static char	*create_env_entry(t_env *env)
 {
 	size_t	klen;
 	size_t	vlen;
@@ -69,7 +69,7 @@ char	**env_to_array(t_shell *shell)
 		env = (t_env *)node->content;
 		arr[i] = create_env_entry(env);
 		if (!arr[i])
-			return (free_export_arr(arr), NULL);
+			return (free_str_array(arr), NULL);
 		i++;
 		node = node->next;
 	}
@@ -96,17 +96,4 @@ void	print_export_arr(char **arr)
 		}
 		i++;
 	}
-}
-
-void	free_export_arr(char **arr)
-{
-	size_t	i;
-
-	i = 0;
-	while (arr[i])
-	{
-		free(arr[i]);
-		i++;
-	}
-	free(arr);
 }

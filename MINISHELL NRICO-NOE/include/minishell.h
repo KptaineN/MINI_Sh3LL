@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/18 02:28:19 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/20 11:59:32 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -281,8 +281,8 @@ int count_exp_len(t_subtoken *b, int *k);
 int	sum_parts_len(t_subtoken_container *a);
 void add_redir(t_token *tok, t_rtype type, const char *arg);
 void	push_redir_if_current(t_token *cur, int op_idx, char *fname);
-void	add_cmd(t_shell *shell, t_token *token);
-
+bool	add_cmd(t_shell *shell, t_token *token);
+int	process_cmd_token(t_shell *shell, t_token *tok, t_token **prev);
 
 /* ================== ENVIRONNEMENT ================== */
 //char	*get_value_env(t_list *env, const char *key);

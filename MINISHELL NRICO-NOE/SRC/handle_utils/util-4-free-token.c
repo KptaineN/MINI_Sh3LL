@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 static void	free_subtoken_parts(t_subtoken_container *cont)
 {
@@ -21,6 +21,8 @@ static void	free_subtoken_parts(t_subtoken_container *cont)
 	k = 0;
 	while (k < cont->n_parts)
 	{
+		if (cont->parts[k].p)
+			free(cont->parts[k].p);
 		cont->parts[k].p = NULL;
 		k++;
 	}

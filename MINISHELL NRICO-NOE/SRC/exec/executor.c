@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:41 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/16 16:36:21 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/20 12:10:00 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 int	run_builtin_if_any(t_shell *shell, char **args)
 {
@@ -22,33 +22,23 @@ int	run_builtin_if_any(t_shell *shell, char **args)
 		return (0);
 	handler = get_builtin_handler(shell->bcmd, idx);
 	if (!handler)
+	{
+		free_str_array(args);
 		exit_child_process(shell, 1);
+	}
 	shell->exit_status = handler(shell, args);
+	free_str_array(args);
 	exit(shell->exit_status);
 	return (1);
 }
 
-void	print_cmd_not_found(const char *s)
+static void	cmd_not_found(t_shell *shell, t_token *cmd, char **args)
 {
-	size_t	len;
-
-	len = ft_strlen(s);
-	write(2, s, len);
+	if (args)
+		free_str_array(args);
+	write(2, cmd->value, ft_strlen(cmd->value));
 	write(2, ": command not found\n", 21);
-}
-
-/* impl */
-char	*resolve_cmd_path_or_die(t_shell *shell, char *name)
-{
-	char	*path;
-
-	path = find_command_path(name, shell->env);
-	if (!path)
-	{
-		print_cmd_not_found(name);
-		exit_child_process(shell, 127);
-	}
-	return (path);
+	exit_child_process(shell, 127);
 }
 
 void	prepare_or_run_builtin(t_shell *shell, t_token *cmd, char ***out_args)
@@ -60,18 +50,18 @@ void	prepare_or_run_builtin(t_shell *shell, t_token *cmd, char ***out_args)
 		exit_child_process(shell, 1);
 	args = expand_cmd(cmd, shell->env);
 	if (!args || !args[0])
-	{
-		write(2, cmd->value, ft_strlen(cmd->value));
-		write(2, ": command not found\n", 21);
-		exit_child_process(shell, 127);
-	}
+		cmd_not_found(shell, cmd, args);
 	if (is_in_t_arr_str(shell->bcmd, args[0]) != -1)
 	{
 		handler = get_builtin_handler(shell->bcmd, is_in_t_arr_str(shell->bcmd,
 					args[0]));
 		if (!handler)
+		{
+			free_str_array(args);
 			exit_child_process(shell, 1);
+		}
 		shell->exit_status = handler(shell, args);
+		free_str_array(args);
 		exit(shell->exit_status);
 	}
 	*out_args = args;
@@ -86,18 +76,22 @@ void	execute_cmd(t_shell *shell, t_token *cmd)
 	prepare_or_run_builtin(shell, cmd, &args);
 	cmd_path = find_command_path(args[0], shell->env);
 	if (!cmd_path)
-	{
-		write(2, args[0], ft_strlen(args[0]));
-		write(2, ": command not found\n", 21);
-		exit_child_process(shell, 127);
-	}
+		return (cmd_not_found(shell, cmd, args));
+	shell->exec_cmd_path_tmp = cmd_path;
 	envp = list_to_envp(shell->env);
 	if (!envp)
 	{
 		perror("envp");
+		free_str_array(args);
 		exit_child_process(shell, 1);
 	}
+	shell->exec_envp_tmp = envp;
 	execve(cmd_path, args, envp);
 	perror("execve");
+	free_str_array(args);
+	free(cmd_path);
+	free_str_array(envp);
+	shell->exec_cmd_path_tmp = NULL;
+	shell->exec_envp_tmp = NULL;
 	exit_child_process(shell, 127);
 }

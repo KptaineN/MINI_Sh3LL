@@ -13,7 +13,7 @@
 #ifndef TOKEN_H
 # define TOKEN_H
 
-# include "../../../include/minishell.h"
+# include "minishell.h"
 
 typedef struct s_qstate
 {
@@ -42,7 +42,6 @@ int				count_subtokens(const char *str);
 void			subtoken_of_cmd(t_subtoken_container *container, char *arg);
 int				attribute_cmd_subtokens(t_shell *shell, t_token *cmd_token,
 					int idx, int len);
-void			subtoken_of_cmd(t_subtoken_container *container, char *arg);
 void			token_set_value_or_die(t_token *tok, char **args, int i);
 int				is_operator_here(t_shell *sh, char **args, int i);
 int				process_operator_token(t_token *tok, int i);

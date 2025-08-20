@@ -10,17 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 void	free_str_array(char **arr)
 {
 	int	i;
 
 	if (!arr)
-	{
-		printf("[DEBUG] free_str_array: arr == NULL\n");
 		return ;
-	}
 	i = 0;
 	while (arr[i])
 	{
