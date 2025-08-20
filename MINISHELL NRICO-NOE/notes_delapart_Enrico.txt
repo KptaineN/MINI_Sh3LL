@@ -1,0 +1,61 @@
+Je commence par dire que je suis content.
+Content de voir de l'ordre, ce qui manque le plus souvant dans mes projets.
+Il faut que je passe sur quelque trucs mais la plus part c'est bon, on y est presque
+
+Il manque: (et apres on aura fini avec ce projet)
+-   tester les proces (travail de debugeur, tu peux debeuger plusieurs proecess au meme temps :)
+-   surement les free (je fais sur mes parties sinon tu auras envie de peter ton ordi)
+-   les signaux: les Ctrl+D,C et autre et execution de chaque process (A,B) doit se faire meme si A rate, B se fait
+
+exemple signaux: 
+➜  ~ cat nonexisting.txt | grep "girl" < another.txt // grep cherche les lignes ou "girl" est present dans nonexisting.txt et another.txt
+cat: nonexisting.txt: No such file or directory
+2 babygirl
+  
+
+
+J'ai toujours pas la Libft
+
+fait ca comme ca je peux lancer le program:
+1. partage moi le repo de ta libft sur github
+2. git submodule add <repo-B-libft-url> MINISHELL\ NRICO-NOE/include/LIBFT
+3. cree .gitmodule dans le repo minishell et ecrit dedans
+
+    [submodule "MINISHELL NRICO-NOE/include/LIBFT"]
+    path = MINISHELL NRICO-NOE/include/LIBFT
+    url = link github libft
+4 commit et push
+
+fichier: main_loop.c
+{
+    
+    j'ai arrêté de regarder parce que les
+    problemes que j'ai vu sont la parce que
+    (poto je t'aime, et c'est pour ca que je te le dis)
+    si tu te renseigne pas sur:
+    -les expands selon les env,
+    -les redirections, 
+    -le launch
+    exemple 1: cat < exemple.txt | grep "phrase dans file" < exemple.txt 
+    exemple 2: cat < example.txt << EOF > new.txt < new.txt | cat
+
+    **Je pense on doit vraiment se mettre ensemble parce que
+    c'est pas ta faute que tu sais pas ces details vu que 
+    c'est la partie la plus dure et tout le monde
+    recode le plus. Il faut que on communique plus et que 
+    tu me demandes plus. Si tu veux me faire un 
+    coup de fil de 20 minutes tous les jours ou me poser des 
+    questions regulierement et tu veut que je te repondes vite
+    ca me derange pas du tout au contraire je suis heureux
+    d'avoir plus de contact avec mon bg de partenaire
+
+    ...
+    fonction:   int	process_input(t_shell *sh, char *in)
+    probleme ligne 73: l'expand peut que etre fait lors de lexecution des commandes, changement de env
+    solution ligne 73: l'expand est deja fait dans la fonction "execution" dans Parsing_Enrico
+
+    fonction: parse_prepare
+    probleme: expansion, redirection*,  
+    *(ma faute, celle qui sont la viennent des versions ou je n'avais pas encore bien compris toutes les interdependances) 
+    ...
+}
