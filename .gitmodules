@@ -1,0 +1,3 @@
+[submodule "MINISHELL NRICO-NOE/include/LIBFT"]
+	path = MINISHELL NRICO-NOE/include/LIBFT
+	url = https://github.com/KptaineN/LIBFT-.git
