@@ -6,7 +6,7 @@
 /*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/20 11:59:32 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/24 16:33:02 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,7 +256,9 @@ void	build_t_arr_dic_str(t_arr **dst, char **keys, int (**values)(t_shell *,
 			char **), int len);
 void	free_t_arr_dic(t_arr *array);
 char *join_path(char *dir, char *cmd);
-
+void    ignore_signals(void);
+void    child_signals(void);
+void    restore_ssignals(void);
 void    free_t_arr(t_arr *arr);
 void    free_list(t_list *lst);
 void	build_t_arr_str(t_arr **dst, char **arr_str, int len);

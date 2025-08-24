@@ -3,26 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 02:24:04 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/18 02:24:06 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/24 16:33:24 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "redir.h"
-
-/* 1) Parent: ignorer SIGINT/SIGQUIT pendant la création du heredoc */
-static void	heredoc_parent_ignore_signals(void)
-{
-	struct sigaction	sa;
-
-	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
-}
 
 /* 2) Enfant: boucle lecture/écriture avec expansion si non quoté */
 static void	heredoc_child_loop(int wfd, t_delim d, t_shell *sh)
@@ -70,7 +58,7 @@ static int	heredoc_wait_and_finish(pid_t pid, int rfd)
 	int	status;
 
 	waitpid(pid, &status, 0);
-	init_signals();
+	restore_ssignals();
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
 		close(rfd);
@@ -85,11 +73,11 @@ int	build_heredoc_fd(t_delim d, t_shell *sh)
 	int		hd[2];
 	pid_t	pid;
 
-	heredoc_parent_ignore_signals();
+	ignore_signals();
 	if (pipe(hd) < 0)
 	{
 		perror("pipe");
-		init_signals();
+		restore_ssignals();
 		return (-1);
 	}
 	pid = fork();
@@ -98,7 +86,7 @@ int	build_heredoc_fd(t_delim d, t_shell *sh)
 		perror("fork");
 		close(hd[0]);
 		close(hd[1]);
-		init_signals();
+		restore_ssignals();
 		return (-1);
 	}
 	if (pid == 0)
