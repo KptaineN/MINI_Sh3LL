@@ -215,7 +215,121 @@ structure
               to  wait  for  id to terminate before returning its status, instead of returning when it changes status.  If id specifies a non-existent process or job,
               the return status is 127.  If wait is interrupted by a signal, the return status will be greater than 128, as described under SIGNALS in bash(1).   Oth‐
               erwise, the return status is the exit status of the last process or job waited for.
+    
 
+             Signal/Action,Effet pendant la saisie d'une commande,Effet pendant l'exécution d'une commande,Effet sur le shell lui-même
+             Ctrl+C (SIGINT),Annule la saisie, retourne au prompt,Interrompt la commande en cours,Ne ferme pas le shell
+             Ctrl+D (EOF),Envoie la commande pour exécution (comme Entrée),Indique la fin de l'entrée (EOF),Ferme le shell si le prompt est vide
+
+Entrée utilisateur (readline)
+
+readline(prompt) : lit une ligne avec édition (flèches, historique).
+Shell-like : affiche ᕕ( ᐛ )ᕗ minishell$ et récupère ce que l’utilisateur tape.
+Mini-ex : line = readline(prompt); if (line) add_history(line);
+
+add_history(s) : ajoute s à l’historique (↑ ↓).
+
+rl_clear_history() : vide l’historique (ex. builtin history -c).
+
+rl_on_new_line(), rl_replace_line(buf,0), rl_redisplay() : utilitaires pour “ré-afficher proprement la ligne” après un signal ou un printf asynchrone (ex : \n suite à Ctrl-C).
+
+Fichiers & I/O bas niveau
+
+access(path, mode) : teste l’accès (existence/X_OK, R_OK…).
+Shell-like : vérifier qu’un binaire dans $PATH est exécutable.
+
+open(path, flags, mode) : ouvre/crée un fichier → fd.
+Shell-like : redirections cmd > out (O_CREAT|O_TRUNC|O_WRONLY), >> (O_APPEND), < (O_RDONLY).
+
+read(fd, buf, n) / close(fd) : lire / fermer un descripteur.
+Shell-like : lire un heredoc, fermer les bouts de pipe inutiles.
+
+unlink(path) : supprime un fichier.
+Shell-like : nettoyer un fichier temporaire (rare si heredoc en pipe).
+
+Processus
+
+fork() : duplique le processus (parent/enfant).
+Shell-like : chaque commande externe s’exécute dans un enfant.
+
+execve(path, argv, envp) : remplace l’enfant par le programme.
+Shell-like : exécuter /bin/ls avec l’environnement courant.
+
+wait(&status) / waitpid(pid, &st, opts) : récupérer le code de fin.
+Shell-like : attendre la fin d’un job, propager $?.
+
+wait3/wait4 : variantes avec infos d’usage CPU/mémoire (optionnel).
+
+exit(code) : termine le processus courant.
+Shell-like : builtin exit, ou quitter l’enfant après execve échoué.
+
+Signaux
+
+signal(signum, handler) (basique) / sigaction(signum, &sa, …) (propre) : installer un gestionnaire (SIGINT, SIGQUIT…).
+Shell-like : dans le parent, SIGINT (Ctrl-C) doit casser la ligne et rendre la main sans tuer le shell ; dans l’enfant, souvent on rétablit le comportement par défaut.
+
+sigemptyset(&set), sigaddset(&set, SIGx) : manipuler des masques pour bloquer/débloquer des signaux.
+
+kill(pid, sig) : envoyer un signal (ex. tuer un job).
+
+Répertoire & chemins
+
+getcwd(buf, size) : chemin courant → pour $PWD et pwd.
+
+chdir(path) : changer de répertoire → builtin cd.
+
+stat/lstat(path, &st), fstat(fd, &st) : infos fichier (type, mode…).
+Shell-like : distinguer “Is a directory” vs “Permission denied” quand on tente d’exécuter un répertoire, suivre ou non les symlinks (lstat).
+
+Pipes & duplication de descripteurs
+
+pipe(int p[2]) : crée un tube p[0]=lecture, p[1]=écriture.
+Shell-like : A | B | C → créer N-1 pipes, chaîner STDOUT→STDIN.
+
+dup(oldfd) / dup2(oldfd, newfd) : dupliquer/rediriger un fd.
+Shell-like : dup2(out_fd, STDOUT_FILENO) pour > file,
+dup2(pipe_in, STDIN_FILENO) / dup2(pipe_out, STDOUT_FILENO) dans chaque maillon du pipeline.
+
+Répertoires (API type ls)
+
+opendir(path) → DIR*, readdir(dir) → struct dirent*, closedir(dir) : lister un répertoire.
+Shell-like : utile pour l’auto-complétion (optionnel), ou émuler certaines commandes si tu implémentes un builtin style ls (non requis par minishell).
+
+Erreurs & TTY
+
+strerror(errno) : chaîne de l’erreur courante.
+
+perror(prefix) : imprime prefix: strerror(errno) sur stderr.
+Shell-like : messages fidèles à bash (ex. minishell: cd: x: No such file or directory).
+
+isatty(fd) : teste si fd est un terminal.
+Shell-like : adapter prompts, gestion interactive vs non-interactive (scripts).
+
+ttyname(fd) : nom du tty, ttyslot() : index tty (rarement utile).
+
+ioctl(fd, req, …) : opérations spécifiques terminal (avancé).
+Shell-like : parfois pour query taille terminal, mais tu as déjà termcap/termios.
+
+Environnement & variables
+
+getenv("KEY") : lit une variable d’environnement.
+Shell-like : récupérer PATH, HOME, etc. (Pour minishell, on maintient souvent notre copie d’environnement en liste chaînée et on génère envp pour execve.)
+
+Contrôle du terminal (termios)
+
+tcgetattr(fd, &term) / tcsetattr(fd, …, &term) : lire/écrire les flags du terminal.
+Shell-like : gérer ECHOCTL (ne pas afficher ^C), désactiver/activer certains comportements pendant le heredoc.
+
+Capabilities du terminal (termcap / terminfo)
+
+tgetent(buf, term) : charge la base termcap pour $TERM.
+
+tgetflag(name), tgetnum(name), tgetstr(name, &area) : capabilities booléennes, numériques, chaînes (p.ex. “cl” clear, “cm” cursor move).
+
+tgoto(cap_cm, col, row) : construit une séquence de déplacement curseur.
+
+tputs(str, affcnt, putc_fn) : “écrit” une capability (avec fonction putc).
+Shell-like : si tu gères toi-même l’édition de ligne/affichage. Avec readline, c’est souvent inutile, mais utile pour mise en forme personnalisée, repositionnement du curseur, etc.
 
 
 

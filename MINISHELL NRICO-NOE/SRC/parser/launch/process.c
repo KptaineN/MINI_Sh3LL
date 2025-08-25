@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
+/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 16:28:22 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 16:29:07 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/24 17:15:55 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,20 @@ void	child_setup_fds(t_exec_ctx *c)
 {
 	if (c->prev_fd != -1)
 	{
-		dup2(c->prev_fd, STDIN_FILENO);
+		if (dup2(c->prev_fd, STDIN_FILENO) == -1)
+		{
+			perror("dup2");
+			exit(1);
+		}
 		close(c->prev_fd);
 	}
 	if (c->i < c->sh->n_cmd - 1)
 	{
-		dup2(c->pipe_fd[1], STDOUT_FILENO);
+		if (dup2(c->pipe_fd[1], STDOUT_FILENO) == -1)
+		{
+			perror("dup2");
+			exit(1);
+		}
 		close(c->pipe_fd[0]);
 		close(c->pipe_fd[1]);
 	}

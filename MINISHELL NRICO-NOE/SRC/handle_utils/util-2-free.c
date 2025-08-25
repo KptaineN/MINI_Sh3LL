@@ -6,7 +6,7 @@
 /*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:45 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/20 12:03:30 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/25 17:27:52 by nkief            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	free_minishell(t_shell *shell)
 {
 	if (!shell)
 		return ;
+	//tcsetattr(STDIN_FILENO, TCSANOW, &term);
 	free_parser(shell);
 	if (shell->args)
 		free_str_array(shell->args);
