@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 16:34:25 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 16:53:00 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/26 19:57:20 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,7 @@ char	*build_kv_string(const char *key, const char *value)
 	if (value)
 		v = ft_strlen(value);
 	else
-	{
 		v = 0;
-	}
 	s = (char *)malloc(k + 1 + v + 1);
 	if (!s)
 		return (NULL);

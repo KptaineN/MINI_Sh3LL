@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 16:28:22 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/24 17:15:55 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 20:13:40 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,16 +73,22 @@ void	wait_all_update_status(t_shell *sh)
 
 	i = 0;
 	status = 0;
-	while (i < sh->n_cmd)
-	{
-		waitpid(sh->pids[i], &status, 0);
-		if (i == sh->n_cmd - 1)
-		{
-			if (WIFEXITED(status))
-				sh->exit_status = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				sh->exit_status = 128 + WTERMSIG(status);
-		}
-		i++;
-	}
+	while (i < sh->n_cmd) //transofrmer waitpid en liste 
+        {
+            waitpid(sh->pids[i], &status, 0); //ajouter option WNOHANG si pb
+            if (i == sh->n_cmd - 1)
+            {
+                    if (WIFEXITED(status))
+                            sh->exit_status = WEXITSTATUS(status);
+                    else if (WIFSIGNALED(status))
+                    {
+                        if (WTERMSIG(status) == SIGINT)
+							write(1, "\n", 1);
+                        else if (WTERMSIG(status) == SIGQUIT)
+							write(1, "Quit (core dumped)\n", 19);
+						sh->exit_status = 128 + WTERMSIG(status);
+                    }
+                } // ajouter controle des wait, nouveau wait pour ceux qui nont pas finis
+                i++;
+        }
 }

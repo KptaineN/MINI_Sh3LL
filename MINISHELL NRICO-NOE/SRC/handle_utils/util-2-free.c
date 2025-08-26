@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   util-2-free.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:45 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/25 17:27:52 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 17:29:05 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,9 +94,14 @@ void	free_minishell(t_shell *shell)
 {
 	if (!shell)
 		return ;
-	//tcsetattr(STDIN_FILENO, TCSANOW, &term);
-	free_parser(shell);
-	if (shell->args)
-		free_str_array(shell->args);
-	shell->args = NULL;
+    cleanup_shell_iter(shell, NULL);
+    if (shell->input)
+    {
+		free(shell->input);
+        shell->input = NULL;
+    }
+    free_parser(shell);
+    if (shell->args)
+            free_str_array(shell->args);
+    shell->args = NULL;
 }

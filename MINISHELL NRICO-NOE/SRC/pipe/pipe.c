@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 23:26:15 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/24 16:25:44 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 19:13:49 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static pid_t	fork_and_run(t_shell *sh, t_token *tok, int prev_fd,
 {
 	pid_t	pid;
 
-	ignore_signals();
+	parent_signals();
 	pid = fork();
 	if (pid < 0)
 	{

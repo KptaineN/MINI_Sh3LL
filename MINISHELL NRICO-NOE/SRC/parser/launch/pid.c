@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 16:28:09 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 16:33:40 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/26 18:11:46 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ void	set_env_pid(t_shell *shell, pid_t pid)
 	char	buf[32];
 
 	ft_itoa_inplace(buf, (int)pid);
-	set_env_value(&shell->env, "PID", buf);
+	if (set_env_value(&shell->env, "PID", buf) != 0)
+		perror("set_env_value");
 }
 
 void	send_pid(int fd, int pid)
@@ -76,5 +77,6 @@ void	update_last_pid_env(t_shell *sh)
 
 	last = (int)sh->pids[sh->n_cmd - 1];
 	ft_itoa_inplace(buf, last);
-	set_env_value(&sh->env, "PID", buf);
+	if (set_env_value(&sh->env, "PID", buf) != 0)
+		perror("set_env_value");
 }

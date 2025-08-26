@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:57 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 22:05:16 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/26 18:09:47 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,13 @@ static int	cd_update_pwds(t_shell *sh, const char *old_pwd)
 		sh->exit_status = 1;
 		return (0);
 	}
-	set_env_value((t_list **)&sh->env, "OLDPWD", (char *)old_pwd);
-	set_env_value((t_list **)&sh->env, "PWD", new_pwd);
+	if ((set_env_value((t_list **)&sh->env, "OLDPWD", (char *)old_pwd) != 0)
+	|| (set_env_value((t_list **)&sh->env, "PWD", new_pwd) != 0))
+	{
+		perror("set_env_value");
+		sh->exit_status = 1;
+		return (0);
+	}
 	sh->exit_status = 0;
 	return (1);
 }

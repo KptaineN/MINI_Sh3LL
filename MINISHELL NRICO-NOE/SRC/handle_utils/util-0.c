@@ -3,17 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   util-0.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiefer <kiefer@student.42.fr>              +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:30:56 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/18 06:04:48 by kiefer           ###   ########.fr       */
+/*   Updated: 2025/08/26 18:25:59 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	cleanup_shell_iter(t_shell *sh)
+void	cleanup_shell_iter(t_shell *sh, char *in)
 {
+	if (in)
+		free(in);
 	if (sh->parsed_args)
 	{
 		free_str_array((char **)sh->parsed_args->arr);
@@ -61,6 +63,7 @@ static void	child_cleanup_shell(t_shell *sh)
 void	exit_child_process(t_shell *sh, int code)
 {
 	child_cleanup_shell(sh);
+	free_minishell(sh);
 	exit(code);
 }
 

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:35:07 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 21:55:44 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/26 18:01:54 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ int	write_and_free(char *dst, char *s, int *i, int new_i)
 	if (!s)
 		return (0);
 	len = ft_strlen(s);
-	ft_memcpy(dst, s, len);
+	if (dst)
+		ft_memcpy(dst, s, len);
 	free(s);
 	*i = new_i;
 	return ((int)len);

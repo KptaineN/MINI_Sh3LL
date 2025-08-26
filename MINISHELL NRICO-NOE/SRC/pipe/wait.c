@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wait.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 23:32:55 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/24 16:33:51 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 19:09:58 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,5 +55,5 @@ void	wait_pipeline(t_shell *sh, int count)
 			set_exit_from_status(sh, status);
 		k++;
 	}
-	restore_ssignals();
+	//restore_ssignals();
 }

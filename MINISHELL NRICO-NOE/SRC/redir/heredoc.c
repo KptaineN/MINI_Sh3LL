@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 02:24:04 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/24 16:33:24 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 19:13:15 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ static int	heredoc_wait_and_finish(pid_t pid, int rfd)
 	int	status;
 
 	waitpid(pid, &status, 0);
-	restore_ssignals();
+	//restore_ssignals();
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
 		close(rfd);
@@ -73,11 +73,11 @@ int	build_heredoc_fd(t_delim d, t_shell *sh)
 	int		hd[2];
 	pid_t	pid;
 
-	ignore_signals();
+	parent_signals();
 	if (pipe(hd) < 0)
 	{
 		perror("pipe");
-		restore_ssignals();
+		//restore_ssignals();
 		return (-1);
 	}
 	pid = fork();
@@ -86,7 +86,7 @@ int	build_heredoc_fd(t_delim d, t_shell *sh)
 		perror("fork");
 		close(hd[0]);
 		close(hd[1]);
-		restore_ssignals();
+		//restore_ssignals();
 		return (-1);
 	}
 	if (pid == 0)

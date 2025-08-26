@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:19 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/13 15:21:50 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/26 19:52:15 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,21 @@ void	init_shell(t_shell *shell, char **envp)
 }
 
 int	start_shell(t_shell *shell, char **envp)
-{
+{	
 	if (!shell)
 		return (0);
 	ft_bzero(shell, sizeof(t_shell));
 	init_signals();
+	init_signals();
 	init_shell(shell, envp);
 	return (1);
 }
+/*
+	//struct termios	term;
+
+ECHOCTL est une constante définie comme 0001000 en octal, 
+ce qui équivaut à 512 en décimal.
+//tcgetattr(STDIN_FILENO, &term);
+	//term.c_lflag &= ~512;
+	//tcsetattr(STDIN_FILENO, TCSANOW, &term);
+*/

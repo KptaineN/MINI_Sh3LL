@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   launch.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/24 16:23:07 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 19:35:41 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	try_fork_and_run(t_exec_ctx *c)
 {
 	pid_t	pid;
 
-	ignore_signals();
+	parent_signals();
 	pid = fork();
 	if (pid < 0)
 	{
@@ -95,6 +95,6 @@ void	launch_process(t_shell *sh)
 		c.i++;
 	}
 	wait_all_update_status(sh);
-	restore_ssignals();
+	init_signals();
 	update_last_pid_env(sh);
 }

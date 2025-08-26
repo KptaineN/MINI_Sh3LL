@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_loop.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:16 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/20 11:13:52 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 17:27:03 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ static int	parse_and_prepare(t_shell *sh, char *line)
 	if (!sh->pids)
 	{
 		perror("malloc pids");
-		cleanup_shell_iter(sh);
+		cleanup_shell_iter(sh, line);
 		return (-2);
 	}
 	return (0);
@@ -66,25 +66,23 @@ int	process_input(t_shell *sh, char *in)
 	int		ret;
 
 	if (is_line_empty(in))
-		return (free(in), 0);
+		return (cleanup_shell_iter(sh, in), 0);
 	add_history(in);
 	if (must_exit(in))
-		return (free(in), 1);
+		return (cleanup_shell_iter(sh, in), 1);
 	line = expand_input(in, sh);
 	if (!line)
-		return (free(in), 0);
+		return (cleanup_shell_iter(sh, in), 0);
 	ret = parse_and_prepare(sh, line);
 	if (ret < 0)
 	{
-		cleanup_shell_iter(sh);
-		free(line);
+		cleanup_shell_iter(sh, line);
 		sh->input = NULL;
 		free(in);
 		return (ret);
 	}
 	launch_process(sh);
-	cleanup_shell_iter(sh);
-	free(line);
+	cleanup_shell_iter(sh, line);
 	sh->input = NULL;
 	return (free(in), 2);
 }

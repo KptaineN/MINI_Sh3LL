@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:10 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/20 12:06:09 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/26 19:53:26 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "../env/env.h"
 
 char	*read_user_input(void)
 {
@@ -48,10 +49,11 @@ int	main(int argc, char **argv, char **envp)
 		ft_putstr_fd("Usage: ./minishell\n", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
-	print_header_emote();
+	//print_header_emote();
 	if (!start_shell(&shell, envp))
 	{
 		ft_putstr_fd("Failed to start minishell\n", STDERR_FILENO);
+		free_env_list(shell.env);
 		return (EXIT_FAILURE);
 	}
 	looping(&shell);
