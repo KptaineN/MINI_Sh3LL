@@ -1,38 +1,38 @@
 MAIN
-Cette fonction `main` constitue le **point d'entrée** de votre minishell et suit une structure classique d'initialisation, exécution et nettoyage. Elle accepte les trois paramètres standards : `argc` (nombre d'arguments), `argv` (tableau des arguments) et `envp` (variables d'environnement).
+**point d'entrée** de minishell et suit une structure classique d'initialisation, exécution et nettoyage. Elle accepte les trois paramètres standards : `argc` (nombre d'arguments), `argv` (tableau des arguments) et `envp` (variables d'environnement).
 
-La fonction commence par déclarer une variable `shell` de type `t_shell`, qui semble être la **structure principale** contenant toutes les données nécessaires au fonctionnement du shell. Cette approche centralisée facilite la gestion de l'état global du programme.
+La fonction commence par déclarer une variable `shell` de type `t_shell`, c'est a **structure principale** contenant toutes les données nécessaires au fonctionnement de ce minishell. Cette approche centralisée facilite la gestion de l'état global du programme.
 
-La **validation des arguments** est particulièrement stricte : le programme refuse tout argument supplémentaire avec la condition `if (argc != 1 || argv[1])`. Cette vérification garantit que le minishell se lance uniquement avec minishell sans paramètres, ce qui est cohérent avec le comportement de bash quand il est lancé en mode interactif.
+La **validation des arguments** est stricte : le programme refuse tout argument supplémentaire avec la condition `if (argc != 1 || argv[1])`. Cette vérification garantit que le minishell se lance uniquement avec minishell sans paramètres, ce qui est concorde avec le comportement de bash en mode interactif.
 
-L'**initialisation du shell** se fait via `start_shell(&shell, envp)`, qui reçoit l'adresse de la structure shell et les variables d'environnement. Si cette initialisation échoue, le programme effectue un nettoyage partiel avec `free_env_list(shell.env)` avant de retourner un code d'erreur, démontrant une gestion appropriée de la mémoire même en cas d'échec.
+L'**initialisation du shell** se fait via `start_shell(&shell, envp)`, qui reçoit l'adresse de la structure shell et les variables d'environnement. Si cette initialisation échoue-> le programme effectue un nettoyage partiel avec `free_env_list(shell.env)` avant de retourner un code d'erreur = gestion appropriée de la mémoire même en cas d'échec.
 
 La **boucle principale** `looping(&shell)` représente le cœur du shell - c'est là que s'effectue la lecture des commandes, leur parsing et leur exécution. Une fois cette boucle terminée (généralement par une commande `exit`), le programme procède au **nettoyage complet** avec `free_minishell(&shell)` avant de retourner le code de sortie stocké dans `shell.exit_status`, permettant ainsi de propager correctement les codes d'erreur des commandes exécutées.
 
 LOOPING
-Cette fonction `looping` implémente la **boucle principale** (REPL - Read-Eval-Print Loop) de votre minishell, qui constitue le cœur de l'interface interactive du shell. Elle prend en paramètre un pointeur vers la structure `t_shell` qui contient toutes les données nécessaires au fonctionnement du shell.
+Cette fonction `looping` implémente la **boucle principale** de votre minishell, qui constitue le cœur de l'interface interactive du shell. Elle prend en paramètre un pointeur vers la structure `t_shell` qui contient toutes les données nécessaires au fonctionnement du shell.
 
 La fonction utilise une **boucle infinie** `while (1)` qui ne se termine que dans des conditions spécifiques. À chaque itération, elle déclare deux variables locales : `in` pour stocker l'entrée utilisateur sous forme de chaîne de caractères, et `r` pour capturer le code de retour du traitement de cette entrée.
 
-Le **cycle de lecture** commence par l'appel à `read_user_input()`, qui affiche probablement le prompt du shell et attend une saisie utilisateur. Si cette fonction retourne `NULL` (condition `!in`), cela indique généralement que l'utilisateur a tapé Ctrl+D (EOF), déclenchant une sortie propre du shell via `break`.
+Le **cycle de lecture** commence par l'appel à `read_user_input()`, qui affiche le prompt du shell "ᕕ( ᐛ )ᕗ minishell$ " et attend une saisie utilisateur. Si cette fonction retourne `NULL` (condition `!in`), cela indique que l'utilisateur a tapé Ctrl+D (EOF), ce qui nous fai sortir proprement du shell via `break`.
 
-Le **traitement de l'entrée** s'effectue ensuite avec `process_input(shell, in)`, qui parse et exécute la commande saisie. Cette fonction retourne un code d'état stocké dans `r`. Si ce code vaut `1`, cela semble indiquer une demande de sortie explicite (probablement via la commande `exit`), déclenchant également un `break` pour terminer la boucle.
+Le **traitement de l'entrée** s'effectue ensuite avec `process_input(shell, in)`, qui parse et exécute la commande saisie. Cette fonction retourne un code d'état stocké dans `r`. Si ce code vaut `1`, cela indique une demande de sortie explicite (via la commande `exit`), déclenchant aussi un `break` pour terminer la boucle.
 
-La fonction retourne systématiquement `0`, suggérant un **arrêt normal** du shell. Cette architecture garantit que le shell reste actif jusqu'à ce qu'une condition de sortie soit rencontrée, offrant ainsi une expérience utilisateur fluide et prévisible typique des shells interactifs.
+La fonction retourne systématiquement `0`,  un **arrêt normal** du shell. Cette architecture garantit que le shell reste actif jusqu'à ce qu'une condition de sortie soit rencontrée, offrant ainsi une expérience utilisateur fluide et prévisible typique des shells interactifs.
 
 READ_USER_INPUT
-Cette fonction `read_user_input` gère la **lecture interactive** des commandes utilisateur dans votre minishell. Elle utilise la bibliothèque GNU Readline, qui est le standard pour créer des interfaces en ligne de commande interactives avec des fonctionnalités avancées comme l'historique des commandes et l'édition de ligne.
+Cette fonction `read_user_input` gère la **lecture interactive** des commandes utilisateur dans minishell. Elle utilise la bibliothèque GNU Readline, qui est le standard pour créer des interfaces en ligne de commande interactives avec des fonctionnalités avancées comme l'historique des commandes et l'édition de ligne.
 
 La fonction commence par déclarer une variable locale `input` de type `char *` pour stocker la chaîne de caractères saisie par l'utilisateur. L'appel à `readline()` affiche le **prompt personnalisé** `"ᕕ( ᐛ )ᕗ minishell$ "` (qui inclut un emoticon amusant) et attend que l'utilisateur tape une commande suivie d'Entrée.
 
 La **gestion de l'EOF** (End-of-File) est cruciale ici : si `readline()` retourne `NULL`, cela signifie que l'utilisateur a tapé Ctrl+D, qui est le signal standard Unix pour indiquer la fin d'entrée. Dans ce cas, la fonction écrit explicitement `"exit\n"` sur la sortie standard (descripteur 1) avec `write()` pour informer l'utilisateur que le shell va se fermer.
 
-Un point important à noter est que `readline()` **alloue dynamiquement** la mémoire pour stocker l'entrée utilisateur. Cette mémoire devra être libérée avec `free()` ailleurs dans votre code pour éviter les fuites mémoire. La fonction retourne soit un pointeur vers la chaîne saisie (qu'il faudra libérer), soit `NULL` en cas d'EOF, permettant au code appelant de déterminer s'il doit continuer ou arrêter la boucle principale du shell.
+Un point important à noter est que `readline()` **alloue dynamiquement** la mémoire pour stocker l'entrée utilisateur. Cette mémoire devra être libérée avec `free()` ailleurs dans le code pour éviter les fuites mémoire. La fonction retourne soit un pointeur vers la chaîne saisie (qu'il faudra libérer), soit `NULL` en cas d'EOF, permettant au code appelant de déterminer s'il doit continuer ou arrêter la boucle principale du shell.
 
-Cette approche est élégante car elle sépare clairement la responsabilité de lecture d'entrée du traitement des commandes, facilitant la maintenance et les tests du code.
+approche élégante car elle sépare clairement la responsabilité de lecture d'entrée du traitement des commandes, facilitant la maintenance et les tests du code.
 
 PROCESS_INPUT
-Cette fonction `process_input` constitue le **gestionnaire central** de traitement des commandes dans votre minishell, orchestrant tout le pipeline depuis la validation de l'entrée utilisateur jusqu'à l'exécution des processus.
+Cette fonction `process_input` constitue le **gestionnaire central** de traitement des commandes dans minishell, orchestrant tout le pipeline depuis la validation de l'entrée utilisateur jusqu'à l'exécution des processus.
 
 La fonction commence par effectuer des **vérifications préliminaires** essentielles. Si l'entrée est vide (détectée par `is_line_empty`), elle nettoie immédiatement les ressources et retourne 0. Sinon, elle ajoute la commande à l'historique via `add_history()` pour permettre la navigation avec les flèches, puis vérifie si l'utilisateur souhaite quitter le shell avec `must_exit()`, auquel cas elle retourne 1 pour signaler à la boucle principale de se terminer.
 
@@ -43,7 +43,7 @@ Le **parsing et la préparation** s'effectuent via `parse_and_prepare()`, qui tr
 En cas de succès, la fonction appelle `launch_process()` pour **exécuter les commandes parsées**, puis procède au **nettoyage final** systématique : libération des ressources temporaires, remise à NULL du pointeur d'entrée, et libération de la chaîne d'entrée originale. Le retour de la valeur 2 semble indiquer une exécution réussie, permettant à la boucle principale de continuer normalement. Cette architecture garantit une gestion rigoureuse de la mémoire et une propagation claire des états d'erreur.
 
 PARSE_AND_PREPARE
-Cette fonction `parse_and_prepare` implémente la **phase de parsing et de préparation** de votre minishell, transformant une ligne de commande brute en structures de données exploitables pour l'exécution. Elle suit une approche séquentielle où chaque étape dépend du succès de la précédente.
+Cette fonction `parse_and_prepare` implémente la **phase de parsing et de préparation** de minishell, transformant une ligne de commande brute en structures de données exploitables pour l'exécution. Elle suit une approche séquentielle où chaque étape dépend du succès de la précédente.
 
 La fonction commence par sauvegarder la ligne d'entrée dans `sh->input`, puis lance le **découpage lexical** avec `custom_split()`. Cette fonction personnalisée divise probablement la ligne en tokens en respectant les règles du shell (guillemets, échappements, espaces). Si le découpage échoue (retourne NULL), la fonction retourne immédiatement -1, indiquant une erreur de parsing qui peut survenir avec des commandes malformées ou des problèmes d'allocation mémoire.
 
@@ -54,7 +54,7 @@ La **préparation à l'exécution** se termine par l'allocation d'un tableau de 
 Le retour de 0 signale un succès complet, indiquant que toutes les structures sont prêtes pour l'étape d'exécution. Cette architecture modulaire facilite le débogage et permet une gestion d'erreur granulaire selon le type de problème rencontré.
 
 ENSURE_FALLBACK_CMD
-Cette fonction `ensure_fallback_cmd` implémente un **mécanisme de sécurité** crucial dans votre parser de shell pour gérer les cas où le parsing a produit des tokens mais n'a pas réussi à construire de commandes valides. Elle agit comme un filet de sécurité pour éviter les états incohérents dans la structure de données du shell.
+Cette fonction `ensure_fallback_cmd` implémente un **mécanisme de sécurité** crucial dans le parser de minishell pour gérer les cas où le parsing a produit des tokens mais n'a pas réussi à construire de commandes valides. Elle agit comme un filet de sécurité pour éviter les états incohérents dans la structure de données du shell.
 
 La condition `if (sh->n_tokens > 0 && sh->n_cmd == 0)` détecte une **situation problématique** : le shell a réussi à tokeniser l'entrée utilisateur (il y a des tokens), mais le processus de construction des commandes n'a produit aucune commande exécutable. Cette situation peut survenir avec des entrées malformées ou des cas limites que le parser principal n'a pas su traiter correctement.
 
@@ -65,16 +65,16 @@ La **gestion d'erreur** est particulièrement stricte : si l'allocation du nœud
 Enfin, la fonction initialise les **pointeurs de liste** `cmd_head` et `cmd_tail` au même nœud, créant une liste d'un seul élément. Cette configuration permet au reste du système d'exécution de fonctionner normalement, même dans ce cas de fallback, en maintenant la cohérence des structures de données attendues par les fonctions d'exécution.
 
 IS_LINE_EMPTY / MUST_EXIT
-Ces deux fonctions utilitaires implémentent des **vérifications fondamentales** pour le traitement des entrées utilisateur dans votre minishell, utilisant des techniques de validation simples mais robustes.
+Ces deux fonctions utilitaires implémentent des **vérifications fondamentales** pour le traitement des entrées utilisateur dans minishell, utilisant des techniques de validation simples mais robustes.
 
 La fonction `is_line_empty()` détecte les **entrées vides ou invalides** en utilisant une logique à deux niveaux. Elle retourne vrai si le pointeur `s` est NULL (entrée invalide) ou si le premier caractère de la chaîne est le terminateur `'\0'` (chaîne vide). Cette double vérification est une pratique défensive essentielle en C pour éviter les segfaults lors du déréférencement de pointeurs NULL. L'utilisation de l'opérateur logique `||` garantit une **évaluation paresseuse** : si `s` est NULL, la seconde condition ne sera pas évaluée, évitant ainsi un accès mémoire invalide.
 
-La fonction `must_exit()` implémente la **détection de la commande de sortie** en comparant la chaîne d'entrée avec "exit" via `ft_strcmp()`. Cette fonction personnalisée (probablement de votre libft) retourne 0 quand les chaînes sont identiques, d'où la comparaison `== 0`. Cette approche est plus robuste qu'une simple vérification de longueur car elle garantit une correspondance exacte avec la commande exit standard des shells Unix.
+La fonction `must_exit()` implémente la **détection de la commande de sortie** en comparant la chaîne d'entrée avec "exit" via `ft_strcmp()`. Cette fonction personnalisée (de la libft) retourne 0 quand les chaînes sont identiques, d'où la comparaison `== 0`. Cette approche est plus robuste qu'une simple vérification de longueur car elle garantit une correspondance exacte avec la commande exit standard des shells Unix.
 
-Ces fonctions illustrent des **bonnes pratiques de programmation défensive** : elles sont courtes, ont une responsabilité unique, et gèrent les cas d'erreur de manière prévisible. Le mot-clé `static` indique qu'elles sont à usage interne du module, ce qui améliore l'encapsulation. Leur simplicité les rend facilement testables et réutilisables, constituant des briques de base fiables pour le système de validation des entrées de votre shell.
+Ces fonctions illustrent des **bonnes pratiques de programmation défensive** : elles sont courtes, ont une responsabilité unique, et gèrent les cas d'erreur de manière prévisible. Le mot-clé `static` indique qu'elles sont à usage interne du module, ce qui améliore l'encapsulation. Leur simplicité les rend facilement testables et réutilisables, constituant des briques de base fiables pour le système de validation des entrées de minoshell.
 
 START_INIT
-Ce code implémente la **séquence d'initialisation complète** de votre minishell à travers trois fonctions qui se coordonnent pour préparer tous les composants nécessaires au fonctionnement du shell.
+Ce code implémente la **séquence d'initialisation complète** de  minishell à travers trois fonctions qui se coordonnent pour préparer tous les composants nécessaires au fonctionnement du shell.
 
 La fonction `init_idx()` se concentre sur l'**initialisation des structures de données internes** de votre shell. Elle commence par initialiser l'environnement via `init_env(envp)`, qui copie probablement les variables d'environnement du processus parent. Si cette initialisation échoue, le programme termine immédiatement avec `exit(EXIT_FAILURE)`, indiquant que l'environnement est critique pour le fonctionnement du shell. La fonction procède ensuite à l'initialisation systématique de tous les champs de la structure : les descripteurs de fichiers sont configurés sur les valeurs standard (`STDIN_FILENO`, `STDOUT_FILENO`), les compteurs sont mis à zéro, et tous les pointeurs sont initialisés à `NULL` pour éviter les accès à des zones mémoire non définies.
 
