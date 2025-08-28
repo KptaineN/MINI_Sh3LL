@@ -6,27 +6,27 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 14:13:36 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/28 14:22:32 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/28 17:04:44 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	set_status_from_wait(int status, t_shell *sh)
+static void	set_status_from_wait(int status, t_shell *shell)
 {
-	int	sig;
+	int	signal;
 
-	sig = 0;
+	signal = 0;
 	if (WIFEXITED(status))
-		sh->exit_status = WEXITSTATUS(status);
+		shell->exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 	{
-		sig = WTERMSIG(status);
-		if (sig == SIGINT)
+		signal = WTERMSIG(status);
+		if (signal == SIGINT)
 			write(2, "\n", 1);
-		else if (sig == SIGQUIT)
+		else if (signal == SIGQUIT)
 			write(2, "Quit (core dumped)\n", 19);
-		sh->exit_status = 128 + sig;
+		shell->exit_status = 128 + signal;
 	}
 }
 

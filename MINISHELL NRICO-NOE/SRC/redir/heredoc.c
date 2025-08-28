@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 02:24:04 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/26 19:13:15 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/28 15:32:25 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ int	build_heredoc_fd(t_delim d, t_shell *sh)
 	if (pipe(hd) < 0)
 	{
 		perror("pipe");
-		//restore_ssignals();
 		return (-1);
 	}
 	pid = fork();
@@ -86,7 +85,6 @@ int	build_heredoc_fd(t_delim d, t_shell *sh)
 		perror("fork");
 		close(hd[0]);
 		close(hd[1]);
-		//restore_ssignals();
 		return (-1);
 	}
 	if (pid == 0)

@@ -6,43 +6,43 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/26 19:35:41 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/28 17:02:36 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "launcher.h"
 
-int	run_single_builtin_if_alone(t_shell *sh)
+int	run_single_builtin_if_alone(t_shell *shell)
 {
 	t_list	*curr;
 	char	**args;
 	int		idx;
 	int		(*handler)(t_shell *, char **);
 
-	if (sh->n_cmd != 1)
+	if (shell->n_cmd != 1)
 		return (0);
-	curr = sh->cmd_head;
-	args = expand_cmd((t_token *)curr->content, sh->env);
+	curr = shell->cmd_head;
+	args = expand_cmd((t_token *)curr->content, shell->env);
 	if (!args)
 		return (0);
-	idx = is_in_t_arr_str(sh->bcmd, args[0]);
+	idx = is_in_t_arr_str(shell->bcmd, args[0]);
 	if (idx == -1)
 	{
 		free_tab(args);
 		return (0);
 	}
-	handler = get_builtin_handler(sh->bcmd, idx);
+	handler = get_builtin_handler(shell->bcmd, idx);
 	if (handler)
-		sh->exit_status = handler(sh, args);
+		shell->exit_status = handler(shell, args);
 	free_tab(args);
 	return (1);
 }
 
-int	check_pipe(t_exec_ctx *c)
+int	check_pipe(t_exec_ctx *exc_context)
 {
-	if (c->i < c->sh->n_cmd - 1)
+	if (exc_context->i < exc_context->sh->n_cmd - 1)
 	{
-		if (pipe(c->pipe_fd) < 0)
+		if (pipe(exc_context->pipe_fd) < 0)
 		{
 			perror("pipe");
 			return (-1);
@@ -51,12 +51,12 @@ int	check_pipe(t_exec_ctx *c)
 	return (0);
 }
 
-void	init_exec_ctx(t_exec_ctx *c, t_shell *sh)
+void	init_exec_ctx(t_exec_ctx *exc_context, t_shell *sh)
 {
-	c->sh = sh;
-	c->node = sh->cmd_head;
-	c->i = 0;
-	c->prev_fd = -1;
+	exc_context->sh = sh;
+	exc_context->node = sh->cmd_head;
+	exc_context->i = 0;
+	exc_context->prev_fd = -1;
 }
 
 int	try_fork_and_run(t_exec_ctx *c)
