@@ -1,10 +1,7 @@
 {
     "files.associations": {
-        "minishell.h": "c",
-        "type_traits": "c",
-        "libft.h": "c",
-        "parsing.h": "c",
-        "signal.h": "c",
-        "readline.h": "c"
-    }
+        "*.h": "c",
+        "*.c": "c"
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
 }
