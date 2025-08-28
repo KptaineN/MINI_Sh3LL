@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "../env/env.h"
+#include "minishell.h"
 
 void	free_t_arr_dic(t_arr *array)
 {
@@ -94,14 +94,14 @@ void	free_minishell(t_shell *shell)
 {
 	if (!shell)
 		return ;
-    cleanup_shell_iter(shell, NULL);
-    if (shell->input)
-    {
+	cleanup_shell_iter(shell, NULL);
+	if (shell->input)
+	{
 		free(shell->input);
-        shell->input = NULL;
-    }
-    free_parser(shell);
-    if (shell->args)
-            free_str_array(shell->args);
-    shell->args = NULL;
+		shell->input = NULL;
+	}
+	free_parser(shell);
+	if (shell->args)
+		free_str_array(shell->args);
+	shell->args = NULL;
 }

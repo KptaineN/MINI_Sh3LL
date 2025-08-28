@@ -33,46 +33,45 @@ int	set_env_value(t_list **env, const char *key, const char *value)
 	t_env	*cur;
 	t_env	*new_env;
 	t_list	*node;
+	char	*dup;
 
-	char    *dup;
-	
 	cur = env_lookup(*env, key);
-        if (cur)
-        {
-                dup = ft_strdup(value);
-                if (!dup)
-                        return (1);
-                free(cur->value);
-                cur->value = dup;
-                return (0);
-        }
-        new_env = malloc(sizeof(t_env));
-        node = malloc(sizeof(t_list));
-        if (!new_env || !node)
-        {
-                free(new_env);
-                free(node);
-                return (1);
-        }
-        new_env->key = ft_strdup(key);
-        if (!new_env->key)
-        {
-                free(new_env);
-                free(node);
-                return (1);
-        }
-        new_env->value = ft_strdup(value);
-        if (!new_env->value)
-        {
-                free(new_env->key);
-                free(new_env);
-                free(node);
-                return (1);
-        }
-        node->content = new_env;
-        node->next = *env;
-        *env = node;
-        return (0);
+	if (cur)
+	{
+		dup = ft_strdup(value);
+		if (!dup)
+			return (1);
+		free(cur->value);
+		cur->value = dup;
+		return (0);
+	}
+	new_env = malloc(sizeof(t_env));
+	node = malloc(sizeof(t_list));
+	if (!new_env || !node)
+	{
+		free(new_env);
+		free(node);
+		return (1);
+	}
+	new_env->key = ft_strdup(key);
+	if (!new_env->key)
+	{
+		free(new_env);
+		free(node);
+		return (1);
+	}
+	new_env->value = ft_strdup(value);
+	if (!new_env->value)
+	{
+		free(new_env->key);
+		free(new_env);
+		free(node);
+		return (1);
+	}
+	node->content = new_env;
+	node->next = *env;
+	*env = node;
+	return (0);
 }
 
 char	*get_value_env(t_list *env, char *value, int len)

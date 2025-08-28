@@ -89,48 +89,48 @@ char	*replace_variables(const char *arg, t_shell *sh)
 	}
 	res[j] = '\0';
 	return (res);*/
-	 in_sq = false;
-        in_dq = false;
-        i = 0;
-        j = 0;
-        while (arg[i])
-        {
-                toggle_quotes(arg[i], &in_sq, &in_dq);
-                if (arg[i] == '$' && !in_sq)
-                        j += process_dollar(NULL, arg, &i, sh);
-                else
-                {
-                        i++;
-                        j++;
-                }
-        }
-        res = malloc(j + 1);
-        if (!res)
-                return (NULL);
-        in_sq = false;
-        in_dq = false;
-        i = 0;
-        j = 0;
-        while (arg[i])
-        {
-                toggle_quotes(arg[i], &in_sq, &in_dq);
-                if (arg[i] == '$' && !in_sq)
-                        j += process_dollar(&res[j], arg, &i, sh);
-                else
-                        res[j++] = arg[i++];
-        }
-        res[j] = '\0';
-        return (res);
+	in_sq = false;
+	in_dq = false;
+	i = 0;
+	j = 0;
+	while (arg[i])
+	{
+		toggle_quotes(arg[i], &in_sq, &in_dq);
+		if (arg[i] == '$' && !in_sq)
+			j += process_dollar(NULL, arg, &i, sh);
+		else
+		{
+			i++;
+			j++;
+		}
+	}
+	res = malloc(j + 1);
+	if (!res)
+		return (NULL);
+	in_sq = false;
+	in_dq = false;
+	i = 0;
+	j = 0;
+	while (arg[i])
+	{
+		toggle_quotes(arg[i], &in_sq, &in_dq);
+		if (arg[i] == '$' && !in_sq)
+			j += process_dollar(&res[j], arg, &i, sh);
+		else
+			res[j++] = arg[i++];
+	}
+	res[j] = '\0';
+	return (res);
 }
 /*
-replace_variables a été réécrite pour parcourir l’argument deux fois : 
-une première boucle additionne la taille des expansions 
-en appelant process_dollar(NULL, arg, &i, sh) afin de calculer 
-la longueur exacte, puis la fonction alloue juste ce qu’il faut 
+replace_variables a été réécrite pour parcourir l’argument deux fois :
+une première boucle additionne la taille des expansions
+en appelant	process_dollar(NULL, arg, &i, sh) afin de calculer
+la longueur exacte, puis la fonction alloue juste ce qu’il faut
 avant de remplir réellement le tampon lors du second passage
-process_dollar(dst, arg, &i, sh) renvoie la longueur de l’expansion trouvée 
+process_dollar(dst, arg, &i, sh) renvoie la longueur de l’expansion trouvée
 à l’indice i et met à jour cet indice ; lorsque dst vaut NULL,
 les helpers appelés à l’intérieur ne copient rien (ils vérifient
-if (dst) ou if (res && nb)), ce qui permet un “dry‑run” qui mesure 
+if (dst) ou if (res && nb)), ce qui permet un “dry‑run” qui mesure
 uniquement la taille nécessaire
 */
