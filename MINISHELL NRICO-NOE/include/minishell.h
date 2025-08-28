@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/26 19:51:32 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/28 19:06:31 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,8 +204,10 @@ int   builtin_cd(t_shell *shell, char **argv);
 int   builtin_export(t_shell *shell, char **argv);
 int   builtin_env(t_shell *shell, char **argv);
 int   builtin_exit(t_shell *shell, char **argv);
-int builtin_pwd(t_shell *shell, char **argv);
-int builtin_unset(t_shell *shell, char **argv);
+int   builtin_pwd(t_shell *shell, char **argv);
+int   builtin_unset(t_shell *shell, char **argv);
+int	  builtin_cd(t_shell *sh, char **args);
+
 
 int   export_no_arguments(t_shell *shell);
 int   process_export_argument(char *arg, t_shell *shell);

@@ -1,0 +1,54 @@
+REPLACE_VARIABLE
+Cette fonction `replace_variables()` implémente un **système de substitution de variables** sophistiqué qui remplace les références de variables d'environnement (commençant par `$`) dans une chaîne de commande shell, tout en respectant les règles de quotage Unix où les guillemets simples protègent contre l'expansion des variables.
+
+La fonction utilise une **approche algorithmique en deux passes** pour optimiser l'allocation mémoire et éviter le gaspillage d'espace. Le code commenté montre l'ancienne approche qui allouait massivement `ft_strlen(arg) * 50 + 1` octets, une sur-allocation importante pour gérer les cas où les variables expansées seraient beaucoup plus longues que les références originales. Cette méthode fonctionnelle mais inefficace a été remplacée par une technique plus élégante.
+
+La **première passe de calcul** parcourt la chaîne d'entrée pour déterminer précisément la taille nécessaire du buffer de sortie. Elle maintient l'état des guillemets avec `toggle_quotes()` et utilise `process_dollar(NULL, arg, &i, sh)` en mode "calcul seulement" (buffer NULL) pour déterminer la longueur des variables expansées sans effectuer la copie réelle. Cette passe accumule dans `j` la taille totale requise, permettant une allocation exacte avec `malloc(j + 1)`.
+
+La **seconde passe d'écriture** reprend exactement la même logique de parcours mais avec un buffer alloué, effectuant cette fois la substitution réelle avec `process_dollar(&res[j], arg, &i, sh)`. Les variables booléennes `in_sq` et `in_dq` suivent l'état des guillemets simples et doubles pour déterminer quand les variables doivent être expansées : `if (arg[i] == '$' && !in_sq)` n'active la substitution que si le caractère `$` n'est pas protégé par des guillemets simples.
+
+Cette **architecture en deux passes** représente un compromis intelligent entre performance et utilisation mémoire : elle nécessite deux parcours de la chaîne d'entrée mais garantit une allocation optimale, évitant le gaspillage de mémoire tout en simplifiant la gestion des buffers. Cette approche est particulièrement efficace pour les chaînes contenant de nombreuses variables courtes, où la sur-allocation fixe de l'ancienne méthode était disproportionnée.
+
+PROCESS_DOLLAR
+Cette fonction `process_dollar()` implémente un **gestionnaire de substitution de variables** qui orchestre le traitement des expressions commençant par le caractère `$` dans les chaînes de commande shell, utilisant une architecture de délégation à deux niveaux pour séparer les cas particuliers du traitement standard.
+
+La fonction utilise une **stratégie de traitement hiérarchique** en appelant d'abord `dollar_edge_cases()` pour gérer les cas spéciaux et les situations d'exception liées aux expressions `$`. Cette fonction retourne une valeur entière qui peut être positive (nombre de caractères traités), zéro (aucun caractère traité mais cas géré), ou négative (cas non géré par cette fonction). Cette convention de retour permet de distinguer clairement entre les cas résolus et ceux nécessitant un traitement ultérieur.
+
+La **logique de branchement conditionnel** avec `if (handled >= 0)` détermine si le cas spécial a été résolu avec succès. Si `dollar_edge_cases()` retourne une valeur positive ou nulle, cela indique que l'expression `$` a été complètement traitée (qu'il s'agisse d'un cas d'erreur, d'une variable spéciale, ou d'une situation particulière), et la fonction retourne immédiatement cette valeur. Cette approche évite un traitement redondant et garantit que les cas particuliers ont la priorité sur le traitement générique.
+
+Si les **cas particuliers ne s'appliquent pas** (retour négatif), la fonction délègue vers `handle_dollar()` qui implémente la logique standard de substitution de variables d'environnement. Cette séparation architecturale permet de maintenir une distinction claire entre les traitements exceptionnels (variables spéciales comme `$$`, `$?`, `$0`, erreurs de syntaxe) et le processus normal d'expansion des variables utilisateur, facilitant la maintenance et l'évolution du code.
+
+Cette **approche modulaire** reflète la complexité inhérente à la substitution de variables dans les shells Unix, où de nombreux cas particuliers coexistent avec le mécanisme principal. La fonction sert de point d'entrée unifié qui garantit que tous les types d'expressions `$` sont traités de manière appropriée selon leur nature, tout en maintenant une interface simple pour les fonctions appelantes.
+
+DOLLAR_EDGE_CASES
+Cette fonction `dollar_edge_cases()` implémente un **gestionnaire de cas particuliers** pour les expressions commençant par `$` dans votre système de substitution de variables shell, traitant spécifiquement les situations d'exception qui ne correspondent pas aux variables d'environnement standard.
+
+La fonction commence par examiner le **caractère suivant le `$`** en calculant `k = *i + 1` pour obtenir l'index du caractère après le dollar, puis stocke ce caractère dans `c = arg[k]`. Cette approche permet d'analyser le contexte immédiat de l'expression `$` pour déterminer s'il s'agit d'un cas particulier nécessitant un traitement spécialisé.
+
+Le **premier cas d'exception** avec `if (c == '\0')` gère la situation où le caractère `$` apparaît en fin de chaîne, sans aucun caractère suivant. Dans ce contexte, le `$` est traité littéralement (sans expansion de variable) via `write_dollar(dst, i)`, respectant la sémantique shell où un `$` isolé n'a pas de signification spéciale et doit être préservé tel quel dans la sortie.
+
+Le **deuxième cas spécial** avec `if (c == '?')` traite l'expression `$?` qui représente une variable spéciale dans les shells Unix contenant le code de sortie de la dernière commande exécutée. La fonction utilise `ft_itoa(sh->exit_status)` pour convertir le code de sortie numérique en chaîne, puis `write_and_free()` pour l'écrire dans le buffer de destination tout en libérant automatiquement la chaîne temporaire créée par `ft_itoa()`.
+
+Le **troisième cas d'exception** avec `if (!is_valid_key_char((unsigned char)c))` identifie les situations où le caractère suivant le `$` n'est pas valide pour un nom de variable (par exemple `$@`, `$#`, `$ `, etc.). Dans ces cas, le `$` est également traité littéralement via `write_dollar()`, évitant les erreurs d'interprétation. Le **retour de -1** indique que si aucun cas particulier ne s'applique, le traitement doit être délégué à la fonction de gestion standard des variables d'environnement, permettant une architecture de traitement en cascade élégante.
+
+HANDLE_DOLLAR
+Cette fonction `handle_dollar()` implémente le **mécanisme principal de substitution de variables** pour les expressions `$` standard dans votre système de parsing shell, gérant l'extraction, la copie et la libération des valeurs de variables d'environnement de manière optimisée.
+
+La fonction délègue d'abord l'**extraction de la valeur** à `get_dollar_value(arg, i, sh)` qui se charge de parser le nom de variable après le `$`, de le rechercher dans l'environnement du shell, et de retourner une chaîne allouée dynamiquement contenant la valeur correspondante. Cette séparation des responsabilités maintient une architecture modulaire où la logique de recherche est isolée de la logique de copie et de gestion mémoire.
+
+La **validation de retour** avec `if (!val)` gère le cas où la variable n'existe pas ou où l'allocation a échoué, retournant immédiatement 0 pour indiquer qu'aucun caractère n'a été écrit. Cette gestion gracieuse des erreurs permet au système de continuer le traitement même avec des variables non définies, suivant la sémantique shell standard où les variables inexistantes sont remplacées par une chaîne vide.
+
+Le **mécanisme de copie conditionnelle** utilise `if (res && nb)` pour déterminer s'il faut effectuer la copie réelle. Si `res` est NULL, la fonction fonctionne en mode "calcul de taille seulement", utile pour les algorithmes en deux passes. Si `nb` est zéro (variable vide), aucune copie n'est nécessaire. Cette approche optimise les performances en évitant des opérations de copie inutiles pour les variables vides tout en supportant les deux modes d'utilisation de la fonction.
+
+La **finalisation avec gestion mémoire** libère systématiquement la chaîne temporaire avec `free(val)` pour éviter les fuites mémoire, puis retourne `nb` (la longueur de la valeur) pour permettre aux fonctions appelantes de suivre précisément le nombre de caractères ajoutés au buffer de sortie. Cette valeur de retour est essentielle pour maintenir les offsets corrects lors de la construction progressive de la chaîne résultante dans les algorithmes de substitution de variables.
+
+WRITE_DOLLAR
+Cette fonction `write_dollar()` implémente un **utilitaire de copie littérale** qui écrit le caractère `$` dans un buffer de destination tout en gérant l'avancement des index, constituant un mécanisme de traitement pour les cas où le symbole dollar doit être préservé tel quel sans substitution de variable.
+
+La fonction utilise une **approche de copie conditionnelle** avec `if (dst)` qui détermine si l'écriture doit être effectuée réellement ou si la fonction fonctionne en mode "calcul de taille seulement". Lorsque `dst` est non-NULL, elle place directement le caractère `$` à la position `dst[0]`, supposant que le pointeur de destination pointe vers l'emplacement approprié dans le buffer. Cette flexibilité permet d'utiliser la même fonction dans les algorithmes en deux passes où la première passe calcule la taille nécessaire sans effectuer de copie.
+
+L'**incrémentation de l'index source** avec `(*i)++` avance le pointeur de lecture dans la chaîne d'origine, indiquant que le caractère `$` à la position courante a été consommé et traité. Cette mise à jour est cruciale pour maintenir la synchronisation entre les positions de lecture et d'écriture lors du parsing séquentiel de la chaîne d'entrée.
+
+La **valeur de retour constante** `written = 1` puis `return (written)` indique toujours qu'un seul caractère a été "écrit" (même en mode calcul seulement), permettant aux fonctions appelantes de suivre précisément le nombre de caractères ajoutés au buffer de sortie. Cette cohérence dans les valeurs de retour facilite les calculs d'offset et la gestion des buffers dans les algorithmes de construction de chaînes, où chaque fonction de traitement doit rapporter sa contribution à la taille finale du résultat.
+
+Cette fonction sert typiquement dans les **cas d'échappement littéral** où le caractère `$` ne doit pas déclencher une substitution de variable (par exemple `$` en fin de chaîne, ou suivi de caractères invalides), garantissant que ces occurrences sont préservées dans la sortie finale selon les règles de parsing des shells Unix.

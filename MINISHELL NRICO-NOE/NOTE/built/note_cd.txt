@@ -1,0 +1,67 @@
+CD
+Ce code implémente la **commande built-in `cd`** de votre minishell en utilisant une architecture modulaire qui décompose l'opération en plusieurs phases distinctes, chacune gérant un aspect spécifique du changement de répertoire.
+
+La fonction `cd_too_many()` effectue une **validation des arguments** en vérifiant si plus d'un argument a été fourni à la commande `cd`. Si `args[1]` et `args[2]` existent tous les deux, elle affiche un message d'erreur avec un emoticon amusant `(;・_・)՞` et configure le statut de sortie à 1. Cette vérification précoce empêche l'exécution de la commande avec des paramètres invalides, suivant le principe de "fail fast".
+
+La fonction `cd_pick_target()` implémente la **logique de sélection du répertoire cible** selon les conventions Unix standard. Si aucun argument n'est fourni ou si l'argument est une chaîne vide, elle retourne la variable d'environnement `HOME` pour naviguer vers le répertoire personnel. Si l'argument est `-` ou `--`, elle retourne `OLDPWD` pour revenir au répertoire précédent. Dans tous les autres cas, elle utilise l'argument fourni comme chemin de destination.
+
+La fonction `cd_switch_to()` gère l'**opération de changement de répertoire** en utilisant l'appel système `chdir()`. Elle vérifie d'abord si le répertoire cible est valide (non NULL), ce qui peut arriver si `HOME` ou `OLDPWD` ne sont pas définies. Si `chdir()` échoue, `perror()` affiche automatiquement un message d'erreur descriptif basé sur `errno`, permettant de diagnostiquer des problèmes comme des permissions insuffisantes ou des répertoires inexistants.
+
+La fonction `cd_update_pwds()` maintient la **cohérence des variables d'environnement** après un changement de répertoire réussi. Elle utilise `getcwd()` pour obtenir le nouveau répertoire courant, puis met à jour les variables `PWD` (répertoire courant) et `OLDPWD` (répertoire précédent) via `set_env_value()`. Cette mise à jour est cruciale car de nombreuses commandes et scripts dépendent de ces variables pour fonctionner correctement.
+
+Enfin, `builtin_cd()` orchestre l'**exécution complète** en appelant séquentiellement toutes les fonctions auxiliaires. Elle sauvegarde d'abord le répertoire courant avec `getcwd()`, puis exécute chaque phase en vérifiant les codes de retour. Cette approche permet un contrôle précis des erreurs et garantit que le statut de sortie reflète fidèlement le succès ou l'échec de l'opération, conformément aux attentes des scripts shell.
+
+BUILTIN_CD
+Cette fonction `builtin_cd()` constitue le **point d'entrée principal** pour l'implémentation de la commande `cd` dans votre minishell, orchestrant une séquence d'opérations qui reproduit fidèlement le comportement de la commande `cd` des shells Unix standard.
+
+La fonction commence par déclarer deux variables locales : `old_pwd` comme buffer de 4096 caractères pour stocker le répertoire courant avant le changement (taille standard pour les chemins Unix), et `target` comme pointeur constant vers la destination déterminée par les arguments. Cette approche sépare clairement la sauvegarde de l'état actuel de la détermination de la nouvelle destination.
+
+La **séquence de validation et de préparation** suit un pattern défensif rigoureux. D'abord, `cd_too_many()` vérifie que la commande n'a pas reçu trop d'arguments, retournant immédiatement en cas d'erreur. Ensuite, `getcwd(old_pwd, 4096)` capture le répertoire courant dans le buffer local. Si cette opération échoue (répertoire supprimé, permissions insuffisantes), la fonction affiche une erreur avec `perror()`, configure le statut de sortie à 1, et termine l'exécution.
+
+L'**exécution du changement de répertoire** s'effectue en deux phases distinctes. `cd_pick_target(args)` détermine la destination selon les conventions Unix (HOME si aucun argument, OLDPWD pour `-`, ou l'argument fourni), tandis que `cd_switch_to()` effectue le changement réel avec `chdir()`. Cette séparation permet une logique claire entre la détermination de la destination et son exécution.
+
+La **finalisation et la cohérence** se terminent par `cd_update_pwds()` qui met à jour les variables d'environnement `PWD` et `OLDPWD` avec les nouvelles valeurs. Cette étape est cruciale pour maintenir la cohérence du shell car de nombreuses commandes et scripts dépendent de ces variables. La fonction retourne systématiquement `sh->exit_status`, permettant au système de commandes de propager correctement les codes d'erreur selon les conventions Unix (0 pour succès, non-zéro pour échec).
+
+CD_UPDATE_PWDS
+Cette fonction `cd_update_pwds()` gère la **mise à jour des variables d'environnement** après un changement de répertoire réussi, maintenant la cohérence de l'état du shell conformément aux standards Unix.
+
+La fonction commence par déclarer un buffer local `new_pwd[4096]` pour stocker le chemin du nouveau répertoire courant. Elle utilise ensuite `getcwd(new_pwd, 4096)` pour **capturer le répertoire courant réel** après le changement effectué par `chdir()`. Cette approche garantit que la variable `PWD` reflète exactement l'état du système de fichiers, même si le changement de répertoire a résolu des liens symboliques ou des chemins relatifs complexes.
+
+Si `getcwd()` échoue (cas rare mais possible si le répertoire est supprimé après le changement), la fonction affiche une erreur avec `perror("cd")` et configure le statut de sortie à 1. Cette gestion d'erreur est importante car elle peut survenir dans des situations de concurrence où un autre processus supprime le répertoire pendant l'opération.
+
+La **mise à jour des variables d'environnement** s'effectue via deux appels à `set_env_value()` combinés dans une condition complexe. La fonction met à jour `OLDPWD` avec l'ancien répertoire passé en paramètre, puis `PWD` avec le nouveau répertoire obtenu par `getcwd()`. L'utilisation de l'opérateur logique `||` permet d'arrêter l'évaluation dès qu'une des opérations échoue, suivant le principe de "short-circuit evaluation".
+
+La **gestion d'erreur unifiée** traite les échecs des deux mises à jour de la même manière : affichage d'une erreur avec `perror("set_env_value")`, configuration du statut d'erreur, et retour de 0. En cas de succès complet, la fonction remet explicitement `sh->exit_status` à 0 et retourne 1, établissant une convention claire où 1 indique le succès et 0 l'échec. Cette mise à jour des variables est cruciale car de nombreux programmes et scripts shell dépendent de `PWD` et `OLDPWD` pour déterminer leur contexte d'exécution.
+
+CD_SWITCH_TO
+Cette fonction `cd_switch_to()` implémente la **phase critique d'exécution** du changement de répertoire dans votre commande `cd`, gérant à la fois la validation de la destination et l'opération système sous-jacente.
+
+La fonction commence par une **validation essentielle** du paramètre `target` avec `if (!target)`. Cette condition détecte les cas où le répertoire cible n'a pas pu être déterminé, ce qui arrive typiquement quand les variables d'environnement `HOME` ou `OLDPWD` ne sont pas définies. Dans ce cas, elle affiche un message d'erreur explicite sur stderr avec `ft_putstr_fd()`, configure le statut de sortie à 1 pour indiquer un échec, et retourne 0 pour signaler l'erreur à la fonction appelante.
+
+L'**opération de changement de répertoire** s'effectue via l'appel système `chdir(target)`, qui est l'interface standard Unix pour modifier le répertoire de travail courant du processus. Cette fonction système retourne 0 en cas de succès et -1 en cas d'échec, permettant une vérification simple avec `!= 0`. Les échecs peuvent survenir pour diverses raisons : répertoire inexistant, permissions insuffisantes, ou chemin invalide.
+
+La **gestion d'erreur robuste** utilise `perror("cd")` pour afficher automatiquement un message d'erreur descriptif basé sur la valeur de `errno` définie par `chdir()`. Cette approche fournit des messages précis comme "Permission denied" ou "No such file or directory", aidant l'utilisateur à comprendre la cause exacte de l'échec. Comme pour les autres cas d'erreur, la fonction configure le statut de sortie à 1 et retourne 0.
+
+Le **retour de succès** avec `return (1)` indique que le changement de répertoire s'est déroulé correctement. Cette convention (1 pour succès, 0 pour échec) permet à la fonction appelante de déterminer facilement si elle doit procéder aux étapes suivantes, comme la mise à jour des variables d'environnement. Cette fonction encapsule parfaitement la logique de changement de répertoire avec une gestion d'erreur complète et des messages utilisateur informatifs.
+
+CD_PICK_TARGET
+Cette fonction `cd_pick_target()` implémente la **logique de sélection de destination** pour la commande `cd`, reproduisant fidèlement le comportement des shells Unix en déterminant le répertoire cible selon les conventions standard.
+
+La fonction accepte un tableau d'arguments `char **args` où `args[0]` est la commande "cd" elle-même et `args[1]` est l'argument optionnel spécifiant la destination. Elle retourne un pointeur constant vers une chaîne représentant le chemin du répertoire cible, ou NULL si la destination ne peut pas être déterminée.
+
+La **première condition** `if (args[1] == NULL || *args[1] == '\0')` gère le cas où aucun argument n'est fourni ou où l'argument est une chaîne vide. Cette double vérification couvre à la fois l'absence totale d'argument (`args[1] == NULL`) et la présence d'une chaîne vide (`*args[1] == '\0'`). Dans ces deux cas, la fonction retourne `getenv("HOME")`, implémentant le comportement Unix standard où `cd` sans argument navigue vers le répertoire personnel de l'utilisateur.
+
+La **seconde condition** traite les arguments spéciaux `-` et `--` avec `ft_strcmp(args[1], "-") == 0 || ft_strcmp(args[1], "--") == 0`. L'argument `-` est une convention Unix bien établie qui signifie "retourner au répertoire précédent", tandis que `--` suit la convention GNU pour indiquer la fin des options. Dans ces deux cas, la fonction retourne `getenv("OLDPWD")`, permettant à l'utilisateur de naviguer vers le répertoire de travail précédent.
+
+Le **cas par défaut** `return (args[1])` traite tous les autres arguments comme des chemins explicites vers le répertoire de destination. Cette approche simple et directe permet à l'utilisateur de spécifier n'importe quel chemin (absolu ou relatif) comme destination. La fonction délègue intelligemment la résolution des variables d'environnement au système via `getenv()`, et la validation de l'existence et des permissions au répertoire sera gérée par les fonctions appelantes lors de l'exécution effective du `chdir()`.
+
+CD_TOO_MANY
+Cette fonction `cd_too_many()` implémente une **validation préliminaire** pour la commande `cd` en vérifiant que l'utilisateur n'a pas fourni un nombre excessif d'arguments, respectant ainsi les limitations de la commande `cd` standard Unix.
+
+La fonction utilise une logique de validation simple mais efficace avec `if (args[1] && args[2])`. Cette condition vérifie simultanément l'existence du deuxième argument (`args[1]`) et du troisième argument (`args[2]`) dans le tableau d'arguments. Puisque la commande `cd` n'accepte au maximum qu'un seul argument (le répertoire de destination), la présence de deux arguments ou plus constitue une erreur d'utilisation.
+
+En cas de détection d'arguments excédentaires, la fonction affiche un **message d'erreur personnalisé** avec `ft_putstr_fd()` sur le descripteur de fichier 2 (stderr). Le message inclut un emoticon amusant `(;・_・)՞` qui ajoute une touche de personnalité à votre minishell, suivi du message d'erreur standard. Cette approche rend les messages d'erreur plus mémorables tout en maintenant leur clarté informationnelle.
+
+La **gestion du statut d'erreur** suit les conventions Unix en configurant `sh->exit_status = 1` pour indiquer un échec d'exécution de la commande. Cette valeur sera utilisée par le shell pour déterminer le code de retour de la commande, permettant aux scripts et autres programmes de détecter que la commande `cd` a échoué à cause d'arguments invalides.
+
+Le **système de retour** utilise une convention booléenne où 1 indique qu'une erreur a été détectée (trop d'arguments) et 0 signifie que le nombre d'arguments est acceptable. Cette approche permet à la fonction appelante de déterminer facilement si elle doit interrompre l'exécution de la commande `cd` ou continuer avec les étapes suivantes de validation et d'exécution.

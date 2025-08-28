@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/19 10:43:53 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/16 16:05:59 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/28 17:32:51 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ char	*ft_strdup_count(const char *s, int *count)
 
 	if (!s || !count)
 		return (NULL);
-	len = strlen(s);
+	len = ft_strlen(s);
 	dup = (char *)malloc(len + 1);
 	if (!dup)
 		return (NULL);

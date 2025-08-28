@@ -6,11 +6,11 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:35:57 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/26 18:09:47 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/28 19:06:50 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "cd.h"
+#include "minishell.h"
 
 static int	cd_too_many(char **args, t_shell *sh)
 {
