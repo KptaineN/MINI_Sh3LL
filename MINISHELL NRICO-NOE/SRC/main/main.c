@@ -50,7 +50,7 @@ int	main(int argc, char **argv, char **envp)
 		return (EXIT_FAILURE);
 	}
 	//print_header_emote();
-	if (!start_shell(&shell, envp))
+	if (start_shell(&shell, envp))
 	{
 		ft_putstr_fd("Failed to start minishell\n", STDERR_FILENO);
 		free_env_list(shell.env);
