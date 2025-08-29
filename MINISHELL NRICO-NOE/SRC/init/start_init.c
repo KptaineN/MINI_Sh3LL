@@ -50,12 +50,12 @@ void	init_shell(t_shell *shell, char **envp)
 int	start_shell(t_shell *shell, char **envp)
 {	
 	if (!shell)
-		return (0);
+		return (1);
 	ft_bzero(shell, sizeof(t_shell));
 	init_signals();
 	init_signals();
 	init_shell(shell, envp);
-	return (1);
+	return (0);
 }
 /*
 	//struct termios	term;
