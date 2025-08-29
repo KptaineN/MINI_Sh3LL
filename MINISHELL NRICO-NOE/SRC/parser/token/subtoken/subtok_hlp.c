@@ -3,52 +3,52 @@
 /*                                                        :::      ::::::::   */
 /*   subtok_hlp.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 01:18:47 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/18 01:18:52 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:02:44 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../token.h"
 
-static void	process_char(const char *s, int i, t_qstate *st)
+static void	process_char(const char *str, int i, t_qstate *stock_cut)
 {
-	if (s[i] == '\"' && !st->in_sq && escape_check(s, i))
+	if (str[i] == '\"' && !stock_cut->in_sq && escape_check(str, i))
 	{
-		st->in_nq = false;
-		st->in_dq = !st->in_dq;
-		if (st->in_dq)
-			st->count++;
+		stock_cut->in_nq = false;
+		stock_cut->in_dq = !stock_cut->in_dq;
+		if (stock_cut->in_dq)
+			stock_cut->count++;
 	}
-	else if (s[i] == '\'' && !st->in_dq && escape_check(s, i))
+	else if (str[i] == '\'' && !stock_cut->in_dq && escape_check(str, i))
 	{
-		st->in_nq = false;
-		st->in_sq = !st->in_sq;
-		if (st->in_sq)
-			st->count++;
+		stock_cut->in_nq = false;
+		stock_cut->in_sq = !stock_cut->in_sq;
+		if (stock_cut->in_sq)
+			stock_cut->count++;
 	}
-	else if (!st->in_sq && !st->in_dq && !st->in_nq)
+	else if (!stock_cut->in_sq && !stock_cut->in_dq && !stock_cut->in_nq)
 	{
-		st->count++;
-		st->in_nq = true;
+		stock_cut->count++;
+		stock_cut->in_nq = true;
 	}
 }
 
 int	count_subtokens(const char *str)
 {
-	t_qstate	st;
+	t_qstate	stock_cut;
 	int			i;
 
-	st.in_sq = false;
-	st.in_dq = false;
-	st.in_nq = false;
-	st.count = 0;
+	stock_cut.in_sq = false;
+	stock_cut.in_dq = false;
+	stock_cut.in_nq = false;
+	stock_cut.count = 0;
 	i = 0;
 	while (str[i])
 	{
-		process_char(str, i, &st);
+		process_char(str, i, &stock_cut);
 		i++;
 	}
-	return (st.count);
+	return (stock_cut.count);
 }

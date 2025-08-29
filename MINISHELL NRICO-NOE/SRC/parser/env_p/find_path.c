@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   find_env_value.c                                   :+:      :+:    :+:   */
+/*   find_path.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 14:54:24 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 14:55:39 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:07:54 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,27 +29,27 @@ char	*check_dir_for_cmd(char *dir, char *cmd)
 char	*scan_path_copy(char *cmd, char *copy)
 {
 	char	*p;
-	char	*q;
-	char	c;
+	char	*qq;
+	char	save_c;
 	char	*hit;
 
 	p = NULL;
-	q = NULL;
+	qq = NULL;
 	hit = NULL;
 	p = copy;
 	while (1)
 	{
-		q = p;
-		while (*q && *q != ':')
-			q++;
-		c = *q;
-		*q = '\0';
+		qq = p;
+		while (*qq && *qq != ':')
+			qq++;
+		save_c = *qq;
+		*qq = '\0';
 		if (*p != '\0')
 			hit = check_dir_for_cmd(p, cmd);
-		*q = c;
-		if (hit || c == '\0')
+		*qq = save_c;
+		if (hit || save_c == '\0')
 			break ;
-		p = q + 1;
+		p = qq + 1;
 	}
 	return (hit);
 }

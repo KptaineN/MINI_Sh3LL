@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   wait.c                                             :+:      :+:    :+:   */
+/*   i.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -44,16 +44,16 @@ static void	set_exit_from_status(t_shell *sh, int status)
 
 void	wait_pipeline(t_shell *sh, int count)
 {
-	int	k;
+	int	i;
 	int	status;
 
-	k = 0;
-	while (k < count)
+	i = 0;
+	while (i < count)
 	{
-		waitpid(sh->pids[k], &status, 0);
-		if (k == count - 1)
+		waitpid(sh->pids[i], &status, 0);
+		if (i == count - 1)
 			set_exit_from_status(sh, status);
-		k++;
+		i++;
 	}
 	//restore_ssignals();
 }

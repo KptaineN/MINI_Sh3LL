@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 17:04:27 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/18 01:20:47 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:13:10 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,12 @@ int	setup_tokens_or_return(t_shell *sh)
 	{
 		if (sh)
 			sh->n_tokens = 0;
-		return (0);
+		return (1);
 	}
 	if (sh->parsed_args->len <= 0)
 	{
 		sh->n_tokens = 0;
-		return (0);
+		return (1);
 	}
 	sh->n_tokens = count_tokens(sh, sh->parsed_args, sh->oper);
 	sh->tokens = (t_token *)calloc(sh->n_tokens, sizeof(t_token));
@@ -64,7 +64,7 @@ int	setup_tokens_or_return(t_shell *sh)
 		perror("Erreur allocation tokens");
 		exit(EXIT_FAILURE);
 	}
-	return (1);
+	return (0);
 }
 
 int	process_cmd_or_bcmd(t_shell *sh, t_token *tok, int i)
@@ -96,7 +96,7 @@ void	attribute_token_type(t_shell *sh)
 	int		idx_token;
 	t_token	*tok;
 
-	if (!setup_tokens_or_return(sh))
+	if (setup_tokens_or_return(sh))
 		return ;
 	args = (char **)sh->parsed_args->arr;
 	i = 0;

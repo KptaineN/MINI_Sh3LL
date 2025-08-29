@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:34:48 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/13 15:49:56 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:44:51 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,3 @@ char	*get_dollar_value(const char *arg, int *pos, t_shell *sh)
 	*pos = k + len;
 	return (val);
 }
-// attention a :
-//              88_________*pos = k;

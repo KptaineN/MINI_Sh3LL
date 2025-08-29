@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 15:01:38 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/16 14:24:14 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:31:47 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,25 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
+}
+
+void	ft_lstadd_front(t_list **lst, void *content)
+{
+	t_list	*new_node;
+
+	if (!lst || !content)
+		return ;
+	new_node = malloc(sizeof(t_list));
+	if (!new_node)
+		return ;
+	new_node->content = ft_strdup((char *)content);
+	if (!new_node->content)
+	{
+		free(new_node);
+		return ;
+	}
+	new_node->next = *lst;
+	*lst = new_node;
 }
 
 void	push_lst(t_list **tail, void *content)
@@ -74,26 +93,9 @@ t_list	*set_linked_path(char **env)
 	}
 	return (head);
 }
+*/
 
-void	ft_lstadd_front(t_list **lst, void *content)
-{
-	t_list	*new_node;
-
-	if (!lst || !content)
-		return ;
-	new_node = malloc(sizeof(t_list));
-	if (!new_node)
-		return ;
-	new_node->content = ft_strdup((char *)content);
-	if (!new_node->content)
-	{
-		free(new_node);
-		return ;
-	}
-	new_node->next = *lst;
-	*lst = new_node;
-}
-
+/*
 t_list	*search_lst(t_list *lst, const char *target)
 {
 	size_t	target_len;

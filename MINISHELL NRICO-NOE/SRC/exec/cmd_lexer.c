@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_lexer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkief <nkief@student.42.fr>                +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 01:25:24 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/20 11:42:34 by nkief            ###   ########.fr       */
+/*   Updated: 2025/08/29 11:14:48 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	build_cmd_list(t_shell *shell)
 		tok = &shell->tokens[i];
 		if (tok->type == TOKEN_CMD || tok->type == TOKEN_BCMD)
 		{
-			if (!process_cmd_token(shell, tok, &prev))
+			if (process_cmd_token(shell, tok, &prev))
 				return ;
 		}
 		i++;

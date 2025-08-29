@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/01 13:56:01 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/28 17:02:36 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:55:30 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,15 +51,15 @@ int	check_pipe(t_exec_ctx *exc_context)
 	return (0);
 }
 
-void	init_exec_ctx(t_exec_ctx *exc_context, t_shell *sh)
+void	init_exec_ctx(t_exec_ctx *exc_context, t_shell *shell)
 {
-	exc_context->sh = sh;
-	exc_context->node = sh->cmd_head;
+	exc_context->sh = shell;
+	exc_context->node = shell->cmd_head;
 	exc_context->i = 0;
 	exc_context->prev_fd = -1;
 }
 
-int	try_fork_and_run(t_exec_ctx *c)
+int	try_fork_and_run(t_exec_ctx *ctx)
 {
 	pid_t	pid;
 
@@ -73,28 +73,28 @@ int	try_fork_and_run(t_exec_ctx *c)
 	else if (pid == 0)
 	{
 		child_signals();
-		child_exec(c);
+		child_exec(ctx);
 	}
-	parent_after_fork(c, pid);
+	parent_after_fork(ctx, pid);
 	return (0);
 }
 
-void	launch_process(t_shell *sh)
+void	launch_process(t_shell *shell)
 {
-	t_exec_ctx	c;
+	t_exec_ctx	context;
 
-	if (run_single_builtin_if_alone(sh))
+	if (run_single_builtin_if_alone(shell))
 		return ;
-	init_exec_ctx(&c, sh);
-	while (c.i < sh->n_cmd)
+	init_exec_ctx(&context, shell);
+	while (context.i < shell->n_cmd)
 	{
-		if (check_pipe(&c) < 0)
+		if (check_pipe(&context) < 0)
 			return ;
-		if (try_fork_and_run(&c) < 0)
+		if (try_fork_and_run(&context) < 0)
 			return ;
-		c.i++;
+		context.i++;
 	}
-	wait_all_update_status(sh);
+	wait_all_update_status(shell);
 	init_signals();
-	update_last_pid_env(sh);
+	update_last_pid_env(shell);
 }

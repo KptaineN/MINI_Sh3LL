@@ -6,20 +6,20 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 16:24:16 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/28 13:18:43 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:41:26 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	is_line_empty(const char *s)
+static int	is_line_empty(const char *str)
 {
-	return (!s || *s == '\0');
+	return (!str || *str == '\0');
 }
 
-static int	must_exit(const char *s)
+static int	must_exit(const char *str)
 {
-	return (ft_strcmp(s, "exit") == 0);
+	return (ft_strcmp(str, "exit") == 0);
 }
 
 static void	ensure_fallback_cmd(t_shell *sh)

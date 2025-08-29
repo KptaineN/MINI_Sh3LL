@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 22:24:17 by eganassi          #+#    #+#             */
-/*   Updated: 2025/08/18 00:42:10 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:58:23 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,18 +49,19 @@ bool	escape_check(const char *str, int idx)
 
 int	find_c_nonescaped(const char *str, char *needle, int size_needle)
 {
-	int	c;
+	int	count_needle;
 	int	idx;
 
+	count_needle = 0;
 	idx = 0;
 	while (str[idx])
 	{
-		c = 0;
-		while (c < size_needle && str[idx])
+		count_needle = 0;
+		while (count_needle < size_needle && str[idx])
 		{
-			if (str[idx] == needle[c] && escape_check(str, idx))
+			if (str[idx] == needle[count_needle] && escape_check(str, idx))
 				return (idx);
-			c++;
+			count_needle++;
 		}
 		idx++;
 	}

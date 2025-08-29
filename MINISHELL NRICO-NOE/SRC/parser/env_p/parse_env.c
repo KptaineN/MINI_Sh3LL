@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 14:55:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/26 19:28:43 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:33:08 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,52 +26,6 @@ t_env	*env_lookup(t_list *env, const char *key)
 		tmp = tmp->next;
 	}
 	return (NULL);
-}
-
-int	set_env_value(t_list **env, const char *key, const char *value)
-{
-	t_env	*cur;
-	t_env	*new_env;
-	t_list	*node;
-	char	*dup;
-
-	cur = env_lookup(*env, key);
-	if (cur)
-	{
-		dup = ft_strdup(value);
-		if (!dup)
-			return (1);
-		free(cur->value);
-		cur->value = dup;
-		return (0);
-	}
-	new_env = malloc(sizeof(t_env));
-	node = malloc(sizeof(t_list));
-	if (!new_env || !node)
-	{
-		free(new_env);
-		free(node);
-		return (1);
-	}
-	new_env->key = ft_strdup(key);
-	if (!new_env->key)
-	{
-		free(new_env);
-		free(node);
-		return (1);
-	}
-	new_env->value = ft_strdup(value);
-	if (!new_env->value)
-	{
-		free(new_env->key);
-		free(new_env);
-		free(node);
-		return (1);
-	}
-	node->content = new_env;
-	node->next = *env;
-	*env = node;
-	return (0);
 }
 
 char	*get_value_env(t_list *env, char *value, int len)
@@ -105,18 +59,18 @@ char	*get_path_env(t_list *env)
 
 char	*join_path(char *dir, char *cmd)
 {
-	size_t	dl;
-	size_t	cl;
+	size_t	dir_len;
+	size_t	cmd_len;
 	char	*full;
 
-	dl = ft_strlen(dir);
-	cl = ft_strlen(cmd);
-	full = malloc(dl + 1 + cl + 1);
+	dir_len = ft_strlen(dir);
+	cmd_len = ft_strlen(cmd);
+	full = malloc(dir_len + 1 + cmd_len + 1);
 	if (!full)
 		return (NULL);
-	ft_memcpy(full, dir, dl);
-	full[dl] = '/';
-	ft_memcpy(full + dl + 1, cmd, cl);
-	full[dl + 1 + cl] = '\0';
+	ft_memcpy(full, dir, dir_len);
+	full[dir_len] = '/';
+	ft_memcpy(full + dir_len + 1, cmd, cmd_len);
+	full[dir_len + 1 + cmd_len] = '\0';
 	return (full);
 }

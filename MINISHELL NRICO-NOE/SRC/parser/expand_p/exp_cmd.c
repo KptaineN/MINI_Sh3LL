@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 15:05:44 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 15:20:08 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:52:39 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 
 void	copy_parts_to(char *dst, t_subtoken_container *a)
 {
-	int	pos;
+	int	posi;
 	int	i;
 
-	pos = 0;
+	posi = 0;
 	i = 0;
 	while (i < a->n_parts)
 	{
-		ft_memcpy(dst + pos, a->parts[i].p, a->parts[i].len);
-		pos += a->parts[i].len;
+		ft_memcpy(dst + posi, a->parts[i].p, a->parts[i].len);
+		posi += a->parts[i].len;
 		i++;
 	}
 }

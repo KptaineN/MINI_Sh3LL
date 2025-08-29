@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 16:34:25 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/26 19:57:20 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:42:28 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,33 +33,33 @@ t_list	*find_env_entry(t_list *env, const char *key)
 
 char	*build_kv_string(const char *key, const char *value)
 {
-	size_t	k;
-	size_t	v;
-	char	*s;
+	size_t	key_len;
+	size_t	val_len;
+	char	*strkv;
 
 	if (!key)
 		return (NULL);
-	k = ft_strlen(key);
+	key_len = ft_strlen(key);
 	if (value)
-		v = ft_strlen(value);
+		val_len = ft_strlen(value);
 	else
-		v = 0;
-	s = (char *)malloc(k + 1 + v + 1);
-	if (!s)
+		val_len = 0;
+	strkv = (char *)malloc(key_len + 1 + val_len + 1);
+	if (!strkv)
 		return (NULL);
-	ft_memcpy(s, key, k);
-	s[k] = '=';
-	if (v)
-		ft_memcpy(s + k + 1, value, v);
-	s[k + 1 + v] = '\0';
-	return (s);
+	ft_memcpy(strkv, key, key_len);
+	strkv[key_len] = '=';
+	if (val_len)
+		ft_memcpy(strkv + key_len + 1, value, val_len);
+	strkv[key_len + 1 + val_len] = '\0';
+	return (strkv);
 }
 
 static int	replace_env_if_exists(t_list *env, const char *key,
 		const char *value)
 {
 	t_list	*cur;
-	char	*s;
+	char	*str;
 	size_t	klen;
 
 	klen = ft_strlen(key);
@@ -70,13 +70,13 @@ static int	replace_env_if_exists(t_list *env, const char *key,
 			&& ((char *)cur->content)[klen] == '=')
 		{
 			if (value)
-				s = build_kv_string(key, value);
+				str = build_kv_string(key, value);
 			else
-				s = build_kv_string(key, "");
-			if (!s)
+				str = build_kv_string(key, "");
+			if (!str)
 				return (-1);
 			free(cur->content);
-			cur->content = s;
+			cur->content = str;
 			return (1);
 		}
 		cur = cur->next;
@@ -87,7 +87,7 @@ static int	replace_env_if_exists(t_list *env, const char *key,
 void	replace_or_add_env(t_list **env, const char *key, const char *value)
 {
 	int		ret;
-	char	*s;
+	char	*str;
 	t_list	*node;
 
 	if (!env || !key)
@@ -96,15 +96,15 @@ void	replace_or_add_env(t_list **env, const char *key, const char *value)
 	if (ret != 0)
 		return ;
 	if (value)
-		s = build_kv_string(key, value);
+		str = build_kv_string(key, value);
 	else
-		s = build_kv_string(key, "");
-	if (!s)
+		str = build_kv_string(key, "");
+	if (!str)
 		return ;
-	node = ft_lstnew(s);
+	node = ft_lstnew(str);
 	if (!node)
 	{
-		free(s);
+		free(str);
 		return ;
 	}
 	ft_lstadd_back(env, node);

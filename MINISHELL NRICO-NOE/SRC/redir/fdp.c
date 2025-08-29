@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fdp.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nkiefer <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 02:25:26 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/18 02:25:30 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:27:36 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	copy_no_quotes(t_delim *d, const char *raw)
 
 	clean = malloc(ft_strlen(raw) + 1);
 	if (!clean)
-		return (0);
+		return (1);
 	i = 0;
 	j = 0;
 	while (raw[i])
@@ -37,7 +37,7 @@ static int	copy_no_quotes(t_delim *d, const char *raw)
 	}
 	clean[j] = '\0';
 	d->clean = clean;
-	return (1);
+	return (0);
 }
 
 t_delim	parse_delim(const char *raw)
@@ -49,7 +49,7 @@ t_delim	parse_delim(const char *raw)
 	d.quoted = 0;
 	if (!raw)
 		return (d);
-	if (!copy_no_quotes(&d, raw))
+	if (copy_no_quotes(&d, raw))
 		return (d);
 	return (d);
 }

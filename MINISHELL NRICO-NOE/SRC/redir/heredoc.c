@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 02:24:04 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/28 15:32:25 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 11:19:59 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,6 @@ static int	heredoc_wait_and_finish(pid_t pid, int rfd)
 	int	status;
 
 	waitpid(pid, &status, 0);
-	//restore_ssignals();
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
 		close(rfd);

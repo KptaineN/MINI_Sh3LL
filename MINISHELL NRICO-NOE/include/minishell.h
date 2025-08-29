@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 16:45:17 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/28 19:06:31 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:29:05 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,6 +219,7 @@ void    print_env(t_list *env);
 t_list  *init_env(char **envp);
 int     set_env_value(t_list **env, const char *key, const char *value);
 char    *find_env_value(t_list *env, const char *key);
+t_env	*env_lookup(t_list *env, const char *key);
 
 /* --- Parsing --- */
 t_arr   *custom_split(const char *str, t_shell *shell);
@@ -290,7 +291,7 @@ int	process_cmd_token(t_shell *shell, t_token *tok, t_token **prev);
 
 /* ================== ENVIRONNEMENT ================== */
 //char	*get_value_env(t_list *env, const char *key);
-int		set_env_value(t_list **env, const char *key, const char *value);
+//int		set_env_value(t_list **env, const char *key, const char *value);
 char	**list_to_envp(t_list *env);
 
 /* ================== EXPANSIONS ===================== */

@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 14:13:36 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/28 17:04:44 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:56:40 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,19 +67,19 @@ static void	remaining_children(int remaining, pid_t last, t_shell *sh)
 static int	get_spawned_and_last(const pid_t *pids, int n_cmd, pid_t *last_out)
 {
 	int	spawned;
-	int	k;
+	int	i;
 
 	*last_out = -1;
 	spawned = 0;
-	k = 0;
-	while (k < n_cmd)
+	i = 0;
+	while (i < n_cmd)
 	{
-		if (pids[k] > 0)
+		if (pids[i] > 0)
 		{
-			*last_out = pids[k];
+			*last_out = pids[i];
 			spawned++;
 		}
-		k++;
+		i++;
 	}
 	return (spawned);
 }

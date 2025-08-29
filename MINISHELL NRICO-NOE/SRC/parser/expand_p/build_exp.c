@@ -6,7 +6,7 @@
 /*   By: nkiefer <nkiefer@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 15:05:35 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/08/16 15:07:56 by nkiefer          ###   ########.fr       */
+/*   Updated: 2025/08/29 10:51:56 by nkiefer          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,29 +55,29 @@ int	advance_after_dollar(t_subtoken *b, int k)
 	return (idx);
 }
 
-void	process_unquoted_subtoken(t_subtoken *b, char *dst, int *pi,
+void	process_unquoted_subtoken(t_subtoken *b, char *dst, int *ptri,
 		t_list **phead)
 {
-	int	k;
+	int	kporal;
 	int	i;
 
-	k = 0;
-	i = *pi;
-	while (k < b->len)
+	kporal = 0;
+	i = *ptri;
+	while (kporal < b->len)
 	{
-		if (b->p[k] == '$')
+		if (b->p[kporal] == '$')
 		{
 			append_from_head_and_pop(phead, dst, &i);
-			k = advance_after_dollar(b, k);
+			kporal = advance_after_dollar(b, kporal);
 		}
 		else
 		{
-			dst[i] = b->p[k];
+			dst[i] = b->p[kporal];
 			i++;
 		}
-		k++;
+		kporal++;
 	}
-	*pi = i;
+	*ptri = i;
 }
 
 char	*build_expansion(t_subtoken_container *a, int count, t_list **add_head)
