@@ -34,44 +34,41 @@ static void	free_env_struct(t_env *e)
 }
 static t_env	*new_env_struct(const char *key, const char *value)
 {
-    t_env	*env_entry;
+	t_env	*env_entry;
 
-    env_entry = malloc(sizeof(*env_entry));
-    if (!env_entry)
-        return (NULL);
-    env_entry->key = ft_strdup(key);
-    if (!env_entry->key)
-        return (free(env_entry), (t_env *)NULL);
-    env_entry->value = ft_strdup(value);
-    if (!env_entry->value)
-    {
-        free(env_entry->key);
-        free(env_entry);
-        return (NULL);
-    }
-    return (env_entry);
+	env_entry = malloc(sizeof(*env_entry));
+	if (!env_entry)
+		return (NULL);
+	env_entry->key = ft_strdup(key);
+	if (!env_entry->key)
+		return (free(env_entry), (t_env *)NULL);
+	env_entry->value = ft_strdup(value);
+	if (!env_entry->value)
+	{
+		free(env_entry->key);
+		free(env_entry);
+		return (NULL);
+	}
+	return (env_entry);
 }
 
-int set_env_value(t_list **env, const char *key, const char *value)
+int	set_env_value(t_list **env, const char *key, const char *value)
 {
-    t_env *existing;
-    t_env *entry;
-    t_list *node;
+	t_env	*existing;
+	t_env	*entry;
+	t_list	*node;
 
-    if (!env || !key || !value)
-        return (1);
-    existing = env_lookup(*env, key);
-    if (existing)
-        return (update_env_value(existing, value));
-
-    entry = new_env_struct(key, value);   // ex- "e"
-    if (!entry)
-        return (1);
-
-    node = ft_lstnew(entry);              // ft_lstnew ne copie pas, il garde le pointeur
-    if (!node)
-        return (free_env_struct(entry), 1);
-
-    ft_lstadd_front(env, node);
-    return (0);
+	if (!env || !key || !value)
+		return (1);
+	existing = env_lookup(*env, key);
+	if (existing)
+		return (update_env_value(existing, value));
+	entry = new_env_struct(key, value); // ex- "e"
+	if (!entry)
+		return (1);
+	node = ft_lstnew(entry); // ft_lstnew ne copie pas, il garde le pointeur
+	if (!node)
+		return (free_env_struct(entry), 1);
+	ft_lstadd_front(env, node);
+	return (0);
 }

@@ -60,7 +60,7 @@ static int	cd_update_pwds(t_shell *sh, const char *old_pwd)
 		return (0);
 	}
 	if ((set_env_value((t_list **)&sh->env, "OLDPWD", (char *)old_pwd) != 0)
-	|| (set_env_value((t_list **)&sh->env, "PWD", new_pwd) != 0))
+		|| (set_env_value((t_list **)&sh->env, "PWD", new_pwd) != 0))
 	{
 		perror("set_env_value");
 		sh->exit_status = 1;

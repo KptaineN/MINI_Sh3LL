@@ -72,23 +72,6 @@ char	*replace_variables(const char *arg, t_shell *sh)
 	bool	in_dq;
 	char	*res;
 
-	/*in_sq = false;
-	in_dq = false;
-	i = 0;
-	j = 0;
-	res = malloc(ft_strlen(arg) * 50 + 1);
-	if (!res)
-		return (NULL);
-	while (arg[i])
-	{
-		toggle_quotes(arg[i], &in_sq, &in_dq);
-		if (arg[i] == '$' && !in_sq)
-			j += process_dollar(&res[j], arg, &i, sh);
-		else
-			res[j++] = arg[i++];
-	}
-	res[j] = '\0';
-	return (res);*/
 	in_sq = false;
 	in_dq = false;
 	i = 0;
