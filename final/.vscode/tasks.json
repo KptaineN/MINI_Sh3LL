@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc build active file",
+            "command": "gcc -fdiagnostics-color=always -Wall -Wextra -Werror -g -lreadline -no-pie -fsanitize=address -fno-omit-frame-pointer $(find . -name '*.c') -o minish",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "sh":{
+                    "executable": "/bin/bash",
+                    "args":["-c"]
+                }
+            },
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build all source files together"
+        }
+    ]
+}
