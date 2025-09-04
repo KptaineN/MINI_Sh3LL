@@ -375,4 +375,3 @@ char *ft_itoa_inplace(char *buf, int n)
     write_digits(buf, num, digits);
     return (start);
 }
-/***************** ft_itoa_inplace*******************/

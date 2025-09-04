@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:00:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/03 11:24:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 11:51:53 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ void	multi_child(t_sh *sh, t_list *cmd, t_launch *all)
 	cmd_line = expansion_partition_redirection(cmd, sh->env, sh->oper);
 	close(all->prev_pipe[1]);
 	close(all->curr_pipe[0]);
+	sh->pipe_to_close[0] = &all->prev_pipe[0];
+	sh->pipe_to_close[1] = &all->curr_pipe[1]; 
 	execution_button(cmd_line, sh);
 }
 
@@ -46,5 +48,7 @@ void	end_child(t_sh *sh, t_list *cmd, t_launch *all)
 	close(all->prev_pipe[1]);
 	close(all->curr_pipe[0]);
 	close(all->curr_pipe[1]);
+	sh->pipe_to_close[0] = &all->curr_pipe[0];
+	sh->pipe_to_close[1] = NULL; 
 	execution_button(cmd_line, sh);
 }

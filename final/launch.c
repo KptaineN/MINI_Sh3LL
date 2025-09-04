@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:28:54 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/03 11:52:54 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/03 19:45:45 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ void condition_dual_funciton_repartition(t_sh *sh, t_launch *all)
 void execution_bcmd( char **cmd_line, t_sh *sh)
 {
 	int idx;
-	idx = is_in_t_arr_dic_str(sh->bcmd, cmd_line[0]) != -1;
-	if (idx)
+	idx = is_in_t_arr_dic_str(sh->bcmd, cmd_line[0]);
+	if (idx != -1)
 	{
 		t_dic *dic = (t_dic *)sh->bcmd->arr[idx];
 		void (*func)(t_sh *, char **) = dic->value;

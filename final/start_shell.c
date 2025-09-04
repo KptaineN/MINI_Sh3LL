@@ -60,7 +60,6 @@ int	start_sh(t_sh *sh)
 	if (!sh)
 		return (1);
 	init_signals();
-	init_signals();
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:52:35 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/02 12:17:29 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/03 19:40:21 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,24 +39,15 @@ int is_in_t_arr_dic_str(t_arr *arr, const char *arg)
 {
     int i = 0;
     t_dic *dic;
-    int len_key;
-    int len_arg;
     
     if (!arr || !arg)
         return (-1);
     
-    len_arg = 1 + (arg[1]!= 0);
     while (i < arr->len)
     {
         dic = (t_dic *)arr->arr[i];
-        char *str = dic->key;
-        (void)str;
-        len_key = ft_strlen(dic->key);
-        if (len_key<=len_arg)
-        {
-            if (dic && dic->key && ft_strncmp((char *)dic->key, arg, len_key) == 0)
-                return (i);
-        }
+        if (dic && dic->key && ft_strcmp((char *)dic->key, arg) == 0)
+            return (i);
         i++;
     }
     return (-1);

@@ -27,6 +27,12 @@
         "string.h": "c",
         "history.h": "c",
         "fcntl.h": "c",
-        "minish.h": "c"
+        "minish.h": "c",
+        "any": "c",
+        "compare": "c",
+        "complex": "c",
+        "variant": "c",
+        "builtin_exit": "c",
+        "stdlib.h": "c"
     }
 }

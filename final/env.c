@@ -6,11 +6,22 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:27:31 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 13:51:18 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/03 17:52:00 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
+
+
+static void	print_env_pair(t_env *env)
+{
+	if (!env || !env->key || !env->value)
+		return ;
+	write(STDOUT_FILENO, env->key, ft_strlen(env->key));
+	write(STDOUT_FILENO, "=", 1);
+	write(STDOUT_FILENO, env->value, ft_strlen(env->value));
+	write(STDOUT_FILENO, "\n", 1);
+}
 
 int	builtin_env(void *v_sh, void **v_argv)
 {
@@ -30,13 +41,7 @@ int	builtin_env(void *v_sh, void **v_argv)
 	while (cur)
 	{
 		env = cur->content;
-		if (env->value)
-		{
-			write(STDOUT_FILENO, env->key, ft_strlen(env->key));
-			write(STDOUT_FILENO, "=", 1);
-			write(STDOUT_FILENO, env->value, ft_strlen(env->value));
-			write(STDOUT_FILENO, "\n", 1);
-		}
+		print_env_pair(env);
 		cur = cur->next;
 	}
 	sh->exit_status = 0;

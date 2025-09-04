@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:47:33 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/02 13:43:22 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/03 19:44:33 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ static char	*get_value_env(t_list *env, char *value, int len)
 	return (NULL);
 }
 
-static char	*join_path(char *dir, char *cmd)
+static char	*join_path(const char *dir, const char *cmd)
 {
 	char	*full_path;
 	int		dir_len;
@@ -130,6 +130,7 @@ static char	*join_path(char *dir, char *cmd)
 	return (full_path);
 }
 
+/********************** -> f cmd path
 char	*find_command_path(char *cmd, t_list *env)
 {
 	char	*path_env;
@@ -182,7 +183,105 @@ char	*find_command_path(char *cmd, t_list *env)
 	}
 	free(path_copy);
 	return (NULL);
+}*/
+
+/** */
+/* --- helpers --------------------------------------------------------- */
+
+static char *try_cmd_in_dir(const char *dir, const char *cmd)
+{
+	char *full;
+
+	full = join_path(dir, cmd);
+	if (!full)
+		return (NULL);
+	if (access(full, F_OK | X_OK) == 0)
+		return (full);              /* gardé: le caller fera le return */
+	free(full);
+	return (NULL);
 }
+
+/* renvoie une copie modifiable de PATH (à free) et écrit sa longueur dans *out_len */
+static char *dup_path_env(t_list *env, int *out_len)
+{
+	char *path_env;
+	char *copy;
+	int   len;
+
+	path_env = get_value_env(env, "PATH", 4);
+	if (!path_env)
+		return (NULL);
+	len = ft_strlen(path_env);
+	copy = (char *)malloc((size_t)len + 1);
+	if (!copy)
+		return (NULL);
+	ft_strcpy(copy, path_env);
+	if (out_len)
+		*out_len = len;
+	return (copy);
+}
+
+/* boucle principale: parcourt path_copy séparé par ':' (on mute les ':' en '\0') */
+static char *search_cmd_in_path(char *path_copy, int len, const char *cmd)
+{
+	int   i;
+	int   start;
+	char *dir;
+	char *found;
+
+	start = 0;
+	i = 0;
+	while (i <= len)
+	{
+		if (path_copy[i] == ':' || path_copy[i] == '\0')
+		{
+			path_copy[i] = '\0';             /* termine le segment courant */
+			dir = path_copy + start;
+			if (*dir != '\0')                /* skip segments vides (comportement identique au tien) */
+			{
+				found = try_cmd_in_dir(dir, cmd);
+				if (found)
+					return (found);          /* à free par le caller si besoin */
+			}
+			start = i + 1;                   /* prochain segment */
+		}
+		i++;
+	}
+	return (NULL);
+}
+
+/* --- API ------------------------------------------------------------- */
+
+char	*find_command_path(char *cmd, t_list *env)
+{
+	char *path_copy;
+	char *found;
+	int   len;
+
+	/* 1) chemin explicite contenant un '/' */
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK | X_OK) == 0)
+			return (ft_strdup(cmd));
+		return (NULL);
+	}
+
+	/* 2) dupliquer PATH pour itérer proprement */
+	path_copy = dup_path_env(env, &len);
+	if (!path_copy)
+		return (NULL);
+
+	/* 3) chercher cmd dans chaque segment de PATH */
+	found = search_cmd_in_path(path_copy, len, cmd);
+
+	/* 4) cleanup et retour */
+	free(path_copy);
+	return (found);
+}
+
+/********find-cmd-path ******/
+
+
 
 t_env	*env_lookup(t_list *env, const char *key)
 {

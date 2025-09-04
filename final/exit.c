@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:26:26 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 13:35:16 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/03 19:52:57 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	is_numeric(const char *str)
 	}
 	return (1);
 }
-
+/*
 int	builtin_exit(void *v_sh, void **v_argv)
 {
 	t_sh	*sh;
@@ -66,4 +66,16 @@ int	builtin_exit(void *v_sh, void **v_argv)
 	}
 	exit_sh(sh, 0);
 	return (0);
+}*/
+
+int	builtin_exit(void *v_sh, void **v_argv)
+{
+	t_sh * sh = v_sh;
+	(void)	v_argv;
+	free_string_array((char **)v_argv);
+	close((*sh->pipe_to_close[0]));
+	if (sh->pipe_to_close[1] != NULL)
+		close((*sh->pipe_to_close[1]));
+	exit(0);
 }
+
