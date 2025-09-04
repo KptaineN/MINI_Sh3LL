@@ -6,15 +6,16 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:49:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 14:16:03 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:34:40 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
 
+sig_atomic_t g_exit_status = 0;
 
 int main(int argc, char **argv, char **envp)
-{ 
+{
     if (argc != 1 || argv[1])
 	{
 		ft_putstr_fd("Usage: ./minish\n", STDERR_FILENO);
@@ -24,7 +25,7 @@ int main(int argc, char **argv, char **envp)
     init_sh(sh,envp);
     looping(sh);
     free_sh(sh);
-	return (exit_status);
+	return (g_exit_status);
 }
 
 /*

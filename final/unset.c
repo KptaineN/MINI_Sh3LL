@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:24:52 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/04 14:02:48 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int	builtin_unset(void *v_sh, void **v_argv)
 		unset_one((t_list **)&sh->env, argv[i]);
 		i++;
 	}
-	exit_status = 0;
+	g_exit_status = 0;
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:28:54 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 14:09:29 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,9 +111,9 @@ void wait_all_pids(int **pids, int n)
 		i++;
 	}
 	if (WIFEXITED(status)) {
-		exit_status = WEXITSTATUS(status);
+		g_exit_status = WEXITSTATUS(status);
 	} else if (WIFSIGNALED(status)) {
-		exit_status = 128 + WTERMSIG(status);
+		g_exit_status = 128 + WTERMSIG(status);
     }
 	free(*pids);
 	*pids = NULL;

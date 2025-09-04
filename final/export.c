@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:55:22 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/04 14:02:48 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,6 @@ int	builtin_export(void *v_sh, void **v_argv)
 		error |= process_export_argument(argv[i], sh);
 		i++;
 	}
-	exit_status = error;
+	g_exit_status = error;
 	return (error);
 }

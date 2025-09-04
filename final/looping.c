@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 14:14:19 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:44:31 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,9 @@ void	parse_and_prepare(t_sh *sh, char *in)
 static int	process_input(t_sh *sh, char *in)
 {
 	if (!in || *in == '\0')
-		return (0); //(cleanup_sh_iter(sh, in), 0);
+		return (0);
 	add_history(in);
 	parse_and_prepare(sh, in);
-	display_linked_list_of_string_array(sh->cmd);
-
 	char **cmd_line = expansion_partition_redirection(sh->cmd, sh->env, sh->oper);
 	(void) cmd_line;
 	launch_process(sh);
@@ -64,7 +62,8 @@ char *get_full_line(void)
 	int type;
 	in = NULL;
 	(void) add;
-	in = readline("ᕕ( ᐛ )ᕗ minish$ ");
+	write(1, "ᕕ( ᐛ )ᕗ minish$ ", ft_strlen("ᕕ( ᐛ )ᕗ minish$ "));
+	in = readline("");
 	if (!in)
 	{	
 		write(1, "exit\n", 5);
@@ -105,7 +104,7 @@ int	looping(t_sh *sh)
 
 	retour = 0;
 	replace_or_add(&sh->env,"?","?=0");
-	exit_status = 0;
+	g_exit_status = 0;
 	char *error_message = ft_calloc(20,sizeof(char));
 	error_message[0] = '?';
 	error_message[1] = '=';
@@ -115,7 +114,7 @@ int	looping(t_sh *sh)
 		if (!in)
 			break ;	
 		retour = process_input(sh, in);
-		ft_itoa_inplace(&error_message[2], exit_status);
+		ft_itoa_inplace(&error_message[2], g_exit_status);
 		replace_or_add(&sh->env,"?",error_message);
 		if (retour == 1)
 			break ;

@@ -33,6 +33,7 @@
         "complex": "c",
         "variant": "c",
         "builtin_exit": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "termios.h": "c"
     }
 }
