@@ -32,6 +32,7 @@
 /* ************************************************************************** */
 /*                                 STRUCTURES                                 */
 /* ************************************************************************** */
+volatile sig_atomic_t exit_status = 0;
 
 typedef struct s_launch		t_launch;
 typedef struct s_sh			t_sh;
@@ -105,7 +106,6 @@ typedef struct s_sh
 	t_arr					*oper;
 	pid_t					*pids;
 	int						fd_pid[2];
-	int						exit_status;
 	char					**exec_envp_tmp;
 	char					*exec_cmd_path_tmp;
 	t_list					*exec_candidates_tmp;
@@ -187,7 +187,8 @@ char **expansion_partition_redirection(t_list *cmd, t_list *env, t_arr *oper);
 void						execution_button(char **cmd_line, t_sh *sh);
 void						launch_process(t_sh *sh);
 
-void						add_pid_env(t_sh *sh, int fd);
+void replace_or_add(t_list **lst, const char *old, const char *new);
+void						add_env(t_sh *sh, const char *key, int fd);
 void						send_pid(int fd, int pid);
 
 char						**expansion_partition_redirection(t_list *cmd,

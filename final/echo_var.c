@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:36:18 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 12:16:25 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:06:55 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,13 @@ int	dollar_edge_cases(char *dst, const char *arg, int *i, t_sh *sh)
 	int		k;
 	char	c;
 
+	(void) sh;
 	k = *i + 1;
 	c = arg[k];
 	if (c == '\0')
 		return (write_dollar(dst, i));
 	if (c == '?')
-		return (write_and_free(dst, ft_itoa(sh->exit_status), i, k + 1));
+		return (write_and_free(dst, ft_itoa(exit_status), i, k + 1));
 	if (!is_valid_key_char((unsigned char)c))
 		return (write_dollar(dst, i));
 	return (-1);

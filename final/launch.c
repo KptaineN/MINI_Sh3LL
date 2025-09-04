@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:28:54 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/03 19:45:45 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:09:29 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static void	separate_family(t_family *f, t_sh *sh, t_launch *all)
 	if (*all->pid == 0)
 	{
 		child_signals();
-		add_pid_env(sh, all->fd_pid[0]);
+		add_env(sh, "PID=",all->fd_pid[0]);
 		close(all->fd_pid[1]);
 		close(all->fd_pid[0]);
 		(f[0])(sh, sh->cmd, all);
@@ -103,12 +103,18 @@ void	execution_button(char **cmd_line, t_sh *sh)
 void wait_all_pids(int **pids, int n)
 {
 	int i;
+	int status;
 	i = 0;
 	while (i < n)
 	{
 		waitpid((*pids)[i], NULL, 0);
 		i++;
 	}
+	if (WIFEXITED(status)) {
+		exit_status = WEXITSTATUS(status);
+	} else if (WIFSIGNALED(status)) {
+		exit_status = 128 + WTERMSIG(status);
+    }
 	free(*pids);
 	*pids = NULL;
 }

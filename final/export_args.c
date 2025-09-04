@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:55:45 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 14:01:18 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:02:48 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	handle_arg_with_assignment(char *arg, t_sh *sh)
 		ft_putstr_fd("minish: export: `", STDERR_FILENO);
 		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
-		sh->exit_status = 1;
+		exit_status = 1;
 		ret = 1;
 	}
 	else if (set_env_var(sh, arg, eq + 1) != 0)
@@ -60,7 +60,7 @@ int	handle_arg_without_assignment(char *arg, t_sh *sh)
 		ft_putstr_fd("minish: export: `", STDERR_FILENO);
 		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
-		sh->exit_status = 1;
+		exit_status = 1;
 		return (1);
 	}
 	if (!find_env_var(sh, arg))
@@ -108,12 +108,12 @@ int	export_no_arguments(t_sh *sh)
 	arr = env_to_array(sh);
 	if (!arr)
 	{
-		sh->exit_status = 1;
+		exit_status = 1;
 		return (1);
 	}
 	ft_bubble_str_sort(arr);
 	print_export_arr(arr);
 	free_string_array(arr);
-	sh->exit_status = 0;
+	exit_status = 0;
 	return (0);
 }

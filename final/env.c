@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:27:31 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/03 17:52:00 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:02:48 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	builtin_env(void *v_sh, void **v_argv)
 	if (args[1])
 	{
 		ft_putstr_fd("( ͡ಠ ʖ̯ ͡ಠ)╭∩╮minish: env: too many arguments\n", 2);
-		return (sh->exit_status = 1);
+		return (exit_status = 1);
 	}
 	cur = sh->env;
 	while (cur)
@@ -44,6 +44,6 @@ int	builtin_env(void *v_sh, void **v_argv)
 		print_env_pair(env);
 		cur = cur->next;
 	}
-	sh->exit_status = 0;
+	exit_status = 0;
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:34:48 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 12:16:38 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:02:48 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ char	*get_dollar_value(const char *arg, int *pos, t_sh *sh)
 	k = *pos + 1;
 	if (arg[k] == '?')
 	{
-		val = ft_itoa(sh->exit_status);
+		val = ft_itoa(exit_status);
 		*pos = k + 1;
 		return (val);
 	}

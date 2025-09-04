@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 12:10:13 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:14:19 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,15 +104,22 @@ int	looping(t_sh *sh)
 	int		retour;
 
 	retour = 0;
+	replace_or_add(&sh->env,"?","?=0");
+	exit_status = 0;
+	char *error_message = ft_calloc(20,sizeof(char));
+	error_message[0] = '?';
+	error_message[1] = '=';
 	while (1)
 	{
 		in = get_full_line();
 		if (!in)
 			break ;	
 		retour = process_input(sh, in);
-		
+		ft_itoa_inplace(&error_message[2], exit_status);
+		replace_or_add(&sh->env,"?",error_message);
 		if (retour == 1)
 			break ;
 	}
+	free(error_message);
 	return (0);
 }

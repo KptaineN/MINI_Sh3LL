@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:49:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/02 12:17:29 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/04 14:16:03 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,7 @@
 
 
 int main(int argc, char **argv, char **envp)
-{
-    
+{ 
     if (argc != 1 || argv[1])
 	{
 		ft_putstr_fd("Usage: ./minish\n", STDERR_FILENO);
@@ -25,7 +24,7 @@ int main(int argc, char **argv, char **envp)
     init_sh(sh,envp);
     looping(sh);
     free_sh(sh);
-	return (sh->exit_status);
+	return (exit_status);
 }
 
 /*
