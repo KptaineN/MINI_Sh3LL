@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 16:37:26 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/03 17:55:14 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 16:13:08 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,8 @@ t_list	*build_cmd(t_sh *sh, char **parsed)
 	scan_segments(&c);
 	warn_trailing_pipe(&c);
 	flush_current_segment(&c);
+	free(sh->parsed_args);
+	sh->parsed_args = NULL;
 	return (c.head);
 }
 /* *********build_cmd ******** */

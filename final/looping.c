@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 12:30:49 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 17:41:55 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,9 @@
 
 void	parse_and_prepare(t_sh *sh, char *in)
 {
-	sh->parsed_args = custom_split(in, sh);
+	sh->parsed_args = custom_split(in);
 	display_string_array(sh->parsed_args);
 	sh->cmd = build_cmd(sh, sh->parsed_args);
-	free(in);
 }
 
 static int	process_input(t_sh *sh, char *in)

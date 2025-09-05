@@ -141,15 +141,14 @@ int							looping(t_sh *sh);
 // free enrico
 void						free_string_array(char **arr);
 void						free_t_arr_dic(t_arr **arr);
-void						free_t_arr_dic_func(t_arr **arr);
 void						free_sh(t_sh *sh);
 void						free_t_list(t_list **env_list);
 
 char						*find_command_path(char *cmd, t_list *env);
 
 // split
-bool						escape_check(const char *str, int idx);
-char						**custom_split(const char *str, t_sh *sh);
+bool 						escape_check(char *in, int idx);
+char 						**custom_split(char *in);
 
 // signal
 void						signal_reset_prompt(int signo);
@@ -167,17 +166,20 @@ char						*find_command_path(char *cmd, t_list *env);
 int							set_env_value(t_list **env, const char *key,
 								const char *value);
 
-// expand tools
+// expansion
 int							count_escape_char_before(const char *str, int idx);
 int							handle_escape_count(const char *str, int *i,
 								int len);
 char						*handle_escape_write(char *dst, const char *src,
 								int *i, int *j);
+char						*expand_single_string(char *str, t_list *env_list);
+char						*get_env_value(t_list *env_list, const char *key);
+//
+
 
 t_list						*build_cmd(t_sh *sh, char **parsed);
 void						parse_and_prepare(t_sh *sh, char *in);
-char						*expand_single_string(char *str, t_list *env_list);
-char						*get_env_value(t_list *env_list, const char *key);
+
 
 // child
 void						**pid_expansion(void **v_arr, t_list *env);

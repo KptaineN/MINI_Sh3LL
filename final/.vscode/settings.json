@@ -34,6 +34,14 @@
         "variant": "c",
         "builtin_exit": "c",
         "stdlib.h": "c",
-        "termios.h": "c"
+        "termios.h": "c",
+        "deque": "c",
+        "forward_list": "c",
+        "list": "c",
+        "string": "c",
+        "unordered_map": "c",
+        "unordered_set": "c",
+        "vector": "c",
+        "text_encoding": "c"
     }
 }
