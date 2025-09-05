@@ -15,25 +15,26 @@
 
 # include <errno.h>
 # include <fcntl.h>
+# include <termios.h>
+# include <unistd.h>
 # include <signal.h>
 # include <stdbool.h>
 # include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# include <termios.h>
-# include <unistd.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 
+
 /* ************************************************************************** */
 /*                                 STRUCTURES                                 */
 /* ************************************************************************** */
 
-extern sig_atomic_t g_exit_status;
+extern sig_atomic_t			g_exit_status;
 
 typedef struct s_launch		t_launch;
 typedef struct s_sh			t_sh;
@@ -116,9 +117,8 @@ typedef struct s_sh
 
 typedef struct s_xpctx
 {
-	const char *s;       /* input */
-	char *res;          
-		/* NULL => phase longueur ; non-NULL => phase écriture */
+	const char *s; /* input */
+	char					*res;
 	t_list *env;         /* utilisé seulement en phase longueur */
 	t_list **exp;        /* liste des expansions (E/S) */
 	t_list *curr;        /* dummy node pendant la phase longueur */
@@ -141,7 +141,7 @@ int							looping(t_sh *sh);
 // free enrico
 void						free_string_array(char **arr);
 void						free_t_arr_dic(t_arr **arr);
-void 						free_t_arr_dic_func(t_arr **arr);
+void						free_t_arr_dic_func(t_arr **arr);
 void						free_sh(t_sh *sh);
 void						free_t_list(t_list **env_list);
 
@@ -150,6 +150,13 @@ char						*find_command_path(char *cmd, t_list *env);
 // split
 bool						escape_check(const char *str, int idx);
 char						**custom_split(const char *str, t_sh *sh);
+
+// signal
+void						signal_reset_prompt(int signo);
+void						set_signals_interactive(void);
+void						signal_print_newline(int signal);
+void						set_signals_noninteractive(void);
+void						ignore_sigquit(void);
 
 // PATH
 t_list						*ft_lstnew(void *content);
@@ -168,10 +175,12 @@ char						*handle_escape_write(char *dst, const char *src,
 								int *i, int *j);
 
 t_list						*build_cmd(t_sh *sh, char **parsed);
-void	parse_and_prepare(t_sh *sh, char *in);
+void						parse_and_prepare(t_sh *sh, char *in);
+char						*expand_single_string(char *str, t_list *env_list);
+char						*get_env_value(t_list *env_list, const char *key);
 
 // child
-void						child_signals(void);
+void						**pid_expansion(void **v_arr, t_list *env);
 void						one_child(t_sh *sh, t_list *cmd, t_launch *all);
 void						multi_child(t_sh *sh, t_list *cmd, t_launch *all);
 void						end_child(t_sh *sh, t_list *cmd, t_launch *all);
@@ -181,14 +190,12 @@ void						one_parent(t_sh *sh, t_list *cmd, t_launch *all);
 void						multi_parent(t_sh *sh, t_list *cmd, t_launch *all);
 void						end_parent(t_sh *sh, t_list *cmd, t_launch *all);
 
-//execution
-char **expansion_partition_redirection(t_list *cmd, t_list *env, t_arr *oper);
-
 // launch
 void						execution_button(char **cmd_line, t_sh *sh);
 void						launch_process(t_sh *sh);
 
-void replace_or_add(t_list **lst, const char *old, const char *new);
+void						replace_or_add(t_list **lst, const char *old,
+								const char *new);
 void						add_env(t_sh *sh, const char *key, int fd);
 void						send_pid(int fd, int pid);
 
@@ -216,6 +223,7 @@ char						*env_get_var(t_list *env_list, const char *key);
 */
 void						free_string_array(char **array);
 void						free_env_list(t_list **env_list);
+void						free_linked_list_of_array_string(t_list *head);
 
 /*
 ** UTILITY/DEBUG FUNCTIONS
@@ -252,6 +260,7 @@ int							ft_atoi(const char *str);
 void						ft_putchar_fd(char c, int fd);
 int							ft_isalpha(int c);
 void						ft_putendl_fd(const char *s, int fd);
+int							count_digits(long n);
 char						*ft_itoa_inplace(char *buf, int n);
 
 // functions

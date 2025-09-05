@@ -55,18 +55,18 @@ void	init_family(t_sh *sh)
 	sh->f_core[len] = NULL;
 }
 
-int	start_sh(t_sh *sh)
-{	
-	if (!sh)
-		return (1);
-	init_signals();
-	return (0);
-}
+//int	start_sh(t_sh *sh)
+//{	
+//	if (!sh)
+//		return (1);
+//	init_signals();
+//	return (0);
+//}
 
 void	init_sh(t_sh *sh, char **envp)
 {
 	sh->env = set_linked_env(envp);
     init_all_t_arr(sh);
 	init_family(sh);
-	start_sh(sh);
+	//start_sh(sh);
 }

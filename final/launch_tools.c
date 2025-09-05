@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 16:48:34 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 12:39:03 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 12:07:22 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,18 +85,11 @@ void replace_or_add(t_list **lst, const char *old, const char *new)
     ft_lstadd_front(lst, (void *)new);
 }
 
-void add_env(t_sh *sh, const char *key ,int fd)
+void add_env(t_sh *sh, const char *key, int fd)
 {
     char s[20] = {0};
-    ssize_t l_k  = ft_strlen(key);
-    ssize_t n = read(fd, s, l_k + sizeof(pid_t));
-    if (n != (l_k + (ssize_t)sizeof(pid_t)))
-    {
-        perror("add_pid_func");
-        return;  // Or handle error as needed
-    }
-    pid_t received_pid = *(pid_t *)(&s[4]);  // Extract binary PID
-    ft_itoa_inplace(&s[4], (int)received_pid);
+    ssize_t n = read(fd, s,20);
+    s[n] = 0;
     replace_or_add(&sh->env, key, (const char *)s);
 }
 
@@ -105,6 +98,7 @@ void send_pid(int fd, int pid)
     char *s_pid = ft_itoa(pid);
     write(fd, "PID=", 4);
     write(fd, s_pid, ft_strlen(s_pid));  // Send child's PID to child
+    write(fd,"\0",1);
     free(s_pid);
 }
 

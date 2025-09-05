@@ -330,7 +330,7 @@ void	ft_putendl_fd(const char *s, int fd)
 
 /***************** ft_itoa_inplace*******************/
 
-static int count_digits(long n)
+int count_digits(long n)
 {
     int d = 0;
     while (n > 0)

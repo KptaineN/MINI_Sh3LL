@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:29:36 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/03 19:00:27 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 09:22:33 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,3 +83,22 @@ void    free_sh(t_sh *sh) {
     free(sh);
 }
 
+void free_linked_list_of_array_string(t_list* head) {
+    t_list* current = head;
+    t_list* next;
+
+    while (current != NULL) {
+        // Free each string in the strings array
+        if (current->arr_content != NULL) {
+            for (int i = 0; current->arr_content[i]; i++) {
+                if (current->arr_content[i] != NULL) {
+                    free(current->arr_content[i]);
+                }
+            }
+            free(current->arr_content);
+        }
+        next = current->next;
+        free(current);
+        current = next;
+    }
+}

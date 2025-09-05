@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 14:44:31 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 12:30:49 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,27 @@ void	parse_and_prepare(t_sh *sh, char *in)
 	sh->parsed_args = custom_split(in, sh);
 	display_string_array(sh->parsed_args);
 	sh->cmd = build_cmd(sh, sh->parsed_args);
+	free(in);
 }
 
 static int	process_input(t_sh *sh, char *in)
 {
 	if (!in || *in == '\0')
 		return (0);
+
 	add_history(in);
+	in = expand_single_string(in,sh->env);
 	parse_and_prepare(sh, in);
-	char **cmd_line = expansion_partition_redirection(sh->cmd, sh->env, sh->oper);
-	(void) cmd_line;
+	display_linked_list_of_string_array(sh->cmd);
+	if (ft_strcmp((char *)sh->cmd->arr_content[0], "exit") == 0)
+	{	
+		free_linked_list_of_array_string(sh->cmd);
+		return 1;
+	}
+	//sh->cmd->arr_content = pid_expansion(sh->cmd->arr_content,sh->env);
+	//free_linked_list_of_array_string(sh->cmd);
 	launch_process(sh);
-	return (free(in), 2);
+	return (2);
 }
 
 int check_open_quotes(char *in)
@@ -62,8 +71,9 @@ char *get_full_line(void)
 	int type;
 	in = NULL;
 	(void) add;
-	write(1, "ᕕ( ᐛ )ᕗ minish$ ", ft_strlen("ᕕ( ᐛ )ᕗ minish$ "));
-	in = readline("");
+	set_signals_interactive();
+	in = readline("ᕕ( ᐛ )ᕗ minish$ ");
+	set_signals_noninteractive();
 	if (!in)
 	{	
 		write(1, "exit\n", 5);
@@ -72,10 +82,12 @@ char *get_full_line(void)
 	type = check_open_quotes(in);
 	while(type != 0)
 	{
+		set_signals_interactive();
 		if (type == 1)
 			add = readline("squote> ");
 		else
 			add = readline("dquote> ");
+		set_signals_noninteractive();
 		if (!add)
 		{
 			write(1, "exit\n", 5);
@@ -108,6 +120,7 @@ int	looping(t_sh *sh)
 	char *error_message = ft_calloc(20,sizeof(char));
 	error_message[0] = '?';
 	error_message[1] = '=';
+	replace_or_add(&sh->env,"PID","PID=0");
 	while (1)
 	{
 		in = get_full_line();

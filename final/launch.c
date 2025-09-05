@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:28:54 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 12:26:04 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,18 @@ static int	init_pip(t_sh *sh, t_launch *all)
 }
 
 
+void	ctrl_c(int sig)
+{
+	write(1,"\n",1);
+	(void)sig;
+}
+
+void	back_slash(int sig)
+{
+	printf("Quit (core dumped)\n");
+	(void)sig;
+}
+
 static void	separate_family(t_family *f, t_sh *sh, t_launch *all)
 {
 	if (*all->pid < 0)
@@ -30,9 +42,10 @@ static void	separate_family(t_family *f, t_sh *sh, t_launch *all)
 		perror("Forks");
 		exit(1);
 	}
+	signal(SIGINT, ctrl_c);
+	signal(SIGQUIT, back_slash);
 	if (*all->pid == 0)
 	{
-		child_signals();
 		add_env(sh, "PID=",all->fd_pid[0]);
 		close(all->fd_pid[1]);
 		close(all->fd_pid[0]);
@@ -86,11 +99,7 @@ void	execution_button(char **cmd_line, t_sh *sh)
 	if (access(path, X_OK) == -1)
 	{
 		execution_bcmd(cmd_line, sh);
-		if (path)
-		{
-			perror("execv");
-			exit(1);
-		}
+		free_string_array(cmd_line);
 		perror("access");
 		exit(1);
 	}
@@ -103,11 +112,11 @@ void	execution_button(char **cmd_line, t_sh *sh)
 void wait_all_pids(int **pids, int n)
 {
 	int i;
-	int status;
 	i = 0;
+	int status = 0;
 	while (i < n)
 	{
-		waitpid((*pids)[i], NULL, 0);
+		waitpid((*pids)[i], &status, 0);
 		i++;
 	}
 	if (WIFEXITED(status)) {

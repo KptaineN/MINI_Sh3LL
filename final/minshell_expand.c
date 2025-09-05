@@ -12,7 +12,7 @@
 
 #include "minish.h"
 
-static char	*get_env_value(t_list *env_list, const char *key)
+char	*get_env_value(t_list *env_list, const char *key)
 {
 	t_list	*current;
 	size_t	key_len;
@@ -80,15 +80,20 @@ static char	*extract_simple_var(const char *str, int *var_len)
 {
 	int	i;
 	int	start;
-
 	i = 1;
 	start = i;
 	while (str[i] && str[i] != ' ' && str[i] != '"' && str[i] != '\''
 		&& str[i] != '\\')
+	{	
 		i++;
+		if( str[i]=='$')
+			break;
+	}
 	*var_len = i;
-	if (i == 1)
-		return (ft_strdup("$"));
+	//if (i == 1) //DOUBIOUS
+	//{	
+	//	return (ft_strdup("$"));
+	//}
 	return (ft_strndup(str + start, i - start));
 }
 
@@ -201,27 +206,6 @@ typedef struct s_expval
 		/* nb de caractères consommés dans l’entrée (p.ex "$FOO" => 4) */
 }			t_expval;
 
-/* push un expval (alloue la structure, mais pas val) */
-static void	push_expval(t_list **tail, const char *val, int span)
-{
-	t_expval	*exp;
-
-	if (!tail || !*tail)
-		return ;
-	exp = (t_expval *)malloc(sizeof(*exp));
-	if (!exp)
-		return ;
-	if (val)
-		exp->val = val;
-	else
-		exp->val = "";
-	if (span > 0)
-		exp->span = span;
-	else
-		exp->span = 1;
-	push_lst(tail, exp);
-		/* tail est un "pointeur vers dernier" (dummy au début) */
-}
 
 /* résout $... en (val, span).
    - "$" ou pattern invalide => val="$", span=1 (dollar littéral)
@@ -265,22 +249,24 @@ static t_expval	resolve_from_info(t_list *env, t_varinfo *vi)
 	r.span = vi->span;
 	if (vi->literal_dollar)
 	{
-		r.val = "$";
+		r.val = "$$";
 		return (r);
 	}
 	val = get_env_value(env, vi->name);
 	if (val)
+	{	
 		r.val = val;
+		if (vi->name)
+			free(vi->name);
+	}
 	else
-		r.val = "";
-	if (vi->name)
-		free(vi->name);
+	{
+		if (vi->name)
+			r.val = vi->name;
+	}	
 	return (r);
 }
 
-/* Wrapper compatible avec l’ancienne signature */
-/*static void	resolve_var_at(const char *s, t_list *env, int i,
-		const char **out_val, int *out_span)*/
 static t_expval resolve_var_at(const char *s, t_list *env, int i)
 {
     t_varinfo vi = parse_varinfo_at(s, i);
@@ -291,7 +277,7 @@ static int	handle_dollar_len_count(t_xpctx *c)
 {
     t_expval r = resolve_var_at(c->s, c->env, c->i);
     c->len += ft_strlen(r.val);
-    push_expval(&c->curr, r.val, r.span);
+    push_lst(&c->curr, (void *)r.val);
     c->i += r.span;
     return 1;
 }
@@ -304,11 +290,11 @@ static int	handle_dollar_len(t_xpctx *c)
 		return (handle_dollar_len_count(c));
 	else
 	{
-		 size_t l = ft_strlen((const char *)(*c->exp)->content);
-    ft_strcpy(&c->res[c->j], (const char *)(*c->exp)->content);
-    advance_node(c->exp);
-    c->j += (int)l;
-    c->i = count_varlen_env(c->s, c->i);
+		size_t l = ft_strlen((const char *)(*c->exp)->content);
+		ft_strcpy(&c->res[c->j], (const char *)(*c->exp)->content);
+		advance_node(c->exp);
+		c->j += (int)l;
+		c->i = count_varlen_env(c->s, c->i);
 	}
 	return (1);
 }
@@ -345,7 +331,7 @@ static void	len_step(t_xpctx *c)
 /* Calcule la longueur développée et prépare *exp :
  * *exp pointera sur le premier vrai nœud (après le dummy), le dummy est libéré.
  */
-static size_t	calculate_expanded_length(const char *str, t_list *env_list,
+size_t	count_expansion(const char *str, t_list *env_list,
 		t_list **exp)
 {
 	t_xpctx	c;
@@ -375,64 +361,16 @@ static char	*write_expansion(const char *str, int expanded_len, t_list **exp)
 }
 
 // Expand a single string with proper quote handling
-static char	*expand_single_string(const char *str, t_list *env_list)
+char	*expand_single_string(char *str, t_list *env_list)
 {
 	t_list	*exp;
 	size_t	expanded_len;
+	char *r;
 
 	if (!str)
 		return (NULL);
-	expanded_len = calculate_expanded_length(str, env_list, &exp);
-	return (write_expansion(str, (int)expanded_len, &exp));
-}
-
-static int	count_strings(char **array)
-{
-	int	count;
-
-	count = 0;
-	if (!array)
-		return (0);
-	while (array[count])
-		count++;
-	return (count);
-}
-
-static int	expand_array_elements(char **input_array, char **expanded_array,
-		t_list *env_list)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	while (input_array[i])
-	{
-		expanded_array[i] = expand_single_string(input_array[i], env_list);
-		if (!expanded_array[i])
-		{
-			j = 0;
-			while (j < i)
-				free(expanded_array[j++]);
-			free(expanded_array);
-			return (0);
-		}
-		i++;
-	}
-	return (1);
-}
-
-char	**expand_variables(char **input_array, t_list *env_list)
-{
-	int		array_size;
-	char	**expanded_array;
-
-	if (!input_array)
-		return (NULL);
-	array_size = count_strings(input_array);
-	expanded_array = ft_calloc(array_size + 1, sizeof(char *));
-	if (!expanded_array)
-		return (NULL);
-	if (!expand_array_elements(input_array, expanded_array, env_list))
-		return (NULL);
-	return (expanded_array);
+	expanded_len = count_expansion((const char *)str, env_list, &exp);
+	r = write_expansion((const char *)str, (int)expanded_len, &exp);
+	free(str);
+	return (r);
 }
