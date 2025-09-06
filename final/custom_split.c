@@ -6,11 +6,16 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 15:25:28 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/05 17:42:18 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/05 17:46:34 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h" 
+
+/*
+	1 not escaped
+	0 escaped
+*/
 // »»-----► Number of lines: 8
 bool escape_check(char *in, int idx)
 {
@@ -21,7 +26,7 @@ bool escape_check(char *in, int idx)
 		s^=1;
 		idx--;
 	}
-	return s;
+	return s^1;
 }
 /*
 	str = "  hello  cut"

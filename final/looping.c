@@ -6,39 +6,31 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 17:41:55 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/06 09:38:50 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
-void	parse_and_prepare(t_sh *sh, char *in)
-{
-	sh->parsed_args = custom_split(in);
-	display_string_array(sh->parsed_args);
-	sh->cmd = build_cmd(sh, sh->parsed_args);
-}
-
+// »»-----► Number of lines: 15
 static int	process_input(t_sh *sh, char *in)
 {
 	if (!in || *in == '\0')
 		return (0);
 
 	add_history(in);
-	in = expand_single_string(in,sh->env);
-	parse_and_prepare(sh, in);
+	in = expand_single_string(in,sh->env); //old line freed 
+	sh->parsed_args = custom_split(in); //old line freed 
+	display_string_array(sh->parsed_args);
+	sh->cmd = build_cmd(sh, sh->parsed_args);
 	display_linked_list_of_string_array(sh->cmd);
 	if (ft_strcmp((char *)sh->cmd->arr_content[0], "exit") == 0)
 	{	
 		free_linked_list_of_array_string(sh->cmd);
 		return 1;
 	}
-	//sh->cmd->arr_content = pid_expansion(sh->cmd->arr_content,sh->env);
-	//free_linked_list_of_array_string(sh->cmd);
-	launch_process(sh);
 	return (2);
 }
-
+// »»-----► Number of lines: 18
 int check_open_quotes(char *in)
 {
 	bool single_quote = false;
@@ -60,7 +52,7 @@ int check_open_quotes(char *in)
 	else
 		return 0;
 }
-
+// »»-----► Number of lines: 43
 char *get_full_line(void)
 {
 	char *in;
@@ -107,18 +99,15 @@ char *get_full_line(void)
 	}
 	return (in);
 }
-
+// »»-----► Number of lines: 18
 int	looping(t_sh *sh)
 {
 	char	*in;
 	int		retour;
 
 	retour = 0;
-	replace_or_add(&sh->env,"?","?=0");
 	g_exit_status = 0;
-	char *error_message = ft_calloc(20,sizeof(char));
-	error_message[0] = '?';
-	error_message[1] = '=';
+	replace_or_add(&sh->env,"?","?=0");
 	replace_or_add(&sh->env,"PID","PID=0");
 	while (1)
 	{
@@ -126,11 +115,9 @@ int	looping(t_sh *sh)
 		if (!in)
 			break ;	
 		retour = process_input(sh, in);
-		ft_itoa_inplace(&error_message[2], g_exit_status);
-		replace_or_add(&sh->env,"?",error_message);
 		if (retour == 1)
 			break ;
+		launch_process(sh);
 	}
-	free(error_message);
 	return (0);
 }

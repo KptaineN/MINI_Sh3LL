@@ -115,18 +115,16 @@ typedef struct s_sh
 	int						*pipe_to_close[2];
 }							t_sh;
 
-typedef struct s_xpctx
+
+//								SIDE STRUCTURES                                     //
+typedef struct s_build_cmd
 {
-	const char *s; /* input */
-	char					*res;
-	t_list *env;         /* utilisé seulement en phase longueur */
-	t_list **exp;        /* liste des expansions (E/S) */
-	t_list *curr;        /* dummy node pendant la phase longueur */
-	size_t len;          /* compteur longueur (phase longueur) */
-	int i;               /* index lecture */
-	int j;               /* index écriture (phase écriture) */
-	t_quote_state state; /* quotes */
-}							t_xpctx;
+	int i;
+	int j;
+	t_list *head;
+	t_list *curr;
+}	t_build_cmd;
+//////////////////////////////////////////////////////////////////////////////////////
 
 /* ************************************************************************** */
 /*                           FUNCTION PROTOTYPES                             */
@@ -177,9 +175,10 @@ char						*get_env_value(t_list *env_list, const char *key);
 //
 
 
+//							BUILD_CMD.C												//
 t_list						*build_cmd(t_sh *sh, char **parsed);
 void						parse_and_prepare(t_sh *sh, char *in);
-
+//////////////////////////////////////////////////////////////////////////////////////
 
 // child
 void						**pid_expansion(void **v_arr, t_list *env);
