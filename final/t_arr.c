@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:52:35 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/03 19:40:21 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 13:50:46 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,14 @@ void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
     }
 }
 
+
+
 // initialise the builtins and operators
 void init_all_t_arr(t_sh *sh)
 {
 	char *all_operators[] = {"<<",">>","&&","||","|","<",">"};
 	char *all_builtins[] = {"echo", "cd", "pwd", "export", "unset", "env", "exit"};
-    int (*operator_handlers[])(void *, void **, int *) = {
+    t_func operator_handlers[] = {
 		handle_heredoc,     // "<<" 0
 		append_redirection, // ">>" 1
 		NULL,               // "&&" 2

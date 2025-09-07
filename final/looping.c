@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 10:34:58 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 14:17:52 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,8 @@ int	looping(t_sh *sh)
 		g_exit_status = process_input(sh, in);
 		if (g_exit_status == -1)
 			break ;
+		//int pipe[2] = {-1,-1};
+		//sh->cmd->arr_content = (void **)rebuild_noredir_cmd(sh->oper, (char **)sh->cmd->arr_content, pipe);
 		launch_process(sh);
 		free_linked_list_of_array_string(sh->cmd);
 	}	

@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:00:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 10:47:47 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 14:12:48 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ void	one_child(t_sh *sh, t_list *cmd, t_launch *all)
 {
 	close(all->curr_pipe[0]);
 	close(all->curr_pipe[1]);
+	sh->pipe_to_close[0] = -1;
+	sh->pipe_to_close[1] = -1; 
 	execution_button((char **)cmd->arr_content, sh);
 }
 // »»-----► Number of lines: 8
@@ -87,8 +89,8 @@ void	multi_child(t_sh *sh, t_list *cmd, t_launch *all)
 	dup2(all->curr_pipe[1], STDOUT_FILENO);	
 	close(all->prev_pipe[1]);
 	close(all->curr_pipe[0]);
-	sh->pipe_to_close[0] = &all->prev_pipe[0];
-	sh->pipe_to_close[1] = &all->curr_pipe[1]; 
+	sh->pipe_to_close[0] = all->prev_pipe[0];
+	sh->pipe_to_close[1] = all->curr_pipe[1]; 
 	execution_button((char **)cmd->arr_content, sh);
 }
 // »»-----► Number of lines: 8
@@ -98,8 +100,8 @@ void	end_child(t_sh *sh, t_list *cmd, t_launch *all)
 	close(all->prev_pipe[1]);
 	close(all->curr_pipe[0]);
 	close(all->curr_pipe[1]);
-	sh->pipe_to_close[0] = &all->curr_pipe[0];
-	sh->pipe_to_close[1] = NULL; 
+	sh->pipe_to_close[0] = all->curr_pipe[0];
+	sh->pipe_to_close[1] = -1; 
 	execution_button((char **)cmd->arr_content, sh);
 }
 

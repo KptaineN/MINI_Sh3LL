@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:28:54 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 10:51:59 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 14:16:05 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,11 +91,65 @@ int execution_bcmd( char **cmd_line, t_sh *sh)
 	}
 	return 0;
 }
+
+//return overall length and return the pointer of n_redir
+// »»-----► Number of lines: 10
+void count_redir(t_arr *oper,char **arr, int *len,int *n_redir)
+{
+	*n_redir = 0;
+	*len = 0;
+	while(arr[*len])
+	{
+		if (is_in_t_arr_dic_str(oper,arr[(*len)++]) != -1)
+		{	
+			(*len)++;
+			(*n_redir)++;
+		}
+	}
+}
+
+typedef struct s_redir
+{
+	int n_redir; 
+// »»-----► Number of lines: 16
+	int len;
+	char **new; 
+	int i;
+	int j;
+	int idx_oper;
+	t_func f;
+}	t_redir;
+
+//rebuild_cmd_without_redir_and_apply_them
+char **rebuild_noredir_cmd(t_arr *oper, char **arr, int *pipe)
+{
+	t_redir r;
+	ft_bzero(&r, sizeof(t_redir));
+	count_redir(oper, arr, &r.len, &r.n_redir);
+	r.new = malloc(sizeof(char*)*(r.len - 2*r.n_redir+1));
+	while(arr[r.i])
+	{
+		r.idx_oper = is_in_t_arr_dic_str(oper,arr[r.i]);
+		if (r.idx_oper!=-1)
+		{
+			r.f = (t_func)((t_dic *)oper->arr[r.idx_oper])->value;
+			free(arr[r.i++]);
+			r.f((void *)arr[r.i], (void **)arr, pipe);
+			free(arr[r.i++]);
+		}
+		else
+			r.new[r.j++] = arr[r.i++];
+	}
+	free(arr);
+	r.new[r.j] = NULL;
+	return r.new;
+}
+
 // »»-----► Number of lines: 16
 void	execution_button(char **cmd_line, t_sh *sh)
 {
 	char *path = find_command_path(cmd_line[0], sh->env);
-
+	cmd_line = rebuild_noredir_cmd(sh->oper, cmd_line, (int *)sh->pipe_to_close);
 	if (path == NULL)
 	{
 		if (execution_bcmd(cmd_line, sh))
@@ -106,10 +160,10 @@ void	execution_button(char **cmd_line, t_sh *sh)
 		free_string_array(cmd_line);
 		exit(127);
 	}
-	if (access(path, X_OK) == 0)
+// »»-----► Number of lines: 8
+	else if (access(path, X_OK) == 0)
 		execv(path, cmd_line);
-	perror("execv");
-	exit(1);
+	exit(0);
 }
 // »»-----► Number of lines: 12
 void wait_all_pids(int **pids, int n)
@@ -126,6 +180,7 @@ void wait_all_pids(int **pids, int n)
 	g_exit_status = assign_signal(status);
 	free(*pids);
 	*pids = NULL;
+// »»-----► Number of lines: 4
 }
 // »»-----► Number of lines: 8
 int pipe_and_fork(t_launch *all, int i)
@@ -136,6 +191,7 @@ int pipe_and_fork(t_launch *all, int i)
 		return 1;
 	}
 	all->pids[i] = fork();
+// »»-----► Number of lines: 17
 	all->pid = &all->pids[i];
 	return 0;
 }

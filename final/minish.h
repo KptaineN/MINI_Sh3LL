@@ -77,6 +77,7 @@ typedef struct s_dic // array de string
 	void *value;
 }							t_dic;
 
+typedef int 				(*t_func)(void *, void **, int *);
 typedef void				(*t_family)(t_sh *, t_list *, t_launch *);
 
 typedef struct s_launch
@@ -99,7 +100,7 @@ typedef struct s_sh
 	t_arr					*bcmd;
 	t_arr					*oper;
 	pid_t					*pids;
-	int						*pipe_to_close[2];
+	int						pipe_to_close[2];
 	char					*msg_error;
 	t_family				**f_core;
 }							t_sh;
@@ -186,6 +187,7 @@ void						end_parent(t_sh *sh, t_list *cmd, t_launch *all);
 // launch
 void						execution_button(char **cmd_line, t_sh *sh);
 int							execution_bcmd(char **cmd_line, t_sh *sh);
+char 						**rebuild_noredir_cmd(t_arr *oper, char **arr, int *pipe);
 void						launch_process(t_sh *sh);
 
 void						replace_or_add(t_list **lst, const char *old,
