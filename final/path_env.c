@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:47:33 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 09:26:34 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/06 14:59:03 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,22 +25,12 @@ t_list	*ft_lstnew(void *content)
 	return (new);
 }
 
-void advance_node(t_list **node)
-{
-    t_list *curr;
-    if (!(*node))
-        return;
-    curr = (*node);
- 	(*node) = (*node)->next;
-    free(curr);
-}
-
 //gives to the next
 void	push_lst(t_list **tail, void *content)
 {
 	t_list *new;
 
-	if (!*tail)
+	if (!tail || !*tail)
 		return ;
 	new = malloc(sizeof(t_list));
 	if (!new)
@@ -51,7 +41,6 @@ void	push_lst(t_list **tail, void *content)
 	new->content = content;
 	new->next = NULL;
 }
-
 
 t_list	*set_linked_env(char **env)
 {

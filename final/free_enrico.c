@@ -6,12 +6,12 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:29:36 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 16:08:07 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/06 16:10:32 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
+// »»-----► Number of lines: 11
 void free_string_array(char **arr)
 {
     int i;
@@ -26,8 +26,9 @@ void free_string_array(char **arr)
     }
     free(arr);
 }
-
-void free_t_arr_dic(t_arr **arr) {
+// »»-----► Number of lines: 9
+void free_t_arr_dic(t_arr **arr)
+{
     if (!arr || !*arr) return;
     for (int i = 0; i < (*arr)->len; i++) {
         t_dic *dic = (*arr)->arr[i];    
@@ -38,8 +39,9 @@ void free_t_arr_dic(t_arr **arr) {
     free(*arr);
     *arr = NULL;
 }
-
-void free_t_list(t_list **env_list) {
+// »»-----► Number of lines: 8
+void free_t_list(t_list **env_list)
+{
     t_list *curr = *env_list;
     while (curr) {
         t_list *next = curr->next;
@@ -49,7 +51,7 @@ void free_t_list(t_list **env_list) {
     }
     *env_list = NULL;
 }
-
+// »»-----► Number of lines: 10
 void	free_family(t_sh *sh)
 {
     int i = 0;
@@ -63,21 +65,24 @@ void	free_family(t_sh *sh)
     free(sh->f_core);
     sh->f_core = NULL;
 }
-
-void    free_sh(t_sh *sh) {
+// »»-----► Number of lines: 5
+void    free_sh(t_sh *sh)
+{
+    free(sh->msg_error);
     free_t_list(&sh->env);
     free_t_arr_dic(&sh->oper);
     free_t_arr_dic(&sh->bcmd);
     free_family(sh);
     free(sh);
 }
-
-void free_linked_list_of_array_string(t_list* head) {
+// »»-----► Number of lines: 17
+void free_linked_list_of_array_string(t_list* head)
+{
     t_list* current = head;
     t_list* next;
 
     while (current != NULL) {
-        // Free each string in the strings array
+
         if (current->arr_content != NULL) {
             for (int i = 0; current->arr_content[i]; i++) {
                 if (current->arr_content[i] != NULL) {

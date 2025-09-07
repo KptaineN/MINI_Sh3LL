@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:49:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 12:39:28 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 10:09:41 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,26 @@ int main(int argc, char **argv, char **envp)
 		ft_putstr_fd("Usage: ./minish\n", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
+    
     t_sh *sh = calloc(1,sizeof(t_sh));
     init_sh(sh,envp);
-    looping(sh);
+    
+    g_exit_status = looping(sh);
     free_sh(sh);
 	return (g_exit_status);
 }
 
-/*
-    //"$USER-\"USER\"-'$USER'", //"$USER-'$USER-\"$USER\"'-\"$USER\"", problem, c'Est le charactere '-' que j'ai pas pris en compte
-    sh->parsed_args = custom_split("cat | cat | ls", sh);
-    display_string_array(sh->parsed_args);
-    sh->cmd = build_cmd(sh, sh->parsed_args);
-    
-    launch_process(sh,&sh->cmd);
 
+/**========================================================================
+ *                           Test pid expansion function
+ *========================================================================**/
+/*
+    replace_or_add(&sh->env,"PID","PID=0");
+    void *v_arg[4] = {NULL,NULL};
+    v_arg[0] = (void *)ft_strdup("echo $");
+    v_arg[1] = (void *)ft_strdup("echo $ ");
+    v_arg[2] = (void *)ft_strdup("echo$");
+    char **result = (char**)pid_expansion(v_arg,sh->env);
+    display_string_array(result);
+    return (g_exit_status);
 */

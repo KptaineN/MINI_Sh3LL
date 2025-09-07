@@ -67,6 +67,8 @@ void	init_sh(t_sh *sh, char **envp)
 {
 	sh->env = set_linked_env(envp);
     init_all_t_arr(sh);
+	sh->msg_error = ft_calloc(20,sizeof(char));
+	ft_strcpy(sh->msg_error, "?=");
 	init_family(sh);
 	//start_sh(sh);
 }

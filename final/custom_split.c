@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 15:25:28 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/05 17:46:34 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 09:36:44 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ bool escape_check(char *in, int idx)
 {
 	bool s = 0;
 	idx--;
-	while(idx && in[idx] == '\\')
+	while(idx>-1 && in[idx] == '\\')
 	{
 		s^=1;
 		idx--;
@@ -55,10 +55,10 @@ char *set_start_return_end(char **str)
 		}
 		else if (in[i] == '|' && !d_quotes && !s_quotes && escape_check(in,i))
 		{
-			start_found = &in[i];
-			if (i == 0)
-				i++;
-			break;
+			if (start_found)
+				break;
+			*str = &in[i];
+			return &in[i+1];
 		}
 		else
 		{
@@ -86,7 +86,7 @@ int 	ft_splitlen(char *str)
 		if (*end)
 			len++;
 		else
-			return len + ((*str) != 0);
+			return len + (str!=NULL);
 		str = end;
 	}
 }
@@ -105,7 +105,7 @@ char *extract_string(char **in)
 	return result; 
 }
 // »»-----► Number of lines: 18
-char **custom_split(char *in)
+char **custom_split(t_sh *sh ,char *in)
 {
 	char **result = NULL;
 	char *start = in;
@@ -123,6 +123,7 @@ char **custom_split(char *in)
 		}
 		i++;
 	}
+	sh->n_parsed = len;
 	free(start);
 	return result;
 }

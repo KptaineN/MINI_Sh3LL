@@ -12,7 +12,7 @@
 
 #include "minish.h"
 #include <unistd.h>
-
+// »»-----► Number of lines: 6
 size_t	ft_strlen(const char *s)
 {
 	size_t	len;
@@ -22,7 +22,7 @@ size_t	ft_strlen(const char *s)
 		len++;
 	return (len);
 }
-
+// »»-----► Number of lines: 10
 void	ft_bzero(void *s, size_t n)
 {
 	unsigned char	*ptr;
@@ -36,7 +36,7 @@ void	ft_bzero(void *s, size_t n)
 		i++;
 	}
 }
-
+// »»-----► Number of lines: 13
 void	*ft_calloc(size_t count, size_t size)
 {
 	void	*ptr;
@@ -53,7 +53,7 @@ void	*ft_calloc(size_t count, size_t size)
 	ft_bzero(ptr, total_size);
 	return (ptr);
 }
-
+// »»-----► Number of lines: 18
 char	*ft_strdup(const char *s1)
 {
 	char	*dup;
@@ -75,7 +75,7 @@ char	*ft_strdup(const char *s1)
 	dup[i] = '\0';
 	return (dup);
 }
-
+// »»-----► Number of lines: 20
 char	*ft_strndup(const char *s1, size_t n)
 {
 	char	*dup;
@@ -99,7 +99,7 @@ char	*ft_strndup(const char *s1, size_t n)
 	dup[i] = '\0';
 	return (dup);
 }
-
+// »»-----► Number of lines: 6
 int	ft_strcmp(const char *s1, const char *s2)
 {
 	size_t	i;
@@ -109,7 +109,7 @@ int	ft_strcmp(const char *s1, const char *s2)
 		i++;
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
-
+// »»-----► Number of lines: 10
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t	i;
@@ -123,7 +123,7 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 		return (0);
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
-
+// »»-----► Number of lines: 10
 char	*ft_strcpy(char *dst, const char *src)
 {
 	size_t	i;
@@ -137,12 +137,12 @@ char	*ft_strcpy(char *dst, const char *src)
 	dst[i] = '\0';
 	return (dst);
 }
-
+// »»-----► Number of lines: 1
 int	ft_isalnum(int c)
 {
 	return (('A'<= c && c<='Z') || ('a'<= c && c<='z' )|| ('0'<=c && c<= '9'));
 }
-
+// »»-----► Number of lines: 15
 char *ft_strncpy(char *dest, const char *src, size_t n)
 {
     size_t i;
@@ -161,7 +161,7 @@ char *ft_strncpy(char *dest, const char *src, size_t n)
     
     return dest;
 }
-
+// »»-----► Number of lines: 10
 char *ft_strchr(const char *s, int c)
 {
     while (*s != '\0')
@@ -175,7 +175,7 @@ char *ft_strchr(const char *s, int c)
     
     return NULL;
 }
-
+// »»-----► Number of lines: 15
 void	*ft_memcpy(void *dst, const char *src, size_t n)
 {
 	unsigned char	*tmp_dst;
@@ -194,7 +194,7 @@ void	*ft_memcpy(void *dst, const char *src, size_t n)
 	}
 	return (dst);
 }
-
+// »»-----► Number of lines: 9
 void	*ft_memset(void *s, int c, size_t len)
 {
 	unsigned char	*tmp_ps;
@@ -207,7 +207,7 @@ void	*ft_memset(void *s, int c, size_t len)
 	}
 	return (s);
 }
-
+// »»-----► Number of lines: 4
 void ft_putstr_fd(char *s, int fd)
 {
     if (!s)
@@ -215,12 +215,12 @@ void ft_putstr_fd(char *s, int fd)
     while (*s)
         write(fd, s++, 1);
 }
-
+// »»-----► Number of lines: 1
 void	ft_putchar_fd(char c, int fd)
 {
     write(fd, &c, 1);
 }
-
+// »»-----► Number of lines: 11
 static int	ft_numlen(int n)
 {
 	int	len;
@@ -235,7 +235,7 @@ static int	ft_numlen(int n)
 	}
 	return (len);
 }
-
+// »»-----► Number of lines: 23
 char	*ft_itoa(int n)
 {
 	char	*str;
@@ -262,7 +262,7 @@ char	*ft_itoa(int n)
 	}
 	return (str);
 }
-
+// »»-----► Number of lines: 18
 char *ft_substr(const char *s, unsigned int start, size_t len)
 {
     size_t  s_len;
@@ -284,12 +284,12 @@ char *ft_substr(const char *s, unsigned int start, size_t len)
     substr[len] = '\0';
     return substr;
 }
-
+// »»-----► Number of lines: 1
 int	ft_isdigit(int c)
 {
     return (c >= '0' && c <= '9');
 }
-
+// »»-----► Number of lines: 19
 int	ft_atoi(const char *str)
 {
     int		sign;
@@ -312,12 +312,12 @@ int	ft_atoi(const char *str)
     }
     return ((int)(result * sign));
 }
-
+// »»-----► Number of lines: 1
 int	ft_isalpha(int c)
 {
     return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
 }
-
+// »»-----► Number of lines: 5
 void	ft_putendl_fd(const char *s, int fd)
 {
     if (!s)
@@ -327,9 +327,8 @@ void	ft_putendl_fd(const char *s, int fd)
     write(fd, "\n", 1);
 }
 
-
 /***************** ft_itoa_inplace*******************/
-
+// »»-----► Number of lines: 7
 int count_digits(long n)
 {
     int d = 0;
@@ -340,7 +339,7 @@ int count_digits(long n)
     }
     return (d);
 }
-
+// »»-----► Number of lines: 7
 static void write_digits(char *dst, long n, int digits)
 {
     char *ptr = dst + digits - 1;
@@ -351,13 +350,11 @@ static void write_digits(char *dst, long n, int digits)
     }
     dst[digits] = '\0';
 }
-
+// »»-----► Number of lines: 20
 char *ft_itoa_inplace(char *buf, int n)
 {
     char *start = buf;
     long num = n;
-    int digits;
-
     if (!buf)
         return (NULL);
     if (num == 0)
@@ -371,7 +368,6 @@ char *ft_itoa_inplace(char *buf, int n)
         *buf++ = '-';
         num = -num;
     }
-    digits = count_digits(num);
-    write_digits(buf, num, digits);
+    write_digits(buf, num,  count_digits(num));
     return (start);
 }

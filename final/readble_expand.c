@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 15:20:48 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 17:43:08 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/06 15:20:52 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,7 +229,17 @@ static size_t calculate_expanded_length(const char *str, t_list *env_list, t_lis
     free(curr);
     return (len);
 }
-// »»-----► Number of lines: 39
+// »»-----► Number of lines: 6
+void advance_and_free(t_list **exp)
+{
+    t_list *curr;
+    if (!exp || !*exp)
+        return;
+    curr = *exp;
+    (*exp) = (*exp)->next;
+    free(curr);
+}
+// »»-----► Number of lines: 40
 char *write_expansion(const char *str, int expanded_len, t_list **exp)
 {
     int j = 0;
@@ -262,7 +272,7 @@ char *write_expansion(const char *str, int expanded_len, t_list **exp)
                 ft_strcpy(&result[j],(const char *)(*exp)->content);
                 j += ft_strlen((const char *)(*exp)->content);
             }
-            advance_node(exp);
+            advance_and_free(exp);
             i = count_varlen_env(str, i);
         }
         else

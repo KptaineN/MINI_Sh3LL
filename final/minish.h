@@ -15,20 +15,19 @@
 
 # include <errno.h>
 # include <fcntl.h>
-# include <termios.h>
-# include <unistd.h>
 # include <signal.h>
 # include <stdbool.h>
 # include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <termios.h>
+# include <unistd.h>
 # include <string.h>
 # include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <readline/history.h>
 # include <readline/readline.h>
-
 
 /* ************************************************************************** */
 /*                                 STRUCTURES                                 */
@@ -92,38 +91,28 @@ typedef struct s_launch
 
 typedef struct s_sh
 {
-	char					*input;
 	int						n_parsed;
-	char **args;        //
-	char **parsed_args; //	premier parsing pere
+	char					**parsed_args;
 	t_list					*cmd;
-	//	disperse les cmd_line aux enfants (le arr_content avec leur partie)
 	int						n_cmd;
-	//  puis expansion de la part de l'enfant et repartit les pipes et les WORD
-	//  cree la arr_string de la cmd finale
 	t_list					*env;
-	int						fd_in;
-	int						fd_out;
 	t_arr					*bcmd;
 	t_arr					*oper;
 	pid_t					*pids;
-	int						fd_pid[2];
-	char					**exec_envp_tmp;
-	char					*exec_cmd_path_tmp;
-	t_list					*exec_candidates_tmp;
-	t_family				**f_core;
 	int						*pipe_to_close[2];
+	char					*msg_error;
+	t_family				**f_core;
 }							t_sh;
 
-
-//								SIDE STRUCTURES                                     //
+//								SIDE STRUCTURES
+//
 typedef struct s_build_cmd
 {
-	int i;
-	int j;
-	t_list *head;
-	t_list *curr;
-}	t_build_cmd;
+	int						i;
+	int						j;
+	t_list					*head;
+	t_list					*curr;
+}							t_build_cmd;
 //////////////////////////////////////////////////////////////////////////////////////
 
 /* ************************************************************************** */
@@ -145,10 +134,11 @@ void						free_t_list(t_list **env_list);
 char						*find_command_path(char *cmd, t_list *env);
 
 // split
-bool 						escape_check(char *in, int idx);
-char 						**custom_split(char *in);
+bool						escape_check(char *in, int idx);
+char						**custom_split(t_sh *sh, char *in);
 
 // signal
+int							assign_signal(int status);
 void						signal_reset_prompt(int signo);
 void						set_signals_interactive(void);
 void						signal_print_newline(int signal);
@@ -159,12 +149,14 @@ void						ignore_sigquit(void);
 t_list						*ft_lstnew(void *content);
 t_list						*set_linked_env(char **env);
 void						push_lst(t_list **tail, void *content);
-void						advance_node(t_list **node);
 char						*find_command_path(char *cmd, t_list *env);
 int							set_env_value(t_list **env, const char *key,
 								const char *value);
 
-// expansion
+/**========================================================================
+ *                           readable_expannsion.c
+ *========================================================================**/
+void						advance_and_free(t_list **exp);
 int							count_escape_char_before(const char *str, int idx);
 int							handle_escape_count(const char *str, int *i,
 								int len);
@@ -172,18 +164,18 @@ char						*handle_escape_write(char *dst, const char *src,
 								int *i, int *j);
 char						*expand_single_string(char *str, t_list *env_list);
 char						*get_env_value(t_list *env_list, const char *key);
-//
-
+/*============================ END OF readable_expansion.c ============================*/
 
 //							BUILD_CMD.C												//
 t_list						*build_cmd(t_sh *sh, char **parsed);
 void						parse_and_prepare(t_sh *sh, char *in);
-//////////////////////////////////////////////////////////////////////////////////////
+
 
 // child
 void						**pid_expansion(void **v_arr, t_list *env);
 void						one_child(t_sh *sh, t_list *cmd, t_launch *all);
 void						multi_child(t_sh *sh, t_list *cmd, t_launch *all);
+bool						paria(t_sh *sh);
 void						end_child(t_sh *sh, t_list *cmd, t_launch *all);
 
 // parent
@@ -193,6 +185,7 @@ void						end_parent(t_sh *sh, t_list *cmd, t_launch *all);
 
 // launch
 void						execution_button(char **cmd_line, t_sh *sh);
+int							execution_bcmd(char **cmd_line, t_sh *sh);
 void						launch_process(t_sh *sh);
 
 void						replace_or_add(t_list **lst, const char *old,
@@ -202,13 +195,6 @@ void						send_pid(int fd, int pid);
 
 char						**expansion_partition_redirection(t_list *cmd,
 								t_list *env, t_arr *oper);
-/*
-** VARIABLE EXPANSION FUNCTIONS
-** Handle $VAR and ${VAR} expansion with quote and escape support
-*/
-char						**expand_variables(char **input_array,
-								t_list *env_list);
-
 /*
 ** ENVIRONMENT MANIPULATION FUNCTIONS
 ** Add, remove, and retrieve environment variables

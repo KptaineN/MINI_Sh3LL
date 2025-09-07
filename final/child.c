@@ -6,21 +6,19 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 15:00:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 12:16:01 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 10:47:47 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
-
+// »»-----► Number of lines: 49
 void  **pid_expansion(void **v_arr, t_list *env)
 {
 	int n;
 	int i= 0;
 	char *p;
 	char ** arr = (char **)v_arr;
-	char *s_pid = get_env_value(env, "PID");
-	int l_pid = ft_strlen(s_pid);
+	
 	while(arr[i])
 	{
 		n = 0;
@@ -34,15 +32,23 @@ void  **pid_expansion(void **v_arr, t_list *env)
 			{	
 				p+=2;
 				n++;
-			}	
+			}
+			else if (!*(p+1))
+				break;
+			else
+				p++;
 		}
 		if (n != 0)
 		{
-			char *new = malloc((l_pid-2)*n+ft_strlen(arr[i])+1);
+			
+			char *s_pid = get_env_value(env, "PID");
+			int l_pid = ft_strlen(s_pid);
+			int len = (l_pid-2)*n+ft_strlen(arr[i]);
+			char *new = malloc(len+1);
 
 			char *s = arr[i];
 			int idx = 0;
-			while (1)
+			while (*s)
 			{
 				p = ft_strchr(s,'$');
 				if (!p)
@@ -55,9 +61,11 @@ void  **pid_expansion(void **v_arr, t_list *env)
 					idx+=l_pid;
 					s = p+2;
 				}
+				else
+					s = p+1;
 			}
 			ft_strcpy(new+idx,s);
-			new[idx+ft_strlen(s)] = 0;
+			new[len] = 0;
 			free(arr[i]);	
 			arr[i] = new;
 		}
@@ -65,35 +73,48 @@ void  **pid_expansion(void **v_arr, t_list *env)
 	}
 	return v_arr;
 }
-
+// »»-----► Number of lines: 4
 void	one_child(t_sh *sh, t_list *cmd, t_launch *all)
 {
-	cmd->arr_content = pid_expansion(cmd->arr_content, sh->env);
 	close(all->curr_pipe[0]);
 	close(all->curr_pipe[1]);
 	execution_button((char **)cmd->arr_content, sh);
 }
-
+// »»-----► Number of lines: 8
 void	multi_child(t_sh *sh, t_list *cmd, t_launch *all)
 {
 	dup2(all->prev_pipe[0], STDIN_FILENO);
-	dup2(all->curr_pipe[1], STDOUT_FILENO);
-	cmd->arr_content = pid_expansion(cmd->arr_content, sh->env);
+	dup2(all->curr_pipe[1], STDOUT_FILENO);	
 	close(all->prev_pipe[1]);
 	close(all->curr_pipe[0]);
 	sh->pipe_to_close[0] = &all->prev_pipe[0];
 	sh->pipe_to_close[1] = &all->curr_pipe[1]; 
 	execution_button((char **)cmd->arr_content, sh);
 }
-
+// »»-----► Number of lines: 8
 void	end_child(t_sh *sh, t_list *cmd, t_launch *all)
 {
 	dup2(all->prev_pipe[0], STDIN_FILENO);
-	cmd->arr_content = pid_expansion(cmd->arr_content, sh->env);
 	close(all->prev_pipe[1]);
 	close(all->curr_pipe[0]);
 	close(all->curr_pipe[1]);
 	sh->pipe_to_close[0] = &all->curr_pipe[0];
 	sh->pipe_to_close[1] = NULL; 
 	execution_button((char **)cmd->arr_content, sh);
+}
+
+bool paria(t_sh *sh)
+{
+	char *cmd = (char *)sh->cmd->arr_content[0]; 
+	if (!ft_strncmp(cmd,"export",6) || !ft_strcmp(cmd,"cd") || !ft_strncmp(cmd,"unset",5))
+	{
+		sh->cmd->arr_content = pid_expansion(sh->cmd->arr_content, sh->env);
+		if (execution_bcmd((char **)sh->cmd->arr_content, sh))
+			return 1;	
+		write(STDERR_FILENO, "minish : ", 10);
+		write(STDERR_FILENO, sh->cmd->arr_content[0], ft_strlen(sh->cmd->arr_content[0]));
+		ft_putendl_fd(": command not found", STDERR_FILENO);
+		return 1;
+	}
+	return 0;
 }

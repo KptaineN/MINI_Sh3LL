@@ -6,15 +6,24 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 19:36:32 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/04 19:37:00 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/06 16:06:09 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
 
-void	signal_reset_prompt(int signo)
+int assign_signal(int status)
 {
-	(void)signo;
+	if (WIFEXITED(status)) {
+		return WEXITSTATUS(status);
+	} else if (WIFSIGNALED(status)) {
+		return 128 + WTERMSIG(status);
+    }
+	return 0;
+}
+void	signal_reset_prompt(int status)
+{
+	g_exit_status = assign_signal(status);
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
