@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:29:36 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 17:30:45 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:05:17 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void free_string_array(char **arr)
     free(arr);
 }
 // »»-----► Number of lines: 9
-void free_t_arr_dic(t_arr **arr)
+void free_t_arr_dic_handler(t_arr **arr)
 {
     if (!arr || !*arr) return;
     for (int i = 0; i < (*arr)->len; i++) {
@@ -40,12 +40,16 @@ void free_t_arr_dic(t_arr **arr)
     *arr = NULL;
 }
 // »»-----► Number of lines: 8
-void free_t_list(t_list **env_list)
+void free_t_linked_dic_env(t_list **env_list)
 {
     t_list *curr = *env_list;
+    t_dic *dic;
     while (curr) {
         t_list *next = curr->next;
-        free(curr->content);
+        dic = (t_dic *)curr->content;
+        free(dic->key);
+        free(dic->value);
+        free(dic);
         free(curr);
         curr = next;
     }
@@ -69,9 +73,9 @@ void	free_family(t_sh *sh)
 void    free_sh(t_sh *sh)
 {
     free(sh->msg_error);
-    free_t_list(&sh->env);
-    free_t_arr_dic(&sh->oper);
-    free_t_arr_dic(&sh->bcmd);
+    free_t_linked_dic_env(&sh->env);
+    free_t_arr_dic_handler(&sh->oper);
+    free_t_arr_dic_handler(&sh->bcmd);
     free_family(sh);
     free(sh);
 }

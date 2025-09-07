@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:47:33 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/06 14:59:03 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:08:34 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,18 @@ t_list	*set_linked_env(char **env)
 	t_list	*head;
 	t_list	*node;
     t_list	*last;
+	char 	*p;
+	t_dic 	*dic;
 	int		i;
 	i = 0;
     while (env[i])
 	{
-        node = ft_lstnew(ft_strdup(env[i]));
+		dic = malloc(sizeof(t_dic));
+		p = ft_strchr(env[i],'=');
+		p[0] = 0;
+		dic->value = ft_strdup(env[i]);
+		dic->key = ft_strdup(&p[1]);
+		node = ft_lstnew((void *)dic);
 		if (!node)
 			return (NULL);
         if(i == 0)
@@ -70,36 +77,6 @@ t_list	*set_linked_env(char **env)
 	return (head);
 }
 
-bool special_strcmp(char *dst, char *str, char c, int len)
-{
-	int	i;
-	i = 0;
-	if (dst == NULL || str == NULL || len <= 0)
-		return true;
-	while(i<len)
-	{
-		if (dst[i] != str[i])
-			return true;
-		i++;
-	}
-	if (dst[i] == c)
-		return false;
-	return true;
-}
-
-static char	*get_value_env(t_list *env, char *value, int len)
-{
-	t_list	*temp;
-	temp = env;
-	while (temp != NULL)
-	{
-		if (special_strcmp((char *)temp->content, value, '=', len) == 0)
-			return (temp->content + len +1); // Skip "value="
-		temp = temp->next;
-	}
-	return (NULL);
-}
-
 static char	*join_path(const char *dir, const char *cmd)
 {
 	char	*full_path;
@@ -108,74 +85,15 @@ static char	*join_path(const char *dir, const char *cmd)
 
 	dir_len = ft_strlen(dir);
 	cmd_len = ft_strlen(cmd);
-	full_path = malloc(dir_len + cmd_len + 2); // +2 for '/' and '\0'
+	full_path = malloc(dir_len + cmd_len + 2);
 	if (!full_path)
 		return (NULL);
-	// Copy directory
 	ft_strncpy(full_path,dir,dir_len);
 	full_path[dir_len++] = '/';
 	ft_strncpy(&full_path[dir_len],cmd,cmd_len);
 	full_path[cmd_len+dir_len] = '\0';
 	return (full_path);
 }
-
-/********************** -> f cmd path
-char	*find_command_path(char *cmd, t_list *env)
-{
-	char	*path_env;
-	char	*path_copy;
-	char	*dir;
-	char	*full_path;
-
-	int i, start, len;
-	// If command contains '/', it's already a path
-	if (ft_strchr(cmd, '/'))
-	{
-		if (access(cmd, F_OK | X_OK) == 0)
-			return (ft_strdup(cmd));
-		return (NULL);
-	}
-	// Get PATH envirnment variable
-	path_env = get_value_env(env, "PATH", 4);
-	if (!path_env)
-		return (NULL);
-	// Make a copy of PATH to work with
-	len = ft_strlen(path_env);
-	path_copy = malloc(len + 1);
-	if (!path_copy)
-		return (NULL);
-	ft_strcpy(path_copy, path_env);
-	// Search through each directory in PATH
-	start = 0;
-	i = 0;
-	while (i <= len)
-	{
-		if (path_copy[i] == ':' || path_copy[i] == '\0')
-		{
-			path_copy[i] = '\0'; // Null-terminate current directory
-			dir = path_copy + start;
-			// Skip empty directories
-			if (*dir != '\0')
-			{
-				full_path = join_path(dir, cmd);
-				if (full_path && access(full_path, F_OK | X_OK) == 0)
-				{
-					free(path_copy);
-					return (full_path);
-				}
-				if (full_path)
-					free(full_path);
-			}
-			start = i + 1;
-		}
-		i++;
-	}
-	free(path_copy);
-	return (NULL);
-}*/
-
-/** */
-/* --- helpers --------------------------------------------------------- */
 
 static char *try_cmd_in_dir(const char *dir, const char *cmd)
 {
@@ -185,33 +103,28 @@ static char *try_cmd_in_dir(const char *dir, const char *cmd)
 	if (!full)
 		return (NULL);
 	if (access(full, F_OK | X_OK) == 0)
-		return (full);              /* gardé: le caller fera le return */
+		return (full);
 	free(full);
 	return (NULL);
 }
 
 /* renvoie une copie modifiable de PATH (à free) et écrit sa longueur dans *out_len */
-static char *dup_path_env(t_list *env, int *out_len)
+static char *dup_path_env(t_list *env)
 {
 	char *path_env;
 	char *copy;
-	int   len;
 
-	path_env = get_value_env(env, "PATH", 4);
+	path_env = get_env_value(env, "PATH");
 	if (!path_env)
 		return (NULL);
-	len = ft_strlen(path_env);
-	copy = (char *)malloc((size_t)len + 1);
+	copy = ft_strdup(path_env);
 	if (!copy)
 		return (NULL);
-	ft_strcpy(copy, path_env);
-	if (out_len)
-		*out_len = len;
 	return (copy);
 }
 
 /* boucle principale: parcourt path_copy séparé par ':' (on mute les ':' en '\0') */
-static char *search_cmd_in_path(char *path_copy, int len, const char *cmd)
+static char *search_cmd_in_path(char *path_copy, const char *cmd)
 {
 	int   i;
 	int   start;
@@ -220,67 +133,52 @@ static char *search_cmd_in_path(char *path_copy, int len, const char *cmd)
 
 	start = 0;
 	i = 0;
-	while (i <= len)
+	while (path_copy[i])
 	{
 		if (path_copy[i] == ':' || path_copy[i] == '\0')
 		{
-			path_copy[i] = '\0';             /* termine le segment courant */
+			path_copy[i] = '\0';            
 			dir = path_copy + start;
-			if (*dir != '\0')                /* skip segments vides (comportement identique au tien) */
+			if (*dir != '\0')               
 			{
 				found = try_cmd_in_dir(dir, cmd);
 				if (found)
-					return (found);          /* à free par le caller si besoin */
+					return (found);          
 			}
-			start = i + 1;                   /* prochain segment */
+			start = i + 1;                   
 		}
 		i++;
 	}
 	return (NULL);
 }
 
-/* --- API ------------------------------------------------------------- */
-
 char	*find_command_path(char *cmd, t_list *env)
 {
 	char *path_copy;
 	char *found;
-	int   len;
-
-	/* 1) chemin explicite contenant un '/' */
 	if (ft_strchr(cmd, '/'))
 	{
 		if (access(cmd, F_OK | X_OK) == 0)
 			return (ft_strdup(cmd));
 		return (NULL);
 	}
-
-	/* 2) dupliquer PATH pour itérer proprement */
-	path_copy = dup_path_env(env, &len);
+	path_copy = dup_path_env(env);
 	if (!path_copy)
 		return (NULL);
-
-	/* 3) chercher cmd dans chaque segment de PATH */
-	found = search_cmd_in_path(path_copy, len, cmd);
-
-	/* 4) cleanup et retour */
+	found = search_cmd_in_path(path_copy, cmd);
 	free(path_copy);
 	return (found);
 }
 
-/********find-cmd-path ******/
-
-
-
-t_env	*env_lookup(t_list *env, const char *key)
+t_dic	*env_lookup(t_list *env, const char *key)
 {
 	t_list	*tmp;
-	t_env	*cur;
+	t_dic	*cur;
 
 	tmp = env;
 	while (tmp)
 	{
-		cur = (t_env *)tmp->content;
+		cur = (t_dic *)tmp->content;
 		if (cur && cur->key && ft_strcmp(cur->key, key) == 0)
 			return (cur);
 		tmp = tmp->next;
@@ -288,7 +186,7 @@ t_env	*env_lookup(t_list *env, const char *key)
 	return (NULL);
 }
 
-static int	update_env_value(t_env *cur, const char *value)
+static int	update_env_value(t_dic *cur, const char *value)
 {
 	char	*dup;
 
@@ -300,16 +198,16 @@ static int	update_env_value(t_env *cur, const char *value)
 	return (0);
 }
 
-static t_env	*new_env_struct(const char *key, const char *value)
+static t_dic	*new_env_struct(const char *key, const char *value)
 {
-	t_env	*env_entry;
+	t_dic	*env_entry;
 
 	env_entry = malloc(sizeof(*env_entry));
 	if (!env_entry)
 		return (NULL);
 	env_entry->key = ft_strdup(key);
 	if (!env_entry->key)
-		return (free(env_entry), (t_env *)NULL);
+		return (free(env_entry), (t_dic *)NULL);
 	env_entry->value = ft_strdup(value);
 	if (!env_entry->value)
 	{
@@ -341,8 +239,8 @@ void	ft_lstadd_front(t_list **lst, void *content)
 
 int	set_env_value(t_list **env, const char *key, const char *value)
 {
-	t_env	*existing;
-	t_env	*entry;
+	t_dic	*existing;
+	t_dic	*entry;
 	t_list	*node;
 
 	if (!env || !key || !value)

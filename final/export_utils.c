@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:56:01 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 13:55:27 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:07:01 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static size_t	env_count(t_sh *sh)
 	return (count);
 }
 
-static char	*create_env_entry(t_env *env)
+static char	*create_env_entry(t_dic *env)
 {
 	size_t	klen;
 	size_t	vlen;
@@ -55,7 +55,7 @@ char	**env_to_array(t_sh *sh)
 	size_t	n;
 	char	**arr;
 	size_t	i;
-	t_env	*env;
+	t_dic	*env;
 	t_list	*node;
 
 	n = env_count(sh);
@@ -66,7 +66,7 @@ char	**env_to_array(t_sh *sh)
 	node = sh->env;
 	while (node)
 	{
-		env = (t_env *)node->content;
+		env = (t_dic *)node->content;
 		arr[i] = create_env_entry(env);
 		if (!arr[i])
 			return (free_string_array(arr), NULL);

@@ -6,30 +6,26 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 16:48:34 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/05 12:07:22 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:08:45 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
 
-t_list *search_lst(t_list *lst, const char *target)
+t_list *search_env(t_list *lst, const char *target)
 {
-    size_t target_len;
+    t_dic *dic;
 
-    if (!lst || !target)
+    if (!lst | !target)
         return NULL;
-
-    target_len = strlen(target);
 
     while (lst)
     {
-        char *s  = (char *)lst->content;
-        (void)s;
-        if (lst->content && strncmp((char *)lst->content, target, target_len) == 0)
+        dic = (t_dic *)lst->content;
+        if (dic->key && strcmp(dic->key, target) == 0)
             return lst;
         lst = lst->next;
     }
-
     return NULL;
 }
 
@@ -62,33 +58,35 @@ static void ft_lstadd_front(t_list **lst, void *content)
 void replace_or_add(t_list **lst, const char *old, const char *new)
 {
     t_list *node;
+    t_dic *dic;
+    char *newval;
 
     if (!*lst || !old || !new)
         return;
-
+    
     // Search for node matching old
-    node = search_lst(*lst, old);
+    node = search_env(*lst, old);
+    newval = ft_strdup(new);
     if (node)
     {
-        // Match found: free old content and replace
-        free(node->content);
-        node->content = ft_strdup(new);
-        if (!node->content)
-        {
-            // Handle strdup failure (optional: remove node or set to NULL)
-            node->content = NULL;
-        }
+        dic = (t_dic *)node->content;
+        free(dic->value);
+        dic->value = newval;        
         return;
     }
-
-    // No match: add new node at front
-    ft_lstadd_front(lst, (void *)new);
+    else
+    {
+        dic = malloc(sizeof(t_dic));
+        dic->key = ft_strdup(old);
+        dic->key = newval;
+    }
+    ft_lstadd_front(lst, (void *)dic);
 }
 
 void add_env(t_sh *sh, const char *key, int fd)
 {
-    char s[20] = {0};
-    ssize_t n = read(fd, s,20);
+    char s[6];
+    ssize_t n = read(fd, s,sizeof(s));
     s[n] = 0;
     replace_or_add(&sh->env, key, (const char *)s);
 }
@@ -96,7 +94,6 @@ void add_env(t_sh *sh, const char *key, int fd)
 void send_pid(int fd, int pid)
 {
     char *s_pid = ft_itoa(pid);
-    write(fd, "PID=", 4);
     write(fd, s_pid, ft_strlen(s_pid));  // Send child's PID to child
     write(fd,"\0",1);
     free(s_pid);

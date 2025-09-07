@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:34:48 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:07:01 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	*find_env_value(t_list *env, const char *key)
 {
-	t_env	*entry;
+	t_dic	*entry;
 
 	while (env)
 	{

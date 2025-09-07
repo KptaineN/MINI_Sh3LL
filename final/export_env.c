@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:55:54 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/02 12:27:25 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:07:01 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,16 @@
 
 t_list	*find_env_var(t_sh *sh, const char *key)
 {
-	t_env	*env;
+	t_dic	*env;
 	t_list	*node;
 
 	node = sh->env;
 	while (node)
 	{
-		env = (t_env *)node->content;
+		env = (t_dic *)node->content;
+		char *str;
+		str = env->value;
+		(void) str;
 		if (ft_strcmp(env->key, key) == 0)
 			return (node);
 		node = node->next;
@@ -30,9 +33,9 @@ t_list	*find_env_var(t_sh *sh, const char *key)
 
 int	update_env_var(t_list *env_node, const char *value)
 {
-	t_env	*env;
+	t_dic	*env;
 
-	env = (t_env *)env_node->content;
+	env = (t_dic *)env_node->content;
 	free(env->value);
 	if (value != NULL)
 		env->value = ft_strdup(value);
@@ -43,7 +46,7 @@ int	update_env_var(t_list *env_node, const char *value)
 
 int	create_env_var(t_sh *sh, const char *key, const char *value)
 {
-	t_env	*new_env;
+	t_dic	*new_env;
 	t_list	*new_node;
 
 	new_env = malloc(sizeof(*new_env));

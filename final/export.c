@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:55:22 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:07:36 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 void	print_env_debug(t_list *env)
 {
-	t_env	*e;
+	t_dic	*e;
 
 	while (env)
 	{
 		e = env->content;
-		printf("[DEBUG] %s=", e->key);
+		printf("[DEBUG] %s=", (char *)e->key);
 		if (e->value)
-			printf("%s\n", e->value);
+			printf("%s\n", (char *)e->value);
 		else
 			printf("\n");
 		env = env->next;

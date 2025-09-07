@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 15:20:48 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/06 15:20:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 19:44:02 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,16 +76,13 @@ char *handle_escape_write(char *dst, const char* src, int *i, int *j)
 char *get_env_value(t_list *env_list, const char *key)
 {
     t_list *current = env_list;
-    size_t key_len = ft_strlen(key);
-    
+    t_dic *dic;
+
     while (current)
     {
-        char *env_entry = (char *)current->content;
-        if (env_entry && ft_strncmp(env_entry, key, key_len) == 0 
-            && env_entry[key_len] == '=')
-        {
-            return (env_entry + key_len + 1); // Return value after '='
-        }
+        dic = (t_dic *)current->content;
+        if (dic->key && ft_strcmp(dic->key, key) == 0)
+            return (dic->value); // Return value after '='
         current = current->next;
     }
     return (NULL);

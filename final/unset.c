@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:24:52 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/04 14:27:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 20:07:01 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static void	unset_one(t_list **env, const char *key)
 {
 	t_list	*prev;
 	t_list	*cur;
-	t_env	*env_var;
+	t_dic	*env_var;
 
 	prev = NULL;
 	cur = *env;
@@ -63,7 +63,7 @@ void	unset_env_value(t_list **env, const char *key)
 {
 	t_list	*tmp;
 	t_list	*prev;
-	t_env	*env_var;
+	t_dic	*env_var;
 
 	tmp = *env;
 	prev = NULL;

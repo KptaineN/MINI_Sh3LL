@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 18:40:40 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 19:42:19 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,20 +57,18 @@ char check_open_quotes(char *in)
 }
 typedef struct s_get_line
 {
-// »»-----► Number of lines: 4
+// »»-----► Number of lines: 53
 	char *in;
 	char *add;
-	int l_tmp;
+	int l_in;
 	int l_add;
 	char type;
-	char *tmp;
 	char *last_hdoc;
 }	t_get_line;
 
 void update_error_env(t_sh *sh, int nbr)
 {
-	ft_itoa_inplace(sh->msg_error+2,nbr);
-	//printf("\t%s\n",sh->msg_error);
+	ft_itoa_inplace(sh->msg_error,nbr);
 	replace_or_add(&sh->env,"?",sh->msg_error);
 }
 
@@ -105,6 +103,26 @@ bool find_apply_heredoc(t_get_line *l)
 	return l->last_hdoc;
 }*/
 
+// »»-----► Number of lines: 12
+char *ft_strjoin_consume(char **dst, char **add, char connector)
+{
+	char *tmp = *dst;
+	bool bc = (connector!=0);
+	int l_add = ft_strlen(*add);
+	int l_tmp = ft_strlen(tmp);
+	*dst = malloc(sizeof(char)*(l_tmp + l_add + 1+bc));
+	if (!*dst)
+		return (free(tmp), free_setnull((void **)add), NULL);
+	ft_strcpy(*dst,tmp);
+	if (bc)
+		(*dst)[l_tmp] = connector;
+	ft_strcpy((*dst)+l_tmp + bc,*add);
+	(*dst)[l_tmp + l_add + bc] = '\0';
+	free_setnull((void **)add);
+	free(tmp);
+	return *dst;
+}
+
 // »»-----► Number of lines: 43
 char *get_full_line(t_sh *sh)
 {
@@ -119,10 +137,7 @@ char *get_full_line(t_sh *sh)
 	l.type = check_open_quotes(l.in);
 	while(l.type != 0)
 	{
-		l.tmp = l.in;
-		l.l_tmp = ft_strlen(l.tmp);
 		set_signals_interactive();
-
 		if (l.type == '\'')
 			l.add = readline("squote> ");
 		else if (l.type == '"')
@@ -130,7 +145,8 @@ char *get_full_line(t_sh *sh)
 		else if (l.type == '\\')
 		{	
 			l.add = readline("> ");
-			l.in[l.l_tmp-2] = 0;
+			l.in[ft_strlen(l.in)-1] = 0;
+			l.type = 0;
 		}
 		else if (l.type == '|')
 			l.add = readline("pipe> ");	
@@ -138,17 +154,10 @@ char *get_full_line(t_sh *sh)
 		if (g_exit_status == 127)
 			return (free(l.add),free(l.in),NULL);
 		if (!l.add)
-			continue;
-		l.l_add = ft_strlen(l.add);
-		l.in = malloc(sizeof(char)*(l.l_tmp + l.l_add + 2));
-		if (!l.in)
-			return (free(l.tmp), free(l.add), NULL);
-		ft_strcpy(l.in,l.tmp);
-		l.in[l.l_tmp] = '\n';
-		ft_strcpy(l.in+l.l_tmp+1,l.add);
-		l.in[l.l_tmp + l.l_add + 1] = '\0';
-		free_setnull((void *)&l.tmp);
-		free_setnull((void *)&l.add);
+			continue;	
+		if (l.type != 0)
+			l.type = '\n';
+		ft_strjoin_consume(&l.in, &l.add, l.type);
 		l.type = check_open_quotes(l.in);
 	}
 	return (l.in);
@@ -160,8 +169,8 @@ int	looping(t_sh *sh)
 	char	*in;
 
 	g_exit_status = 0;
-	replace_or_add(&sh->env,"PID","PID=0");
-	replace_or_add(&sh->env,"PID","0=bash");
+	replace_or_add(&sh->env,"PID","0");
+	replace_or_add(&sh->env,"0","bash");
 	update_error_env(sh,0);
 	while (1)
 	{

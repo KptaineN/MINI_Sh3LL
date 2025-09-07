@@ -39,7 +39,6 @@ typedef struct s_launch		t_launch;
 typedef struct s_sh			t_sh;
 typedef struct s_list		t_list;
 typedef struct s_arr		t_arr;
-typedef struct s_env		t_env;
 typedef struct s_dic		t_dic;
 typedef enum e_quote_state	t_quote_state;
 
@@ -48,14 +47,9 @@ typedef struct s_list
 {
 	void					*content;
 	void					**arr_content;
+	int						*pipe;
 	struct s_list			*next;
 }							t_list;
-
-typedef struct s_env
-{
-	char					*key;
-	char					*value;
-}							t_env;
 
 typedef struct s_arr // array de string
 {
@@ -128,9 +122,9 @@ int							looping(t_sh *sh);
 
 // free enrico
 void						free_string_array(char **arr);
-void						free_t_arr_dic(t_arr **arr);
+void						free_t_arr_dic_handler(t_arr **arr);
 void						free_sh(t_sh *sh);
-void						free_t_list(t_list **env_list);
+void						free_t_arr_dic_env(t_list **env_list);
 void 						free_setnull(void **a);
 
 char						*find_command_path(char *cmd, t_list *env);
@@ -148,6 +142,8 @@ void						set_signals_noninteractive(void);
 void						ignore_sigquit(void);
 
 // PATH
+char 						*get_env_value(t_list *env_list, const char *key);
+t_list						*search_env(t_list *lst, const char *target);
 t_list						*ft_lstnew(void *content);
 t_list						*set_linked_env(char **env);
 void						push_lst(t_list **tail, void *content);
@@ -165,11 +161,10 @@ int							handle_escape_count(const char *str, int *i,
 char						*handle_escape_write(char *dst, const char *src,
 								int *i, int *j);
 char						*expand_single_string(char *str, t_list *env_list);
-char						*get_env_value(t_list *env_list, const char *key);
 /*============================ END OF readable_expansion.c ============================*/
 
 //							BUILD_CMD.C												//
-void	add_node_record(t_list **head, t_list **curr);
+void						add_node_record(t_list **head, t_list **curr);
 t_list						*build_cmd(t_sh *sh, char **parsed);
 void						parse_and_prepare(t_sh *sh, char *in);
 
