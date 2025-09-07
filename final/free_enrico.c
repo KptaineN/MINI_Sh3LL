@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 12:29:36 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/06 16:10:32 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 17:30:45 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,4 +95,12 @@ void free_linked_list_of_array_string(t_list* head)
         free(current);
         current = next;
     }
+}
+
+void free_setnull(void **a)
+{
+    if (!a || !*a)
+        return;
+    free(*a);
+    *a = NULL;
 }

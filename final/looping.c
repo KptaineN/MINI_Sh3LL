@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/01 14:24:09 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 14:17:52 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 18:40:40 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,11 @@ static int	process_input(t_sh *sh, char *in)
 	}
 	return (0);
 }
-// »»-----► Number of lines: 18
-int check_open_quotes(char *in)
+// »»-----► Number of lines: 22
+char check_open_quotes(char *in)
 {
 	bool single_quote = false;
 	bool double_quote = false;
-
 	int i = 0;
 	while(in[i])
 	{
@@ -44,22 +43,28 @@ int check_open_quotes(char *in)
 			double_quote = !double_quote;
 		i++;
 	}
+	i--;
 	if (single_quote)
-		return 1;
+		return '\'';
 	else if (double_quote)
-		return 2;
+		return '"';
+	else if (in[i] == '\\' && escape_check(in,i))
+		return '\\';
+	else if (in[i] == '|' && escape_check(in,i))
+		return '\\';	
 	else
 		return 0;
 }
 typedef struct s_get_line
 {
-// »»-----► Number of lines: 12
+// »»-----► Number of lines: 4
 	char *in;
 	char *add;
 	int l_tmp;
 	int l_add;
-	int type;
+	char type;
 	char *tmp;
+	char *last_hdoc;
 }	t_get_line;
 
 void update_error_env(t_sh *sh, int nbr)
@@ -69,24 +74,42 @@ void update_error_env(t_sh *sh, int nbr)
 	replace_or_add(&sh->env,"?",sh->msg_error);
 }
 
-bool only_char(char *str, char c)
+/*
+bool find_apply_heredoc(t_get_line *l)
 {
-	int i = 0;
-	while(str[i])
+	char *explore;
+	t_list *here;
+	t_list *curr;
+	int idx;
+	while (1)
 	{
-		if (str[i]!=c)
-			return 0;
-		i++;
+		if (!l->last_hdoc)
+			l->last_hdoc = ft_strchr(l->in, '<');
+		if (!l->last_hdoc)
+			break;	
+		while(1)
+		{
+			idx = l->last_hdoc-l->in;
+		
+			if (l->last_hdoc[1] == '<' && escape_check(l->last_hdoc,idx))
+				
+			else if (idx != 0 && *(l->last_hdoc-1) == '<' && escape_check(l->last_hdoc-1,idx))
+
+			explore = ft_strchr(l->last_hdoc, '<');
+			if (!explore)
+				break;
+			l->last_hdoc = explore;
+		}
+	
 	}
-// »»-----► Number of lines: 42
-	return 1;
-}
+	return l->last_hdoc;
+}*/
+
 // »»-----► Number of lines: 43
 char *get_full_line(t_sh *sh)
 {
 	t_get_line l;
-	l.in = NULL;
-
+	ft_bzero(&l, sizeof(t_get_line));
 	set_signals_interactive();
 	l.in = readline("ᕕ( ᐛ )ᕗ minish$ ");
 	set_signals_noninteractive();
@@ -96,25 +119,26 @@ char *get_full_line(t_sh *sh)
 	l.type = check_open_quotes(l.in);
 	while(l.type != 0)
 	{
-		set_signals_interactive();
-		if (l.type == 1)
-			l.add = readline("squote> ");
-		else
-			l.add = readline("dquote> ");
-		set_signals_noninteractive();
-		if (g_exit_status == 127)
-		{
-			free(l.add);
-			free(l.in);
-			return NULL;
-		}
-		if (!l.add)
-		{
-			write(1, "exit\n", 5);
-			return (free(l.in),NULL);
-		}
 		l.tmp = l.in;
 		l.l_tmp = ft_strlen(l.tmp);
+		set_signals_interactive();
+
+		if (l.type == '\'')
+			l.add = readline("squote> ");
+		else if (l.type == '"')
+			l.add = readline("dquote> ");
+		else if (l.type == '\\')
+		{	
+			l.add = readline("> ");
+			l.in[l.l_tmp-2] = 0;
+		}
+		else if (l.type == '|')
+			l.add = readline("pipe> ");	
+		set_signals_noninteractive();
+		if (g_exit_status == 127)
+			return (free(l.add),free(l.in),NULL);
+		if (!l.add)
+			continue;
 		l.l_add = ft_strlen(l.add);
 		l.in = malloc(sizeof(char)*(l.l_tmp + l.l_add + 2));
 		if (!l.in)
@@ -123,12 +147,11 @@ char *get_full_line(t_sh *sh)
 		l.in[l.l_tmp] = '\n';
 		ft_strcpy(l.in+l.l_tmp+1,l.add);
 		l.in[l.l_tmp + l.l_add + 1] = '\0';
-		free(l.tmp);
-		free(l.add);
+		free_setnull((void *)&l.tmp);
+		free_setnull((void *)&l.add);
 		l.type = check_open_quotes(l.in);
 	}
 	return (l.in);
-// »»-----► Number of lines: 18
 }
 
 // »»-----► Number of lines: 18

@@ -6,12 +6,12 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:49:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 10:09:41 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 14:41:15 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
+// »»-----► Number of lines: 12
 sig_atomic_t g_exit_status = 0;
 
 int main(int argc, char **argv, char **envp)

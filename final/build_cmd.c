@@ -6,13 +6,13 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 16:37:26 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/06 10:41:56 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/07 18:03:37 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
 // »»-----► Number of lines: 13
-static void	add_node_record(t_list **head, t_list **curr)
+void	add_node_record(t_list **head, t_list **curr)
 {
 	if (curr == head && curr == NULL)
 		return ;

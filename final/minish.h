@@ -131,6 +131,7 @@ void						free_string_array(char **arr);
 void						free_t_arr_dic(t_arr **arr);
 void						free_sh(t_sh *sh);
 void						free_t_list(t_list **env_list);
+void 						free_setnull(void **a);
 
 char						*find_command_path(char *cmd, t_list *env);
 
@@ -168,6 +169,7 @@ char						*get_env_value(t_list *env_list, const char *key);
 /*============================ END OF readable_expansion.c ============================*/
 
 //							BUILD_CMD.C												//
+void	add_node_record(t_list **head, t_list **curr);
 t_list						*build_cmd(t_sh *sh, char **parsed);
 void						parse_and_prepare(t_sh *sh, char *in);
 
