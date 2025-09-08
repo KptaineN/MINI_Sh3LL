@@ -1,0 +1,48 @@
+EXIT
+Ce code implémente la **commande built-in `exit`** de votre minishell en C, gérant proprement la terminaison du shell avec validation des arguments et nettoyage des ressources selon les conventions Unix standard.
+
+La fonction `exit_shell()` constitue le **point de sortie centralisé** du minishell, orchestrant une séquence de nettoyage complète avant la terminaison. Elle appelle d'abord `free_minishell(shell)` pour libérer toutes les structures de données allouées dynamiquement (environnement, historique des commandes, buffers, etc.), puis `rl_clear_history()` pour nettoyer l'historique de la bibliothèque readline. Enfin, elle invoque `exit(exit_code)` avec le code de sortie approprié. Cette centralisation garantit que toutes les ressources sont libérées de manière cohérente, indépendamment du chemin d'exécution qui mène à la sortie.
+
+La fonction `is_numeric()` implémente un **validateur de chaîne numérique** qui vérifie si une chaîne représente un nombre valide. Elle gère les signes optionnels `+` et `-` en début de chaîne, puis vérifie que tous les caractères restants sont des chiffres avec `ft_isdigit()`. La validation précoce `if (!str || !str[0])` protège contre les chaînes NULL ou vides. Cette fonction est essentielle car `exit` n'accepte que des codes de sortie numériques selon les standards Unix.
+
+La fonction `builtin_exit()` orchestre la **logique complète de la commande `exit`** en gérant différents scénarios d'utilisation. Elle affiche d'abord "exit" sur stdout avec `write(1, "exit\n", 5)` pour informer l'utilisateur de la sortie imminente. Si aucun argument n'est fourni, elle termine le shell avec le code 0 (succès). La gestion d'erreur utilise des emoticons expressifs dans les messages d'erreur, ajoutant une personnalité distinctive au shell tout en restant informatifs.
+
+La **validation des arguments** suit une approche stricte conforme aux shells Unix : si l'argument n'est pas numérique, le shell se termine immédiatement avec le code 2 (erreur de syntaxe). Si trop d'arguments sont fournis, la fonction retourne 1 sans terminer le shell, permettant à l'utilisateur de corriger la commande. Le calcul `code % 256` applique la convention Unix qui limite les codes de sortie à 8 bits (0-255), gérant automatiquement le débordement des valeurs importantes. Cette implémentation reproduit fidèlement le comportement de `exit` dans bash et autres shells standard.
+
+BUILTIN_EXIT
+Cette fonction `builtin_exit()` implémente la **commande built-in `exit`** de votre minishell, gérant la terminaison propre du shell avec validation des arguments et gestion d'erreurs selon les conventions Unix standard.
+
+La fonction commence par déclarer une variable `code` de type `long` initialisée à 0, qui stockera le code de sortie à transmettre au système. Elle affiche immédiatement "exit" sur la sortie standard avec `write(1, "exit\n", 5)`, informant l'utilisateur que le shell va se terminer. Cette notification immédiate suit le comportement des shells standard comme bash qui confirment la commande d'exit avant de procéder à la terminaison.
+
+La **logique de validation des arguments** s'articule autour de `if (argv[1])` qui détermine si un argument a été fourni à la commande exit. Si aucun argument n'est présent, le shell se terminera avec le code de sortie par défaut (0). Cette approche respecte la convention Unix où `exit` sans argument indique une terminaison normale avec succès.
+
+Lorsqu'un argument est fourni, la fonction effectue une **validation stricte** en deux étapes. D'abord, `is_numeric(argv[1])` vérifie que l'argument est bien un nombre valide. Si ce n'est pas le cas, elle affiche un message d'erreur personnalisé avec un emoticon `┐(￣ ヘ￣)┌` et termine immédiatement le shell avec le code d'erreur 2 via `exit_shell(shell, 2)`. Cette terminaison immédiate reproduit le comportement des shells Unix qui considèrent les arguments non-numériques comme des erreurs fatales.
+
+La **seconde validation** vérifie s'il y a trop d'arguments avec `if (argv[2])`. Si c'est le cas, elle affiche un message d'erreur avec l'emoticon `╮(╯ _╰ )╭` et retourne 1 sans terminer le shell. Cette distinction est importante : contrairement aux arguments invalides qui provoquent une terminaison immédiate, un nombre excessif d'arguments permet à l'utilisateur de corriger sa commande sans perdre la session shell.
+
+La **finalisation** convertit l'argument valide en entier avec `ft_atoi(argv[1])` et applique l'opération modulo 256 avec `code % 256` pour respecter la convention Unix qui limite les codes de sortie à 8 bits (0-255). Cette limitation gère automatiquement le débordement des grandes valeurs. Dans tous les cas de succès, la fonction appelle `exit_shell(shell, code)` qui effectue le nettoyage des ressources avant la terminaison définitive du processus.
+
+IS_NUMERIC
+Cette fonction `is_numeric()` implémente un **validateur de chaîne numérique** qui détermine si une chaîne de caractères représente un nombre entier valide, constituant un composant essentiel de validation d'entrée pour les commandes shell qui requièrent des arguments numériques.
+
+La fonction commence par une **validation défensive** avec `if (!str || !str[0])` qui vérifie deux conditions critiques : que le pointeur de chaîne n'est pas NULL et que la chaîne n'est pas vide. Cette double vérification protège contre les segfaults lors du déréférencement et rejette immédiatement les entrées invalides, retournant 0 pour indiquer qu'une chaîne NULL ou vide n'est pas considérée comme numérique.
+
+La **gestion des signes optionnels** avec `if (str[0] == '+' || str[0] == '-')` reconnaît les préfixes de signe valides selon les conventions numériques standard. Si le premier caractère est un signe plus ou moins, la fonction incrémente l'index `i` pour commencer la validation des chiffres à partir de la position suivante. Cette approche permet d'accepter des nombres comme "+42", "-123", ou "456" tout en maintenant une logique de parsing cohérente.
+
+La **boucle de validation principale** `while (str[i])` parcourt chaque caractère restant de la chaîne et vérifie sa validité numérique avec `ft_isdigit(str[i])`. Si un caractère non-numérique est rencontré, la fonction retourne immédiatement 0, indiquant que la chaîne contient des éléments invalides. Cette validation stricte garantit que seules les chaînes composées exclusivement de chiffres (après un éventuel signe) sont acceptées.
+
+Le **retour de succès** avec `return (1)` indique que la chaîne a passé toutes les validations et représente un nombre entier valide. Cette fonction est particulièrement utile dans le contexte de votre minishell pour valider les arguments de commandes comme `exit` qui ne doivent accepter que des codes de sortie numériques, évitant les erreurs de conversion et garantissant la robustesse du shell face aux entrées utilisateur invalides.
+
+EXIT_SHELL
+Cette fonction `exit_shell()` constitue le **point de sortie centralisé** de votre minishell, orchestrant une séquence de nettoyage complète et ordonnée avant la terminaison définitive du processus, garantissant qu'aucune ressource n'est laissée en mémoire.
+
+La fonction accepte deux paramètres essentiels : un pointeur vers la structure principale `t_shell *shell` qui encapsule tout l'état du shell (environnement, historique, buffers, etc.), et un entier `exit_code` qui représente le code de sortie à transmettre au système d'exploitation parent. Cette interface simple mais complète permet à n'importe quelle partie du code de déclencher une terminaison propre avec le statut approprié.
+
+La **première étape de nettoyage** avec `free_minishell(shell)` libère toutes les structures de données allouées dynamiquement par le shell : la liste des variables d'environnement, les buffers de commandes, les structures de parsing, et toutes les autres ressources mémoire gérées par votre minishell. Cette fonction de nettoyage centralisée garantit une libération cohérente et complète, évitant les fuites mémoire qui pourraient affecter le système hôte.
+
+La **seconde étape** avec `rl_clear_history()` nettoie spécifiquement l'historique maintenu par la bibliothèque readline, qui gère les fonctionnalités d'édition de ligne et de navigation dans l'historique des commandes. Cette opération est importante car readline maintient ses propres structures de données internes qui doivent être explicitement libérées pour éviter les fuites mémoire lors de la terminaison du programme.
+
+La **terminaison finale** avec `exit(exit_code)` invoque l'appel système Unix standard qui termine immédiatement le processus et transmet le code de sortie au processus parent (généralement un autre shell). Cette centralisation de la logique de sortie garantit que toutes les terminaisons du minishell suivent le même protocole de nettoyage, indépendamment de la cause (commande `exit`, erreur fatale, signal, etc.), assurant une terminaison propre et prévisible du programme.
+
+
+EXIT_SHELL

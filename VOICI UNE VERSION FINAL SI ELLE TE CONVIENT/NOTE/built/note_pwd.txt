@@ -1,0 +1,10 @@
+BUILTIN_PWD
+Cette fonction `builtin_pwd()` implémente la **commande built-in `pwd`** (print working directory) de votre minishell, qui affiche le répertoire de travail courant selon les conventions Unix standard.
+
+La fonction déclare un **buffer local** `cwd[1024]` pour stocker le chemin du répertoire courant. La taille de 1024 octets suit une convention commune dans les systèmes Unix, bien que la limite théorique des chemins puisse être plus élevée selon le système de fichiers. Les annotations `(void)shell` et `(void)argv` constituent des **suppressions d'avertissements** qui indiquent explicitement au compilateur que ces paramètres ne sont pas utilisés dans cette implémentation, évitant les warnings de variables inutilisées tout en maintenant une signature cohérente avec les autres commandes built-in.
+
+L'**opération principale** utilise l'appel système `getcwd(cwd, sizeof(cwd))` pour obtenir le chemin absolu du répertoire de travail courant. Cette fonction système remplit le buffer fourni avec le chemin complet et retourne un pointeur vers ce buffer en cas de succès, ou NULL en cas d'échec. L'utilisation de `sizeof(cwd)` garantit que la taille correcte du buffer est transmise, évitant les dépassements de buffer potentiels.
+
+La **logique de sortie** suit une approche conditionnelle simple : si `getcwd()` réussit (retour non-NULL), la fonction affiche le chemin avec `printf("%s\n", cwd)` et retourne 0 pour indiquer un succès. Cette sortie directe sur stdout correspond exactement au comportement attendu de la commande `pwd` standard Unix.
+
+En cas d'**échec de `getcwd()`**, la fonction utilise `perror("pwd")` pour afficher automatiquement un message d'erreur descriptif basé sur la valeur de `errno` définie par l'appel système. Les causes d'échec peuvent inclure des permissions insuffisantes, un répertoire supprimé, ou des limitations de taille de chemin. La fonction retourne alors 1 pour signaler l'erreur selon les conventions Unix, permettant aux scripts et au shell parent de détecter et gérer l'échec de la commande.
