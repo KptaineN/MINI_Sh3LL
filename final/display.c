@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 16:32:54 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/02 12:17:29 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 11:23:04 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,32 @@ void display_linked_list_of_string(t_list *head)
     
     while (current != NULL) {
         printf("Node %d: \"%s\"\n", node_count, (char *)current->content);
+        current = current->next;
+        node_count++;
+    }
+    
+    printf("Total nodes: %d\n", node_count);
+}
+
+void display_linked_list_dic_env(t_list *head)
+{
+    t_list *current;
+    int node_count;
+    
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    current = head;
+    node_count = 0;
+
+    printf("=== Linked List of Strings ===\n");
+    t_dic *dic;
+    while (current != NULL) {
+
+        dic = (t_dic *)current->content;
+        printf("Node %d: key: %s\tvalue: %s\n", node_count, (char *)dic->key, (char *)dic->value);
         current = current->next;
         node_count++;
     }

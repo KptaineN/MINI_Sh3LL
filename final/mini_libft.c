@@ -350,7 +350,7 @@ static void write_digits(char *dst, long n, int digits)
     }
     dst[digits] = '\0';
 }
-// »»-----► Number of lines: 20
+// »»-----► Number of lines: 17
 char *ft_itoa_inplace(char *buf, int n)
 {
     char *start = buf;

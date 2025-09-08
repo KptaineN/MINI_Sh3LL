@@ -6,12 +6,11 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/16 15:25:28 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/07 09:36:44 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 11:57:13 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h" 
-
 /*
 	1 not escaped
 	0 escaped
@@ -104,7 +103,7 @@ char *extract_string(char **in)
 	(*in)+=s_len;
 	return result; 
 }
-// »»-----► Number of lines: 18
+// »»-----► Number of lines: 19
 char **custom_split(t_sh *sh ,char *in)
 {
 	char **result = NULL;

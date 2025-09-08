@@ -6,12 +6,12 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 19:36:32 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/06 16:06:09 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 12:27:52 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
+// »»-----► Number of lines: 6
 int assign_signal(int status)
 {
 	if (WIFEXITED(status)) {
@@ -21,6 +21,7 @@ int assign_signal(int status)
     }
 	return 0;
 }
+// »»-----► Number of lines: 5
 void	signal_reset_prompt(int status)
 {
 	g_exit_status = assign_signal(status);
@@ -29,14 +30,7 @@ void	signal_reset_prompt(int status)
 	rl_replace_line("", 0);
 	rl_redisplay();
 }
-
-/* set_signals_interactive:
-*	Sets the behavior in response to SIGINT (ctrl-c) and SIGQUIT (ctrl-\).
-*	SIGINT resets the user input prompt to a new blank line.
-*	SIGQUIT is ignored.
-*	Used when minishell is in interactive mode, meaning it is awaiting
-*	user input.
-*/
+// »»-----► Number of lines: 6
 void	set_signals_interactive(void)
 {
 	struct sigaction	act;
@@ -46,23 +40,13 @@ void	set_signals_interactive(void)
 	act.sa_handler = &signal_reset_prompt;
 	sigaction(SIGINT, &act, NULL);
 }
-
-/* signal_print_newline:
-*	Prints a newline for noninteractive signal handling.
-*/
+// »»-----► Number of lines: 2
 void	signal_print_newline(int signal)
 {
 	(void)signal;
 	rl_on_new_line();
 }
-
-/* set_signals_noninteractive:
-*	Sets the behavior in response to SIGINT (ctrl -c) and SIGQUIT (ctrl -\).
-*	Used when minishell is in noninteractive mode, meaning it is not awaiting
-*	user input. For example, when a command is running (i.e. cat), minishell
-*	should not react to SIGINT and SIGQUIT because only the running process (cat)
-*	needs to react to those signals.
-*/
+// »»-----► Number of lines: 6
 void	set_signals_noninteractive(void)
 {
 	struct sigaction	act;
@@ -72,11 +56,7 @@ void	set_signals_noninteractive(void)
 	sigaction(SIGINT, &act, NULL);
 	sigaction(SIGQUIT, &act, NULL);
 }
-
-/* ignore_sigquit:
-*	Replaces SIGQUIT signals (ctrl-\) with SIG_IGN to ignore
-*	the signal.
-*/
+// »»-----► Number of lines: 5
 void	ignore_sigquit(void)
 {
 	struct sigaction	act;

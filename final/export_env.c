@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 15:55:54 by nkiefer           #+#    #+#             */
-/*   Updated: 2025/09/07 20:07:01 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 13:56:26 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,33 +44,6 @@ int	update_env_var(t_list *env_node, const char *value)
 	return (0);
 }
 
-int	create_env_var(t_sh *sh, const char *key, const char *value)
-{
-	t_dic	*new_env;
-	t_list	*new_node;
-
-	new_env = malloc(sizeof(*new_env));
-	if (new_env == NULL)
-		return (1);
-	new_env->key = ft_strdup(key);
-	if (value != NULL)
-		new_env->value = ft_strdup(value);
-	else
-		new_env->value = NULL;
-	new_node = malloc(sizeof(*new_node));
-	if (new_node == NULL)
-	{
-		free(new_env->key);
-		free(new_env->value);
-		free(new_env);
-		return (1);
-	}
-	new_node->content = new_env;
-	new_node->next = sh->env;
-	sh->env = new_node;
-	return (0);
-}
-
 int	set_env_var(t_sh *sh, const char *key, const char *value)
 {
 	t_list	*existing;
@@ -79,5 +52,5 @@ int	set_env_var(t_sh *sh, const char *key, const char *value)
 	if (existing)
 		return (update_env_var(existing, value));
 	else
-		return (create_env_var(sh, key, value));
+		return (replace_or_add(&sh->env, key, value),0);
 }

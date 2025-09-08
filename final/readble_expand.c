@@ -6,13 +6,13 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 15:20:48 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 19:44:02 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 13:39:44 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
 // »»-----► Number of lines: 7
-int count_escape(const char* str, int i)
+static int count_front_escape(const char* str, int i)
 {
     int count = 0;
     while(str[i] && str[i] == '\\')
@@ -22,43 +22,28 @@ int count_escape(const char* str, int i)
     }    
     return count;
 }
-// »»-----► Number of lines: 11
-int modulo(int i, int mod)
-{
-    if (i<0)
-    {
-        while(i<0)
-            i+=mod;
-    }
-    else
-    {
-        while(i>=mod)
-            i-=mod;
-    }
-    return i;
-}
 // »»-----► Number of lines: 10
-int handle_escape_count(const char* str, int *i,int len)
+static int handle_escape_count(const char* str, int *i,int len)
 {
 
     int s = *i;
-    int count = count_escape(str,s);
+    int count = count_front_escape(str,s);
     int parity;
     (*i)+= count;
-    parity = modulo(count,2);
+    parity = count%2;
     count /= 2;
     if (str[*i] == '$' || str[*i] == '"' || str[*i] == '\'' ) 
         (*i)+=parity;
     return len+count+parity;
 }
 // »»-----► Number of lines: 17
-char *handle_escape_write(char *dst, const char* src, int *i, int *j)
+static char *handle_escape_write(char *dst, const char* src, int *i, int *j)
 {
     int s = *i;
-    int count = count_escape(src,s);
+    int count = count_front_escape(src,s);
     int parity;
     (*i)+= count;
-    parity = modulo(count,2);
+    parity = count%2;
     count /= 2;
     int z = 0;
     while(z++ < count)
@@ -71,21 +56,6 @@ char *handle_escape_write(char *dst, const char* src, int *i, int *j)
     if(parity)
         dst[(*j)++] = src[(*i)++];
     return dst;
-}
-// »»-----► Number of lines: 14
-char *get_env_value(t_list *env_list, const char *key)
-{
-    t_list *current = env_list;
-    t_dic *dic;
-
-    while (current)
-    {
-        dic = (t_dic *)current->content;
-        if (dic->key && ft_strcmp(dic->key, key) == 0)
-            return (dic->value); // Return value after '='
-        current = current->next;
-    }
-    return (NULL);
 }
 // »»-----► Number of lines: 18
 static int count_varlen_env(const char *str, int i)
@@ -110,8 +80,6 @@ static int count_varlen_env(const char *str, int i)
         return (i);
     }
 }
-
-// Helper function to extract variable name from $VAR or ${VAR}
 // »»-----► Number of lines: 33
 static char *extract_var_name(const char *str, int *var_len)
 {
@@ -126,7 +94,7 @@ static char *extract_var_name(const char *str, int *var_len)
         {   
             if (str[i] == '{')
             {
-                if (count_escape(str,i)%2!=1)
+                if (count_front_escape(str,i)%2!=1)
                     break;
             } 
             i++;
@@ -150,8 +118,6 @@ static char *extract_var_name(const char *str, int *var_len)
         return (ft_strndup(str + start, i - start));
     }
 }
-
-// Helper to update quote state based on character
 // »»-----► Number of lines: 14
 static t_quote_state update_quote_state(const char *str, int i, t_quote_state current_state)
 {
@@ -170,10 +136,6 @@ static t_quote_state update_quote_state(const char *str, int i, t_quote_state cu
     
     return (current_state);
 }
-
-
-
-// Calculate expanded string length considering quotes
 // »»-----► Number of lines: 46
 static size_t calculate_expanded_length(const char *str, t_list *env_list, t_list **exp)
 {
@@ -197,12 +159,14 @@ static size_t calculate_expanded_length(const char *str, t_list *env_list, t_lis
              (state == QUOTE_DOUBLE && c == '"')))
         {
             state = new_state;
-            i++;
-            continue; // Don't count quote characters in length
         }
-        
         // Handle variable expansion
-        if (c == '$' && str[i + 1] && state != QUOTE_SINGLE)
+        if (c == '$' && str[i+1] == c)
+        {
+            i+=2;
+            len+=2;
+        }
+        else if (c == '$' && str[i + 1] && state != QUOTE_SINGLE)
         {
             int var_len;
             char *var_name = extract_var_name(str + i, &var_len);
@@ -227,7 +191,7 @@ static size_t calculate_expanded_length(const char *str, t_list *env_list, t_lis
     return (len);
 }
 // »»-----► Number of lines: 6
-void advance_and_free(t_list **exp)
+static void advance_and_free(t_list **exp)
 {
     t_list *curr;
     if (!exp || !*exp)
@@ -236,8 +200,8 @@ void advance_and_free(t_list **exp)
     (*exp) = (*exp)->next;
     free(curr);
 }
-// »»-----► Number of lines: 40
-char *write_expansion(const char *str, int expanded_len, t_list **exp)
+// »»-----► Number of lines: 39
+static char *write_expansion(const char *str, int expanded_len, t_list **exp)
 {
     int j = 0;
     int i = 0;
@@ -262,7 +226,7 @@ char *write_expansion(const char *str, int expanded_len, t_list **exp)
             i++;
             continue; // Don't count quote characters in length
         }
-        if (c == '$' && str[i + 1] && state != QUOTE_SINGLE)
+        if (c == '$' && str[i + 1] && str[i+1] != '$' && state != QUOTE_SINGLE)
         {
             if ((*exp)->content)
             {   
@@ -279,8 +243,6 @@ char *write_expansion(const char *str, int expanded_len, t_list **exp)
     result[j] = 0;
     return (result);
 }
-
-// Expand a single string with proper quote handling
 // »»-----► Number of lines: 8
 char *expand_single_string(char *str, t_list *env_list)
 {

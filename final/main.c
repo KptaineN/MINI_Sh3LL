@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:49:43 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 14:41:15 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 13:34:32 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,11 @@ int main(int argc, char **argv, char **envp)
     
     t_sh *sh = calloc(1,sizeof(t_sh));
     init_sh(sh,envp);
-    
+    //display_linked_list_dic_env(sh->env);
     g_exit_status = looping(sh);
     free_sh(sh);
 	return (g_exit_status);
 }
-
 
 /**========================================================================
  *                           Test pid expansion function

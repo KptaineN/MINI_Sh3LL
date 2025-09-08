@@ -6,35 +6,12 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 15:52:35 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 13:50:46 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 12:34:25 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
-/*	
-	return (-1) not found
-	return (%d != -1) idx of the one found in the array bcmd->arr
-*/  
-int is_in_t_arr_str(t_arr *arr, const char *arg)
-{
-    int i = 0;
-    char *key;
-    while (i < arr->len)
-    {
-        key = (char *)((t_dic *)arr->arr[i])->key;
-        if (strcmp(key, arg) == 0)
-            return (i);
-        i++;
-    }
-    return (-1);
-}
-
-/*	
-	For t_arr containing t_dic entries - searches by key
-	return (-1) not found
-	return (%d != -1) idx of the one found in the array
-*/  
+// »»-----► Number of lines: 14
 int is_in_t_arr_dic_str(t_arr *arr, const char *arg)
 {
     int i = 0;
@@ -52,37 +29,8 @@ int is_in_t_arr_dic_str(t_arr *arr, const char *arg)
     }
     return (-1);
 }
-
-// build the dynamic array of the builtins cmd
-void build_t_arr_str(t_arr **dst, char **arr_str, int len)
-{
-    *dst = malloc(sizeof(t_arr));
-    if (!*dst)
-        return;
-    
-    (*dst)->len = len;
-    (*dst)->arr = malloc(sizeof(char *) * len);
-    if (!(*dst)->arr)
-    {
-        *dst = NULL;
-        return;
-    }
-    
-    int i = 0;
-    while (i < len)
-    {
-        (*dst)->arr[i] = ft_strdup(arr_str[i]);
-        if (!(*dst)->arr[i])
-        {
-            *dst = NULL;
-            return;
-        }
-        i++;
-    }
-}
-
-// build the dynamic array of t_dic entries
-void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
+// »»-----► Number of lines: 24
+static void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
 {
     *dst = malloc(sizeof(t_arr));
     t_dic *temp;
@@ -110,10 +58,7 @@ void build_t_arr_dic_str(t_arr **dst, char **keys, void **values, int len)
         i++;
     }
 }
-
-
-
-// initialise the builtins and operators
+// »»-----► Number of lines: 25
 void init_all_t_arr(t_sh *sh)
 {
 	char *all_operators[] = {"<<",">>","&&","||","|","<",">"};
@@ -127,7 +72,8 @@ void init_all_t_arr(t_sh *sh)
 		input_redirection,  // "<"  5
 		output_redirection  // ">"  6
 	};
-    int (*builtin_handlers[])(void *, void **) = {
+    int (*builtin_handlers[])(void *, void **) =
+    {
         builtin_echo,
         builtin_cd,
         builtin_pwd,

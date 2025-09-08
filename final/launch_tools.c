@@ -6,96 +6,59 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 16:48:34 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 20:08:45 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 12:52:55 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minish.h"
-
-t_list *search_env(t_list *lst, const char *target)
+// »»-----► Number of lines: 4
+void add_pid(t_sh *sh, const char *key, int fd[2])
 {
-    t_dic *dic;
-
-    if (!lst | !target)
-        return NULL;
-
-    while (lst)
+    char s[20];
+    ssize_t n = read(fd[0], s,sizeof(s));
+    if (n >= 0)
     {
-        dic = (t_dic *)lst->content;
-        if (dic->key && strcmp(dic->key, target) == 0)
-            return lst;
-        lst = lst->next;
+        s[n] = 0;
+        replace_or_add(&sh->env, key, (const char *)s);
     }
-    return NULL;
+    close(fd[1]);
+	close(fd[0]);
 }
-
-static void ft_lstadd_front(t_list **lst, void *content)
-{
-    t_list *new_node;
-
-    if (!lst || !content)
-        return;
-
-    // Allocate new node
-    new_node = malloc(sizeof(t_list));
-    if (!new_node)
-        return; // Allocation failure
-
-    // Duplicate content (assumes char *)
-    new_node->content = (void *)ft_strdup((char *)content);
-    if (!new_node->content)
-    {
-        free(new_node);
-        return; // Allocation failure
-    }
-
-    // Link new node to current head
-    new_node->next = *lst;
-    *lst = new_node; // Update head to new node
-}
-
-
-void replace_or_add(t_list **lst, const char *old, const char *new)
-{
-    t_list *node;
-    t_dic *dic;
-    char *newval;
-
-    if (!*lst || !old || !new)
-        return;
-    
-    // Search for node matching old
-    node = search_env(*lst, old);
-    newval = ft_strdup(new);
-    if (node)
-    {
-        dic = (t_dic *)node->content;
-        free(dic->value);
-        dic->value = newval;        
-        return;
-    }
-    else
-    {
-        dic = malloc(sizeof(t_dic));
-        dic->key = ft_strdup(old);
-        dic->key = newval;
-    }
-    ft_lstadd_front(lst, (void *)dic);
-}
-
-void add_env(t_sh *sh, const char *key, int fd)
-{
-    char s[6];
-    ssize_t n = read(fd, s,sizeof(s));
-    s[n] = 0;
-    replace_or_add(&sh->env, key, (const char *)s);
-}
-
-void send_pid(int fd, int pid)
+// »»-----► Number of lines: 4
+void send_pid(int fd[2], int pid)
 {
     char *s_pid = ft_itoa(pid);
-    write(fd, s_pid, ft_strlen(s_pid));  // Send child's PID to child
-    write(fd,"\0",1);
+    write(fd[1], s_pid, ft_strlen(s_pid));  // Send child's PID to child
+    write(fd[1],"\0",1);
     free(s_pid);
+    close(fd[1]);
+	close(fd[0]);
 }
-
+// »»-----► Number of lines: 2
+void	ctrl_c(int sig)
+{
+	write(1,"\n",1);
+	(void)sig;
+}
+// »»-----► Number of lines: 2
+void	back_slash(int sig)
+{
+	printf("Quit (core dumped)\n");
+	(void)sig;
+}
+// »»-----► Number of lines: 12
+void wait_all_pids(int **pids, int n)
+{
+	int i;
+	i = 0;
+	int status = 0;
+	while (i < n)
+	{
+		if ((*pids)[i] != -1)
+			waitpid((*pids)[i], &status, 0);
+		i++;
+	}
+	g_exit_status = assign_signal(status);
+	free(*pids);
+	*pids = NULL;
+}

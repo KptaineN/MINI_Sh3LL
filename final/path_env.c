@@ -6,7 +6,7 @@
 /*   By: eganassi <eganassi@student.42luxembourg    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 12:47:33 by eganassi          #+#    #+#             */
-/*   Updated: 2025/09/07 20:08:34 by eganassi         ###   ########.fr       */
+/*   Updated: 2025/09/08 13:28:44 by eganassi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,41 +40,6 @@ void	push_lst(t_list **tail, void *content)
 	(*tail) = (*tail)->next; 
 	new->content = content;
 	new->next = NULL;
-}
-
-t_list	*set_linked_env(char **env)
-{
-	t_list	*head;
-	t_list	*node;
-    t_list	*last;
-	char 	*p;
-	t_dic 	*dic;
-	int		i;
-	i = 0;
-    while (env[i])
-	{
-		dic = malloc(sizeof(t_dic));
-		p = ft_strchr(env[i],'=');
-		p[0] = 0;
-		dic->value = ft_strdup(env[i]);
-		dic->key = ft_strdup(&p[1]);
-		node = ft_lstnew((void *)dic);
-		if (!node)
-			return (NULL);
-        if(i == 0)
-        {    
-            head = node;
-            last = node;
-        }
-        else
-        {    
-            last->next = node;
-            last = last->next;
-        }
-        last->next = NULL;
-		i++;
-	}
-	return (head);
 }
 
 static char	*join_path(const char *dir, const char *cmd)
@@ -113,7 +78,6 @@ static char *dup_path_env(t_list *env)
 {
 	char *path_env;
 	char *copy;
-
 	path_env = get_env_value(env, "PATH");
 	if (!path_env)
 		return (NULL);
@@ -218,7 +182,7 @@ static t_dic	*new_env_struct(const char *key, const char *value)
 	return (env_entry);
 }
 
-void	ft_lstadd_front(t_list **lst, void *content)
+static void	ft_lstadd_front(t_list **lst, void *content)
 {
 	t_list	*new_node;
 

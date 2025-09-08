@@ -29,10 +29,9 @@
 # include <readline/history.h>
 # include <readline/readline.h>
 
-/* ************************************************************************** */
-/*                                 STRUCTURES                                 */
-/* ************************************************************************** */
-
+/**========================================================================
+ *                           Structures
+ *========================================================================**/
 extern sig_atomic_t			g_exit_status;
 
 typedef struct s_launch		t_launch;
@@ -42,30 +41,20 @@ typedef struct s_arr		t_arr;
 typedef struct s_dic		t_dic;
 typedef enum e_quote_state	t_quote_state;
 
-// Generic linked list structure
 typedef struct s_list
 {
 	void					*content;
 	void					**arr_content;
-	int						*pipe;
 	struct s_list			*next;
 }							t_list;
 
-typedef struct s_arr // array de string
+typedef struct s_arr
 {
 	void **arr;
 	int len;
 }							t_arr;
 
-// Quote states for parsing
-typedef enum e_quote_state
-{
-	QUOTE_NONE,   // Outside quotes
-	QUOTE_SINGLE, // Inside single quotes ''
-	QUOTE_DOUBLE  // Inside double quotes ""
-}							t_quote_state;
-
-typedef struct s_dic // array de string
+typedef struct s_dic
 {
 	void *key;
 	void *value;
@@ -99,8 +88,17 @@ typedef struct s_sh
 	t_family				**f_core;
 }							t_sh;
 
-//								SIDE STRUCTURES
-//
+/**========================================================================
+ *                           Side Structures
+ *========================================================================**/
+
+typedef enum e_quote_state
+{
+	QUOTE_NONE,  
+	QUOTE_SINGLE, 
+	QUOTE_DOUBLE  
+}							t_quote_state;
+
 typedef struct s_build_cmd
 {
 	int						i;
@@ -108,26 +106,80 @@ typedef struct s_build_cmd
 	t_list					*head;
 	t_list					*curr;
 }							t_build_cmd;
-//////////////////////////////////////////////////////////////////////////////////////
 
-/* ************************************************************************** */
-/*                           FUNCTION PROTOTYPES                             */
-/* ************************************************************************** */
+typedef struct s_get_line
+{
+	char *in;
+	char *add;
+	int l_in;
+	int l_add;
+	char type;
+	char *last_hdoc;
+}	t_get_line;
 
-// start_sh
+typedef enum e_condition
+{
+	ONE_CMD_FUNCTION,
+	MULTI_CMD_FUNCTION,
+	END_CMD_FUNCTION
+}	t_condition;
+
+typedef struct s_redir
+{
+	int n_redir; 
+	int len;
+	char **new; 
+	int i;
+	int j;
+	int idx_oper;
+	t_func f;
+}	t_redir;
+
+/**========================================================================
+ *                          Init sh
+ *========================================================================**/
 void						init_sh(t_sh *sh, char **envp);
 
-// process_input
+/**========================================================================
+ *                           looping
+ *========================================================================**/
 int							looping(t_sh *sh);
 
-// free enrico
+/**========================================================================
+ *                           Parsing Terminal
+ *========================================================================**/
+char 						*get_full_line(t_sh *sh);
+
+/**========================================================================
+ *                           linked list
+ *========================================================================**/
+void						add_node_advance(t_list **head, t_list **curr);
+t_list						*ft_lstnew(void *content);
+
+/**========================================================================
+ *                           PATH ENV
+ *========================================================================**/
+
+void						replace_or_add(t_list **lst, const char *key, const char *value);
+char						*find_command_path(char *cmd, t_list *env);
+char 						*get_env_value(t_list *env_list, const char *key);
+t_list						*search_env_node(t_list *lst, const char *target);
+
+void						push_lst(t_list **tail, void *content);
+int							set_env_value(t_list **env, const char *key,
+								const char *value);
+
+/**========================================================================
+ *                           Free Funcitons
+ *========================================================================**/
 void						free_string_array(char **arr);
 void						free_t_arr_dic_handler(t_arr **arr);
 void						free_sh(t_sh *sh);
 void						free_t_arr_dic_env(t_list **env_list);
 void 						free_setnull(void **a);
 
-char						*find_command_path(char *cmd, t_list *env);
+
+
 
 // split
 bool						escape_check(char *in, int idx);
@@ -141,59 +193,59 @@ void						signal_print_newline(int signal);
 void						set_signals_noninteractive(void);
 void						ignore_sigquit(void);
 
-// PATH
-char 						*get_env_value(t_list *env_list, const char *key);
-t_list						*search_env(t_list *lst, const char *target);
-t_list						*ft_lstnew(void *content);
-t_list						*set_linked_env(char **env);
-void						push_lst(t_list **tail, void *content);
-char						*find_command_path(char *cmd, t_list *env);
-int							set_env_value(t_list **env, const char *key,
-								const char *value);
+
+
 
 /**========================================================================
- *                           readable_expannsion.c
+ *                           Readble Expansion
  *========================================================================**/
-void						advance_and_free(t_list **exp);
-int							count_escape_char_before(const char *str, int idx);
-int							handle_escape_count(const char *str, int *i,
-								int len);
-char						*handle_escape_write(char *dst, const char *src,
-								int *i, int *j);
-char						*expand_single_string(char *str, t_list *env_list);
-/*============================ END OF readable_expansion.c ============================*/
+char 						*expand_single_string(char *str, t_list *env_list);
 
-//							BUILD_CMD.C												//
-void						add_node_record(t_list **head, t_list **curr);
+/**========================================================================
+ *                           BUILD CMD
+ *========================================================================**/
 t_list						*build_cmd(t_sh *sh, char **parsed);
-void						parse_and_prepare(t_sh *sh, char *in);
 
 
-// child
+/**========================================================================
+ *                           Child
+ *========================================================================**/
 void						**pid_expansion(void **v_arr, t_list *env);
 void						one_child(t_sh *sh, t_list *cmd, t_launch *all);
 void						multi_child(t_sh *sh, t_list *cmd, t_launch *all);
-bool						paria(t_sh *sh);
+bool						paria_cmd(t_sh *sh);
 void						end_child(t_sh *sh, t_list *cmd, t_launch *all);
 
-// parent
+/**========================================================================
+ *                           parent
+ *========================================================================**/
 void						one_parent(t_sh *sh, t_list *cmd, t_launch *all);
 void						multi_parent(t_sh *sh, t_list *cmd, t_launch *all);
 void						end_parent(t_sh *sh, t_list *cmd, t_launch *all);
 
-// launch
+/**========================================================================
+ *                           Execution
+ *========================================================================**/
 void						execution_button(char **cmd_line, t_sh *sh);
 int							execution_bcmd(char **cmd_line, t_sh *sh);
 char 						**rebuild_noredir_cmd(t_arr *oper, char **arr, int *pipe);
+
+/**========================================================================
+ *                           Launch Tools
+ *========================================================================**/
+void 						add_pid(t_sh *sh, const char *key, int fd[2]);
+void						send_pid(int fd[2], int pid);
+void						ctrl_c(int sig);
+void						back_slash(int sig);
+void 		 				wait_all_pids(int **pids, int n);
+
+/**========================================================================
+ *                           Launch
+ *========================================================================**/
 void						launch_process(t_sh *sh);
 
-void						replace_or_add(t_list **lst, const char *old,
-								const char *new);
-void						add_env(t_sh *sh, const char *key, int fd);
-void						send_pid(int fd, int pid);
 
-char						**expansion_partition_redirection(t_list *cmd,
-								t_list *env, t_arr *oper);
+
 /*
 ** ENVIRONMENT MANIPULATION FUNCTIONS
 ** Add, remove, and retrieve environment variables
@@ -268,16 +320,16 @@ int							output_redirection(void *v_file, void **v_arr,
 								int *fd);
 int							append_redirection(void *v_file, void **v_arr,
 								int *fd);
-
-int							is_in_t_arr_str(t_arr *arr, const char *arg);
+/**========================================================================
+ *                           t_arr
+ *========================================================================**/
 int							is_in_t_arr_dic_str(t_arr *arr, const char *arg);
-void						build_t_arr_str(t_arr **dst, char **arr_str,
-								int len);
 void						init_all_t_arr(t_sh *sh);
 
 // Function to display the linked list of string arrays
 void						display_linked_list_of_string_array(t_list *head);
 void						display_string_array(char *arr[]);
 void						display_linked_list_of_string(t_list *head);
+void 						display_linked_list_dic_env(t_list *head);
 
 #endif
