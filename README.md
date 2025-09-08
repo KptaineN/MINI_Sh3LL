@@ -17,101 +17,256 @@
 
 
 
+        Anatomie complète de MINISHELL
+        1. Structure centrale
+
+        Le programme repose sur la structure t_shell, véritable « noyau » de l’exécution : elle enregistre l’environnement, les arguments bruts, le tableau de tokens, la liste chaînée de commandes, les redirections, un tableau de PIDs, les copies de stdin/stdout, ainsi que l’état du terminal.
+        Une variable globale g_exit_status, déclarée volatile sig_atomic_t, sert de canal de communication entre la boucle principale et les gestionnaires de signaux pour reporter la cause de la dernière terminaison (code de retour ou signal).
+        2. Initialisation (SRC/init)
+
+            start_shell efface la structure, configure le terminal (term_init), installe les handlers de signaux (init_signals) et transforme envp en liste chaînée (init_env). Les redirections et tableaux de commandes sont initialisés à des états neutres.
+
+            term_init récupère les attributs du terminal, désactive l’affichage de ^C et applique les réglages adaptés au mode canonique.
+
+            init_signals installe handle_sigint et handle_sigquit, tandis que parent_signals/child_signals rétablissent l’ignorance ou le comportement par défaut lors des forks.
+
+            t_arr et t_dic (sous-dossier t_arr/) implémentent des tableaux dynamiques utilisés pour indexer les builtins (bcmd) et les opérateurs (oper).
+
+        3. Boucle principale (SRC/main)
+
+            main vérifie l’absence d’arguments, affiche une bannière puis lance start_shell et looping.
+
+            looping lit chaque ligne via read_user_input, recopie g_exit_status dans shell->exit_status, et confie la chaîne à process_input.
+
+            process_input découpe le traitement en quatre étapes :
+
+                early_stage – gestion des quotes multi‑lignes, historique, détection de exit
+
+                expand_stage – expansion de $? et autres variables
+
+                parse_stage – tokenisation, association des redirections, construction de la liste de commandes
+
+                run_stage – lancement des commandes puis nettoyage des allocations.
+
+        4. Lexing & Parsing (SRC/fck_split, SRC/parser)
+
+            custom_split (fichiers split_count-arg.c/split_extract-arg.c) segmente la ligne en respectant les quotes et les opérateurs.
+
+            attribute_token_type classe chaque segment en TOKEN_CMD, TOKEN_BCMD, TOKEN_PIPE, etc.
+
+            assign_redirs analyse la liste d’arguments, détache les opérateurs de redirection et relie le fichier cible à la commande courante.
+
+            build_cmd_list convertit le tableau de tokens en liste chaînée de commandes prêtes à l’exécution, en sauvegardant pour chacune les éventuelles redirections et le compte d’arguments.
+
+        5. Gestion de l’environnement (SRC/env)
+
+            init_env convertit le tableau envp en liste de nœuds t_env{key,value}, alloués dynamiquement ; chaque nœud est chaîné dans shell->env.
+
+            list_to_envp recompresse la liste en tableau char ** avant un execve, ne conservant que les variables exportables (valeur non NULL).
+
+            set_env_value/unset_env permettent aux builtins export et unset de modifier la liste.
+
+        6. Builtins (SRC/built)
+
+            is_builtin identifie les commandes internes (cd, echo, pwd, export, unset, env, exit).
+
+            get_builtin_handler renvoie le pointeur de fonction dans bcmd, stocké comme dictionnaire dynamique.
+
+            builtin_cd contrôle le nombre d’arguments, choisit la destination (HOME, OLDPWD ou argument explicite), réalise le chdir puis met à jour PWD et OLDPWD dans l’environnement.
+
+            builtin_echo reconnaît les options -n, traite les variables (via replace_variables.c) et imprime les arguments en tenant compte des quotes et des échappements.
+
+            builtin_exit valide l’argument numérique, gère l’erreur « too many arguments » et quitte le shell en libérant toutes les ressources.
+
+            export et unset manipulent la liste d’environnement ; env affiche les variables ; pwd utilise getcwd pour afficher le répertoire courant.
+
+        7. Expansion avancée (SRC/expand, SRC/parser/expand_p)
+
+            expand_input remplace d’abord $? par shell->exit_status grâce à replace_exit.c, tout en respectant les quotes : le parcours tient compte des contextes in_sq/in_dq pour éviter les expansions interdites.
+
+            Dans parser/expand_p/expand_container.c, chaque argument est découpé en sous‑tokens (texte, variable), résolu avec l’environnement puis recomposé ; les quotes sont retirées par remove_quotes.
+
+        8. Exécution (SRC/parser/launch, SRC/exec)
+
+            Préparatifs
+            launch_process restaure le terminal, prépare les heredocs et, si la ligne se réduit à un seul builtin, l’exécute directement dans le processus courant (run_single_builtin_if_alone).
+
+            Fork/pipe
+            Pour chaque commande d’un pipeline :
+
+                check_pipe ouvre un pipe si nécessaire ;
+
+                try_fork_and_run effectue le fork, configure les signaux (parent_signals/child_signals) puis confie au fils child_exec l’application des redirections et l’exécution de la commande.
+
+                Le parent referme les extrémités inutilisées et enregistre le PID.
+
+            Exécution réelle
+
+                prepare_or_run_builtin développe les arguments (expand_cmd) ; si le premier est un builtin, il est exécuté immédiatement ; sinon, le tableau d’arguments est renvoyé au lanceur externe.
+
+                execute_cmd cherche le binaire (find_command_path), construit envp (list_to_envp) et invoque execve. En cas d’échec (ENOENT, EACCES, etc.) un message est émis et le processus fils quitte avec le code approprié.
+
+            Attente et statut
+            wait_all_update_status récupère non‑bloquant les fils déjà terminés, puis attend les autres. Pour le dernier PID, g_exit_status prend soit le code de retour (WIFEXITED), soit 128 + signal (WIFSIGNALED) ; le shell imprime ^C ou Quit (core dumped) si nécessaire.
+
+        9. Redirections & Heredocs (SRC/redir)
+
+            assign_redirs lors du parsing associe chaque opérateur >, >>, <, << au bon token‑commande.
+
+            handle_redirect_in/out/append ouvre les fichiers et met à jour shell->fd_in/fd_out; la fonction vérifie les erreurs d’ouverture et affiche des diagnostics standardisés.
+
+            prepare_heredoc crée des fichiers temporaires, lit jusqu’au délimiteur, applique l’expansion sauf si le délimiteur est quote, et remplace fd_in par ce fichier.
+
+            apply_redirs_in_child (appelée depuis child_exec) duplique fd_in/fd_out vers STDIN_FILENO et STDOUT_FILENO pour rediriger les flux.
+
+        10. Utilitaires (SRC/handle_utils, SRC/utils)
+
+            update_quotes maintient les drapeaux in_sq/in_dq pour tout le parsing afin d’ignorer les $ ou | protégés par des quotes.
+
+            Les sous-modules util-*-free.c libèrent tokens, commandes, tableaux et heredocs après chaque ligne (cleanup_shell_iter) ou à la fermeture (free_minishell).
+
+            handler-1.c/handler-2.c centralisent les erreurs critiques (allocation, redirection, etc.) pour éviter les fuites de mémoire.
+
+        11. Déroulement complet du programme
+
+        main
+        │
+        ├─ start_shell : init_env, term_init, init_signals, init_all_t_arr
+        │
+        └─ looping
+           ├─ read_user_input → readline
+           └─ process_input
+               ├─ early_stage       (read_more, add_history, must_exit)
+               ├─ expand_stage      (expand_input)
+               ├─ parse_stage       (custom_split → tokens → assign_redirs → build_cmd_list)
+               └─ run_stage
+                   └─ launch_process
+                       ├─ prepare_heredocs
+                       ├─ run_single_builtin_if_alone ? (sans fork)
+                       └─ pour chaque commande :
+                           ├─ pipe / fork
+                           ├─ child_exec (dup2, apply_redirs_in_child, execute_cmd ou builtin)
+                           └─ parent_after_fork (ferme fd, enregistre pid)
+                       └─ wait_all_update_status
+
+        12. Exécution d’une commande avec pipes & redirections
+
+        Exemple : cat < in.txt | grep foo | wc -l >> out.txt
+
+        [Parent]
+          pipe(p1) ── fork → child1
+          pipe(p2) ── fork → child2
+                       └── fork → child3
+          ferme fds inutiles, attend tous les enfants
+          └─ wait_all_update_status → g_exit_status = code final
+
+        [child1] cat
+          open("in.txt", RDONLY) → dup2(fd, STDIN)
+          dup2(p1[1], STDOUT)
+          close(p1[0], p1[1], ...)
+          execve("cat")
+
+        [child2] grep foo
+          dup2(p1[0], STDIN)
+          dup2(p2[1], STDOUT)
+          close(p1[0], p1[1], p2[0], p2[1], ...)
+          execve("grep","foo")
+
+        [child3] wc -l
+          open("out.txt", WRONLY|CREAT|APPEND) → dup2(fd, STDOUT)
+          dup2(p2[0], STDIN)
+          close(p1[0], p1[1], p2[0], p2[1], fd)
+          execve("wc","-l")
+
+        Chaque fils applique d’abord ses redirections (fichiers, pipes) via dup2, puis exécute le binaire. Le parent ferme les extrémités inemployées pour éviter les blocages et récolte les statuts.
+        13. Rôle de g_exit_status
+
+            Mis à -1 avant un fork pour différencier les signaux enfants.
+
+            Dans les handlers SIGINT/SIGQUIT, il prend immédiatement 130 ou 131 et redessine le prompt si l’interruption intervient en mode interactif.
+
+            Après wait_all_update_status, il reflète le code de sortie de la dernière commande du pipeline et est recopié dans shell->exit_status pour la ligne suivante.
+
+        14. Conclusion
+
+        MINISHELL combine une architecture modulaire et une gestion rigoureuse des ressources :
+
+            Lecture : readline → expansion → tokenisation.
+
+            Préparation : redirections et heredocs stockés par commande.
+
+            Exécution : builtin isolé (sans fork) ou pipeline (fork/exec) avec redirections.
+
+            Synchronisation : gestion fine des signaux et propagation du code de retour.
+
+            Nettoyage : chaque itération libère tokens, commandes, FD temporaires, garantissant un état sain pour la suivante.
+
+        Grâce à cette structure, le projet reproduit l’essentiel du comportement d’un shell POSIX et peut servir de base à des extensions plus poussées. Vous détenez désormais la compréhension exhaustive de MINISHELL — bonne maîtrise !
 
 
-		/usr/bin/ld: obj/parser/launch.o: in function `launch_process':
-launch.c:(.text+0x68a): undefined reference to `execute_cmd'
-/usr/bin/ld: obj/parser/lexer.o: in function `count_args_cmd':
-lexer.c:(.text+0x77c): undefined reference to `print_dic'
-/usr/bin/ld: obj/parser/path.o: in function `expand_variable':
-path.c:(.text+0x4d4): undefined reference to `get_value_env'
-/usr/bin/ld: obj/parser/path.o: in function `expand_str':
-path.c:(.text+0x5ff): undefined reference to `get_value_env'
-/usr/bin/ld: obj/parser/tool_lexer.o: in function `count_tokens':
-tool_lexer.c:(.text+0x2f7): undefined reference to `ft_free'
-/usr/bin/ld: tool_lexer.c:(.text+0x31a): undefined reference to `ft_free'
-clang: error: linker command failed with exit code 1 (use -v to see invocation)
-make: *** [Makefile:68: minishell] Error 1
+
+ flux de contrôle :
+
+        ┌────────┐   start_shell   ┌───────────────┐
+        │ main() │───────────────▶│ init/env/sign │
+        └───┬────┘                 └──────┬────────┘
+            │ read_loop                 │
+            ▼                           ▼
+          readline ────► process_input ──┬─ expand_input ──┬─ custom_split
+                                         │                 └─ tokenisation & redirs
+                                         │
+                                         ├─ launch_process ──┬─ run_single_builtin?
+                                         │                   └─ fork/exec/pipe
+                                         ▼
+                                    wait_all_update_status
+
+_________________________________________________________________________________________
+                      ┌────────────────────────────────────┐
+                      │              main()                │
+                      └───────────────┬────────────────────┘
+                                      │ start_shell
+                                      ▼
+                            ┌──────────────────────┐
+                            │      looping()       │
+                            └──────────┬───────────┘
+                                       │ readline
+                                       ▼
+                             ┌───────────────────┐
+                             │ process_input()   │
+                             └─┬────────────┬────┘
+                   ┌───────────┘            └───────────────┐
+                   ▼                                       ▼
+              early_stage()                             expand_stage()
+              - read_more                                - expand_input
+              - add_history                              ▼
+              - must_exit?                       parse_stage()
+                   ▼                            - custom_split
+                 run_stage()                    - attribute_token_type
+              - launch_process                  - assign_redirs
+              - cleanup_shell_iter              - build_cmd_list
+                                                - alloc pids
+                                                ▼
+                                             launch_process()
+                                             - run_single_builtin_if_alone ?
+                                             - for each cmd:
+                                                  pipe/fork
+                                                  apply redirs
+                                                  builtin or execve
+                                             - wait_for_children
 
 
-a faire aussi
 
-   		finir parsing lexing token + new make file propre de nrico
-
-       		finir commande a implementer + signal
-
-   		+ finir le reste harmonisation
-
-structure
-
- 		  ├── from_pipex/
-                   └──  execute_pipe.c
-		   └── from_pipex.c
-      		   └── pipex_path.c
-
-		            minishell/
-            ├── built/       # → Tes builtins (echo, cd, exit, export, unset, env)
-            │   ├── builtin.c
-	    │   ├── echo.c
-            │   ├── cd.c
-            │   ├── exit.c
-            │   ├── export.c
-            │   ├── unset.c
-            │   ├── env.c
-            ├── parser/         # → Tokenisation, splitting, création AST
-            |	|			 │   ├── lexer.c               \__ old_parser
-            |	|			 │   ├── ast.c / ast_helper.c  /
-            │   ├── parser.c				
-	    │   ├── parsing.c
-     	    │   ├── subtoken.c
-	    │   ├── token_attribution.c
-    	    │   ├── tokenizer.c
-            ├── exec/           # → Exécution AST, pipeline, redirs
-            │   ├── executor.c
-            │   ├── pipe_utils.c # -> dans from_pipex
-            │   ├── redirection.c
-            ├── env/            # → Gestion env chaîné, export, unset, etc.
-            │   ├── env_list.c
-            │   ├── export.c
-	    │   ├── unset.c
-     	    │   ├── utils_env.c
-            ├── signals/
-            │   └── signals.c
-            ├── handle_utils/          # → ft_split, ft_strjoin_3, ft_free_split etc.
-            │   │   └── handler_cast_t_shell/
-	    |	|	 └── handler-1.c
-            |	|	 └── handler-2.c
-	    │   └── util-0.c
-	    │   └── util-1.c
-     	    │   └── util-2.c
-            │   └── util-3-free.c
-            ├── main/
-	    |	└── main_loop.c
-            |	└── main.c
-	    |	└── start_init.c
-     	    |
-            ├── Include
-	    |	└── minishell.h
-   	    |	└── ast.h
-            |	└── env.h
-	    |	└── parsing.h 	
-            |	└── LIBFT
-	    |	      └── libft.h
-            ├── Makefile
+Exemple : cat < in.txt | grep foo | wc -l >> out.txt
 
 
-			   parser/parser.c → parse l’input, remplit l’AST
+                                    open("in.txt")          pipe()          pipe()            open("out.txt", APPEND)
+                            stdin ───────────► cmd1 ──stdout─┬───► cmd2 ─stdout─┬───► cmd3 ─stdout─┬──► outfile
+                                               ▲             │             │                   │
+                                           dup2(infile,0)    │         dup2(pipe1[0],0)   dup2(pipe2[0],0)
+                                                             │             │                   │
+                                                          dup2(pipe1[1],1) │               dup2(outfile,1)
+                                                             │         close/cleanup         close/cleanup
 
-            utils/utils.c → toutes les petites fonctions de split/join/free
-
-            builtins/echo.c, builtins/cd.c → tes builtins
-
-            env/env_list.c → init/free/print env chaîné
-
-            env/export.c, env/unset.c
-
-            redirection.c → setup_redirections, gestion des fd
-     		    exec/executor.c → gère l’appel principal à l’exécuteur AST, builtins, etc.
 
 
 -A action
@@ -177,7 +332,7 @@ structure
               \uHHHH the Unicode (ISO/IEC 10646) character whose value is the hexadecimal value HHHH (one to four hex digits)
               \UHHHHHHHH
                      the Unicode (ISO/IEC 10646) character whose value is the hexadecimal value HHHHHHHH (one to eight hex digits)
-    
+
            exit [n]
               Cause  the  shell to exit with a status of n.  If n is omitted, the exit status is that of the last command executed.  A trap on EXIT is executed before
               the shell terminates.
@@ -193,7 +348,7 @@ structure
               Print the absolute pathname of the current working directory.  The pathname printed contains no symbolic links if the -P option is supplied  or  the  -o
               physical option to the set builtin command is enabled.  If the -L option is used, the pathname printed may contain symbolic links.  The return status is
               0 unless an error occurs while reading the name of the current directory or an invalid option is supplied.
-        
+
         unset [-fv] [-n] [name ...]
               For each name, remove the corresponding variable or function.  If the -v option is given, each name refers to a shell variable, and that variable is re‐
               moved.  Read-only variables may not be unset.  If -f is specified, each name refers to a shell function, and the function definition is removed.  If the
@@ -215,7 +370,7 @@ structure
               to  wait  for  id to terminate before returning its status, instead of returning when it changes status.  If id specifies a non-existent process or job,
               the return status is 127.  If wait is interrupted by a signal, the return status will be greater than 128, as described under SIGNALS in bash(1).   Oth‐
               erwise, the return status is the exit status of the last process or job waited for.
-    
+
 
              Signal/Action,Effet pendant la saisie d'une commande,Effet pendant l'exécution d'une commande,Effet sur le shell lui-même
              Ctrl+C (SIGINT),Annule la saisie, retourne au prompt,Interrompt la commande en cours,Ne ferme pas le shell

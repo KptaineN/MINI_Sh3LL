@@ -1,0 +1,169 @@
+BUILTIN_ENV
+Cette fonction `builtin_env()` implémente la **commande built-in `env`** de votre minishell, qui affiche toutes les variables d'environnement définies dans le shell courant, reproduisant le comportement de la commande Unix standard.
+
+La fonction commence par une **validation stricte des arguments** avec `if (args[1])`. La commande `env` standard n'accepte aucun argument dans sa forme la plus simple, donc la présence de `args[1]` (le premier argument après "env") constitue une erreur. Le message d'erreur utilise un emoticon expressif `( ͡ಠ ʖ̯ ͡ಠ)╭∩╮` qui ajoute une personnalité distinctive à votre minishell tout en restant informatif. L'utilisation de l'opérateur d'assignation dans le return `return (shell->exit_status = 1)` combine élégamment la configuration du statut d'erreur et la valeur de retour en une seule expression.
+
+Le **parcours de la liste d'environnement** s'effectue via une boucle while qui itère sur la liste chaînée `shell->env`. À chaque itération, la fonction extrait la structure `t_env` contenue dans le nœud courant avec `env = cur->content`, puis vérifie que la variable possède une valeur avec `if (env->value)`. Cette vérification est importante car certaines variables peuvent être déclarées mais non assignées, et seules les variables avec des valeurs doivent être affichées par `env`.
+
+L'**affichage des variables** utilise une série d'appels à `write()` plutôt que des fonctions de plus haut niveau comme `printf()`. Cette approche garantit un contrôle précis sur la sortie et évite les problèmes de buffering. La fonction affiche chaque variable au format standard `KEY=VALUE` en écrivant séquentiellement la clé, le signe égal, la valeur, puis un saut de ligne. L'utilisation de `ft_strlen()` pour calculer les longueurs permet de gérer correctement les chaînes de caractères de longueur variable.
+
+La **finalisation** configure `shell->exit_status = 0` pour indiquer un succès complet et retourne 0. Cette convention suit les standards Unix où un code de retour de 0 signifie succès et les valeurs non-nulles indiquent diverses conditions d'erreur. Cette implémentation reproduit fidèlement le comportement attendu de la commande `env`, permettant aux utilisateurs et aux scripts de lister l'environnement du shell de manière fiable.
+
+INIT_ENV
+Ce code implémente un **système complet d'initialisation de l'environnement** pour votre minishell, transformant le tableau `envp` standard en une liste chaînée de structures `t_env` pour faciliter la manipulation des variables d'environnement.
+
+La fonction `parse_entry()` constitue le **parser fondamental** qui décompose une chaîne d'environnement au format `KEY=VALUE`. Elle utilise `ft_strchr()` pour localiser le caractère `=` qui sépare la clé de la valeur. Si aucun `=` n'est trouvé, elle retourne 0 (entrée valide mais sans valeur). Elle extrait ensuite la clé avec `ft_substr(s, 0, eq - s)` en calculant la longueur par arithmétique de pointeurs, et la valeur avec `ft_strdup(eq + 1)` en dupliquant tout ce qui suit le `=`. La gestion d'erreur robuste libère les allocations partielles en cas d'échec et remet les pointeurs de sortie à NULL pour maintenir un état cohérent.
+
+La fonction `new_env_node_take()` implémente un **constructeur de nœud** qui crée à la fois une structure `t_env` et un nœud de liste `t_list`. L'aspect "take" du nom indique qu'elle prend possession des chaînes passées en paramètre plutôt que de les copier. Si l'une des allocations échoue, elle libère toutes les ressources déjà allouées, y compris les chaînes d'origine, garantissant qu'aucune fuite mémoire ne survient même en cas d'échec partiel.
+
+La fonction `append_node()` gère l'**insertion efficace** en queue de liste en maintenant des pointeurs vers la tête et la queue. Cette approche permet d'ajouter des éléments en O(1) plutôt qu'en O(n), ce qui est particulièrement important lors de l'initialisation où de nombreuses variables d'environnement doivent être traitées. Elle gère élégamment le cas de la liste vide en initialisant à la fois `head` et `tail` au premier nœud.
+
+La fonction `add_env_entry()` orchestre le **processus complet d'ajout** d'une entrée d'environnement en combinant le parsing, la création de nœud, et l'insertion dans la liste. Elle propage les codes de retour du parsing (0 pour entrée sans valeur, 1 pour succès, -1 pour erreur) et gère les échecs d'allocation lors de la création du nœud.
+
+Enfin, `init_env()` constitue le **point d'entrée principal** qui parcourt le tableau `envp` et construit progressivement la liste d'environnement. L'utilisation de l'opérateur virgule dans `return (free_env_list(head), NULL)` est une technique élégante qui libère toute la liste construite en cas d'erreur avant de retourner NULL, garantissant qu'aucune ressource partiellement construite ne soit laissée en mémoire. Cette architecture modulaire facilite le debugging et permet une gestion granulaire des erreurs à chaque étape du processus d'initialisation.
+
+
+INIT_ENV
+Cette fonction `init_env()` constitue le **point d'entrée principal** du système d'initialisation de l'environnement de votre minishell, transformant le tableau de chaînes `envp` (variables d'environnement du processus parent) en une liste chaînée dynamique pour faciliter les opérations de manipulation ultérieures.
+
+La fonction déclare quatre variables locales qui orchestrent le processus de construction : `head` et `tail` comme pointeurs vers le début et la fin de la liste chaînée en cours de construction, `i` comme index pour parcourir le tableau `envp`, et `r` pour capturer les codes de retour des opérations d'ajout. L'initialisation de `head` et `tail` à NULL prépare la construction d'une liste vide qui sera progressivement peuplée.
+
+La **boucle de traitement** utilise une condition composite `while (envp && envp[i])` qui vérifie à la fois que le tableau `envp` n'est pas NULL et que l'élément courant existe. Cette double vérification protège contre les cas où aucun environnement n'est fourni et détecte automatiquement la fin du tableau (marquée par un pointeur NULL selon la convention Unix). À chaque itération, `add_env_entry()` traite une chaîne d'environnement complète, gérant le parsing, l'allocation, et l'insertion dans la liste.
+
+La **gestion d'erreur robuste** surveille le code de retour de `add_env_entry()` stocké dans `r`. Si une erreur survient (allocation échouée, chaîne malformée), indiquée par `r < 0`, la fonction utilise l'opérateur virgule pour exécuter séquentiellement `free_env_list(head)` (qui libère toute la liste partiellement construite) puis retourner NULL. Cette technique garantit qu'aucune fuite mémoire ne survient même en cas d'échec partiel lors de la construction de la liste.
+
+Le **retour de succès** avec `return (head)` fournit un pointeur vers la tête de la liste chaînée complètement construite, contenant toutes les variables d'environnement sous forme de structures `t_env` facilement manipulables. Cette liste servira de base pour toutes les opérations d'environnement du shell (lecture, modification, export), offrant une interface plus flexible que le tableau de chaînes originel tout en préservant toutes les informations d'environnement héritées du processus parent.
+
+ADD_ENV_ENTRY
+Cette fonction `add_env_entry()` implémente un **orchestrateur de traitement** pour ajouter une entrée d'environnement à la liste chaînée, coordonnant les phases de parsing, de création de nœud, et d'insertion dans une séquence d'opérations cohérente.
+
+La fonction utilise des **doubles pointeurs** pour `head` et `tail`, permettant de modifier directement les pointeurs de la liste dans la fonction appelante. Cette approche est essentielle pour maintenir les références vers le début et la fin de la liste lors de l'ajout d'éléments. Les variables locales `key`, `val`, `st`, et `node` servent respectivement à stocker la clé parsée, la valeur parsée, le statut de l'opération de parsing, et le nœud de liste nouvellement créé.
+
+La **phase de parsing** délègue l'analyse de la chaîne d'environnement à `parse_entry()`, qui extrait la clé et la valeur de l'entrée au format `KEY=VALUE`. Le code de retour `st` encode plusieurs états possibles : -1 pour une erreur de parsing ou d'allocation, 0 pour une entrée valide sans valeur (comme une variable déclarée mais non assignée), et 1 pour une entrée complète avec clé et valeur. La condition `if (st <= 0)` propage directement ces codes de retour, permettant à la fonction appelante de distinguer entre erreurs et cas particuliers.
+
+La **création du nœud** via `new_env_node_take()` prend possession des chaînes `key` et `val` allouées par le parser, créant à la fois la structure `t_env` et le nœud de liste `t_list` correspondant. Si cette allocation échoue (mémoire insuffisante), la fonction retourne -1 pour signaler l'erreur. Le nom "take" indique que cette fonction assume la responsabilité de libérer les chaînes en cas d'échec, évitant les fuites mémoire.
+
+L'**insertion finale** avec `append_node()` ajoute le nœud nouvellement créé à la fin de la liste chaînée, en mettant à jour automatiquement les pointeurs `head` et `tail` selon les besoins. Une fois cette opération réussie, la fonction retourne 1 pour indiquer un succès complet. Cette architecture modulaire sépare clairement les responsabilités tout en maintenant une gestion d'erreur robuste à chaque étape du processus d'ajout d'une variable d'environnement.
+
+APPEND_NOTE
+Cette fonction `append_node()` implémente une **insertion efficace en queue de liste chaînée** en maintenant des pointeurs vers la tête et la queue, permettant d'ajouter des éléments en temps constant O(1) plutôt qu'en temps linéaire O(n).
+
+La fonction utilise des **doubles pointeurs** pour `head` et `tail`, ce qui lui permet de modifier directement les pointeurs originaux dans la fonction appelante. Cette approche est cruciale car la fonction doit potentiellement modifier le pointeur de tête (lors du premier ajout) et systématiquement mettre à jour le pointeur de queue après chaque insertion.
+
+La **logique conditionnelle** `if (!*head)` gère le cas spécial de la **liste vide**. Lorsque la liste est vide (head pointe vers NULL), le nouveau nœud devient à la fois la tête et la queue de la liste. Cette situation se produit lors de l'insertion du tout premier élément dans une liste nouvellement initialisée.
+
+Dans le **cas général** où la liste contient déjà des éléments, la condition `else` exécute `(*tail)->next = node`, qui connecte le dernier nœud existant au nouveau nœud en définissant son pointeur `next`. Cette opération maintient la continuité de la liste chaînée en établissant le lien entre l'ancien dernier élément et le nouveau.
+
+L'**opération finale** `*tail = node` met à jour le pointeur de queue pour qu'il pointe vers le nouveau nœud, qui devient désormais le dernier élément de la liste. Cette mise à jour est effectuée dans tous les cas (liste vide ou non vide), garantissant que le pointeur de queue reste toujours valide et pointe vers le dernier élément ajouté. Cette implémentation est particulièrement efficace pour construire des listes lors de l'initialisation, comme c'est le cas pour les variables d'environnement de votre minishell.
+
+NEW_ENV_NODE_TAKE
+Cette fonction `new_env_node_take()` implémente un **constructeur de nœud d'environnement** qui crée une structure de données complète associant une variable d'environnement (clé-valeur) à un nœud de liste chaînée, avec une gestion robuste de la mémoire et de la propriété des ressources.
+
+Le nom de la fonction contient le terme **"take"** qui indique une sémantique de transfert de propriété : la fonction prend possession des chaînes `key` et `value` passées en paramètres, assumant la responsabilité de leur libération en cas d'échec. Cette approche évite les copies inutiles et optimise l'utilisation mémoire en réutilisant directement les chaînes déjà allouées par les fonctions appelantes.
+
+La fonction effectue **deux allocations simultanées** : `malloc(sizeof(*env))` pour créer la structure `t_env` qui stockera la paire clé-valeur, et `malloc(sizeof(*node))` pour le nœud de liste chaînée qui encapsulera cette structure. L'utilisation de `sizeof(*env)` plutôt que `sizeof(t_env)` est une pratique défensive qui garantit la cohérence même si le type de la variable change ultérieurement.
+
+La **gestion d'erreur exhaustive** avec `if (!env || !node)` détecte l'échec de l'une ou l'autre allocation. En cas d'échec, la fonction libère systématiquement toutes les ressources : les chaînes d'origine (`key` et `value`) pour honorer le contrat de propriété, et les structures potentiellement allouées (`env` et `node`). Cette approche garantit qu'aucune fuite mémoire ne survient, même en cas d'allocation partielle réussie.
+
+L'**assemblage final** configure la structure `t_env` en assignant directement les pointeurs `key` et `value` (sans copie), puis initialise le nœud de liste en plaçant la structure d'environnement dans le champ `content` et en mettant `next` à NULL pour indiquer que c'est un nœud terminal. Cette construction en deux niveaux (structure d'environnement encapsulée dans un nœud de liste) permet une organisation flexible des données tout en maintenant une interface de liste chaînée standard.
+
+PARSE_ENTRY
+Cette fonction `parse_entry()` implémente un **parser de variables d'environnement** qui décompose une chaîne au format `KEY=VALUE` en ses composants distincts, constituant un élément fondamental du système de gestion d'environnement de votre minishell.
+
+La fonction utilise des **double pointeurs** pour `out_key` et `out_val`, permettant de modifier les pointeurs dans la fonction appelante et de retourner deux valeurs simultanément. L'initialisation immédiate de ces pointeurs à NULL avec `*out_key = NULL` et `*out_val = NULL` garantit un état de départ propre et permet aux fonctions appelantes de détecter facilement les échecs en vérifiant la nullité des pointeurs retournés.
+
+Le **processus de parsing** commence par localiser le caractère délimiteur `=` avec `ft_strchr(s, '=')`. Si aucun `=` n'est trouvé (`!eq`), la fonction retourne 0, indiquant une entrée valide mais sans valeur assignée (comme une variable déclarée mais non définie). Cette distinction est importante car certains environnements peuvent contenir des variables sans valeurs explicites.
+
+L'**extraction des composants** utilise l'arithmétique de pointeurs pour calculer les longueurs : `ft_substr(s, 0, eq - s)` extrait la clé depuis le début de la chaîne jusqu'au caractère `=` (exclu), tandis que `ft_strdup(eq + 1)` duplique tout ce qui suit le `=` pour créer la valeur. Cette approche gère automatiquement les cas où la valeur est vide (chaîne se terminant par `=`) ou contient des caractères spéciaux.
+
+La **gestion d'erreur robuste** vérifie le succès des allocations avec `if (!*out_key || !*out_val)`. En cas d'échec d'allocation (mémoire insuffisante), la fonction effectue un nettoyage complet en libérant toute allocation partielle, remettre les pointeurs de sortie à NULL, et retourner -1. Cette approche garantit qu'aucune fuite mémoire ne survient et que les fonctions appelantes reçoivent soit des données complètement valides (succès avec retour 1), soit des pointeurs NULL clairement identifiables comme échecs.
+
+ENV_LIST
+Ce code implémente un **système de conversion d'environnement** qui transforme une liste chaînée de variables d'environnement en un tableau de chaînes compatible avec les fonctions système Unix comme `execve()`, constituant un pont essentiel entre la représentation interne de votre minishell et les interfaces système standard.
+
+La fonction `count_exportable()` effectue un **pré-calcul de taille** en parcourant la liste d'environnement pour compter uniquement les variables qui possèdent à la fois une structure valide et une valeur assignée. La condition `if (e && e->value)` filtre les entrées nulles ou les variables déclarées sans valeur, garantissant que seules les variables exportables (au sens Unix) sont comptabilisées. Cette approche permet d'allouer précisément la mémoire nécessaire pour le tableau de sortie.
+
+La fonction `make_kv_cstr()` implémente un **constructeur de chaîne d'environnement** qui forge des chaînes au format `KEY=VALUE` requis par les systèmes Unix. Elle calcule les longueurs avec `ft_strlen()`, alloue un buffer de taille `nk + 1 + nv + 1` (clé + '=' + valeur + '\0'), puis utilise `ft_memcpy()` pour assembler efficacement la chaîne. Cette approche évite les fonctions comme `strcat()` qui nécessiteraient des parcours répétés, optimisant les performances lors de la construction de nombreuses variables.
+
+La fonction `free_envp_partial()` gère le **nettoyage en cas d'échec partiel** lors de la construction du tableau. Elle marque d'abord la fin du tableau partiellement rempli avec `envp[filled] = NULL`, puis délègue la libération complète à `free_str_array()`. Cette stratégie garantit qu'aucune fuite mémoire ne survient même si l'allocation d'une chaîne échoue au milieu du processus de conversion.
+
+Enfin, `list_to_envp()` orchestre la **conversion complète** en combinant toutes les fonctions auxiliaires. Elle alloue un tableau de `n + 1` pointeurs (le +1 pour le terminateur NULL), puis itère sur la liste en créant les chaînes d'environnement via `make_kv_cstr()`. L'utilisation de l'opérateur virgule dans `return (free_envp_partial(envp, i), NULL)` constitue une technique élégante pour nettoyer et retourner NULL en une seule expression. Le résultat est un tableau compatible avec `execve()` et autres fonctions système, permettant au minishell de lancer des programmes avec l'environnement correct.
+
+LIST_TO_ENVP
+Cette fonction `list_to_envp()` implémente un **convertisseur d'environnement** qui transforme une liste chaînée de variables d'environnement en un tableau de chaînes au format standard Unix, permettant à votre minishell d'interfacer avec les fonctions système comme `execve()`.
+
+La fonction commence par **déterminer la taille requise** avec `count_exportable(env)` pour compter précisément le nombre de variables exportables (celles ayant une valeur définie). Elle alloue ensuite un tableau de pointeurs de taille `n + 1` avec `malloc(sizeof(char *) * (n + 1))`, où le `+1` réserve l'espace pour le terminateur NULL obligatoire dans les tableaux d'environnement Unix. Cette allocation préalable évite les réallocations coûteuses et garantit un espace mémoire continu.
+
+Le **parcours et la conversion** s'effectuent via une boucle while qui itère sur la liste chaînée d'origine. À chaque nœud, la fonction extrait la structure `t_env` et vérifie sa validité avec `if (cur && cur->value)`, s'assurant que seules les variables avec des valeurs assignées sont incluses dans le tableau final. Cette filtration est essentielle car les tableaux d'environnement Unix ne supportent que les variables complètement définies.
+
+La **création des chaînes d'environnement** utilise `make_kv_cstr(cur->key, cur->value)` pour construire des chaînes au format `KEY=VALUE`. Si cette allocation échoue pour une chaîne particulière, la fonction utilise l'opérateur virgule pour exécuter séquentiellement `free_envp_partial(envp, i)` (qui libère toutes les chaînes déjà créées) puis retourner NULL. Cette gestion d'erreur robuste garantit qu'aucune fuite mémoire ne survient même en cas d'échec partiel.
+
+La **finalisation** place un pointeur NULL à `envp[i]` pour marquer la fin du tableau selon la convention Unix, puis retourne le tableau complet. Cette structure permet aux fonctions système de détecter automatiquement la fin de l'environnement lors du parcours, assurant une compatibilité parfaite avec l'écosystème Unix et permettant au minishell de lancer des processus enfants avec l'environnement approprié.
+
+FREE_ENVP_PARTIAL
+Cette fonction `free_envp_partial()` implémente un **mécanisme de nettoyage spécialisé** pour libérer proprement un tableau d'environnement partiellement construit lors d'échecs d'allocation, constituant un élément crucial de la gestion d'erreur robuste dans votre système de conversion d'environnement.
+
+La fonction accepte un tableau de chaînes `char **envp` et un entier `filled` qui indique le nombre d'éléments valides déjà alloués dans le tableau. Cette information est essentielle car elle permet de distinguer les pointeurs valides (qui nécessitent une libération) des emplacements non encore initialisés ou contenant des valeurs indéterminées.
+
+La **validation défensive** avec `if (!envp)` protège contre les appels avec un tableau NULL, permettant à la fonction d'être appelée en sécurité même dans des contextes d'erreur où l'allocation principale a échoué. Cette vérification préventive évite les segfaults lors du déréférencement du pointeur dans les opérations suivantes.
+
+L'**opération de marquage** `envp[filled] = NULL` constitue une étape cruciale qui transforme le tableau partiellement rempli en un tableau valide selon les conventions Unix. En plaçant un terminateur NULL à la position `filled`, la fonction marque explicitement la fin des éléments valides, permettant aux fonctions de libération standard de parcourir le tableau jusqu'au bon point d'arrêt sans accéder à des zones mémoire non initialisées.
+
+La **délégation finale** à `free_str_array(envp)` confie la libération effective à une fonction spécialisée qui parcourt le tableau maintenant correctement terminé et libère chaque chaîne individuelle avant de libérer le tableau lui-même. Cette approche modulaire sépare la logique de marquage (spécifique aux cas d'erreur) de la logique de libération standard, facilitant la maintenance et réduisant la duplication de code.
+
+MAKE_KV_CSTR
+Cette fonction `make_kv_cstr()` implémente un **constructeur de chaîne d'environnement** qui forge dynamiquement des chaînes au format `KEY=VALUE` requis par les systèmes Unix pour les variables d'environnement, constituant un composant essentiel de la conversion entre représentations internes et externes.
+
+La fonction commence par une **validation défensive** avec `if (!k || !v)` qui vérifie que les deux paramètres d'entrée sont valides avant de procéder. Cette vérification précoce évite les comportements indéfinis lors des calculs de longueur et des opérations de copie ultérieures, garantissant une exécution sécurisée même avec des entrées potentiellement invalides.
+
+Le **calcul de taille précis** utilise `ft_strlen()` pour déterminer les longueurs `nk` et `nv` de la clé et de la valeur respectivement. L'allocation avec `malloc(nk + 1 + nv + 1)` réserve exactement l'espace nécessaire : `nk` octets pour la clé, 1 octet pour le caractère `=`, `nv` octets pour la valeur, et 1 octet pour le terminateur de chaîne `\0`. Cette approche optimise l'utilisation mémoire en évitant tout gaspillage d'espace.
+
+L'**assemblage de la chaîne** s'effectue via des opérations de copie mémoire efficaces. `ft_memcpy(s, k, nk)` copie la clé au début du buffer, puis `s[nk] = '='` place le délimiteur à la position exacte. La seconde copie `ft_memcpy(s + nk + 1, v, nv)` utilise l'arithmétique de pointeurs pour positionner la valeur après le délimiteur, et `s[nk + 1 + nv] = '\0'` termine la chaîne conformément aux conventions C.
+
+Cette implémentation privilégie les **performances et la sécurité** en utilisant `ft_memcpy()` plutôt que des fonctions comme `strcat()` qui nécessiteraient des parcours répétés pour localiser les fins de chaînes. Le résultat est une chaîne parfaitement formatée compatible avec les tableaux d'environnement Unix, permettant une intégration transparente avec les fonctions système comme `execve()` et `environ`.
+
+COUNT_EXPORTABLE
+Cette fonction `count_exportable()` implémente un **compteur spécialisé** qui détermine le nombre de variables d'environnement exportables dans une liste chaînée, constituant une étape de pré-calcul essentielle pour l'allocation précise de mémoire lors de la conversion vers des tableaux d'environnement Unix.
+
+La fonction utilise une **approche de parcours linéaire** avec une boucle while qui itère sur chaque nœud de la liste chaînée d'environnement. À chaque itération, elle extrait la structure `t_env` encapsulée dans le champ `content` du nœud courant via un cast explicite `(const t_env *)env->content`. L'utilisation de qualificateurs `const` pour les paramètres et les variables locales garantit que la fonction n'altère pas les données d'environnement pendant le comptage.
+
+La **logique de filtrage** avec `if (e && e->value)` implémente une double vérification cruciale : elle s'assure d'abord que la structure `t_env` elle-même est valide (protection contre les nœuds corrompus), puis vérifie que la variable possède une valeur assignée. Cette distinction est importante car dans les systèmes Unix, seules les variables avec des valeurs définies peuvent être exportées vers les processus enfants via les tableaux d'environnement.
+
+Le **comptage sélectif** incrémente le compteur uniquement pour les variables qui satisfont les critères d'exportabilité, excluant automatiquement les variables déclarées mais non assignées ou les entrées potentiellement corrompues. Cette approche garantit que le nombre retourné correspond exactement au nombre d'éléments qui seront effectivement inclus dans le tableau d'environnement final.
+
+Cette fonction constitue un **optimiseur d'allocation mémoire** qui permet aux fonctions appelantes d'allouer précisément l'espace nécessaire pour le tableau de sortie, évitant à la fois le gaspillage de mémoire (sur-allocation) et les erreurs de dépassement de buffer (sous-allocation). Le résultat est utilisé pour dimensionner correctement les tableaux compatibles avec les fonctions système comme `execve()`.
+
+PRINT_ENV
+Cette fonction `print_env()` implémente un **afficheur d'environnement** qui parcourt une liste chaînée de variables d'environnement et les affiche au format standard `KEY=VALUE`, constituant un utilitaire de diagnostic et de visualisation pour votre minishell.
+
+La fonction utilise une **approche de parcours simple** avec une boucle while qui itère sur chaque nœud de la liste chaînée jusqu'à atteindre la fin (pointeur NULL). À chaque itération, elle extrait la structure `t_env` stockée dans le champ `content` du nœud courant avec `cur = env->content`, permettant d'accéder directement aux champs `key` et `value` de la variable d'environnement.
+
+La **logique d'affichage conditionnelle** avec `if (cur->value)` gère deux cas distincts de variables d'environnement. Si la variable possède une valeur assignée, elle affiche le format complet `KEY=VALUE` avec `printf("%s=%s\n", cur->key, cur->value)`. Dans le cas contraire (variable déclarée mais sans valeur), elle affiche uniquement `KEY=` avec `printf("%s=\n", cur->key)`, respectant les conventions Unix pour les variables d'environnement vides.
+
+L'**avancement de la boucle** s'effectue via `env = env->next` qui fait progresser le pointeur vers le nœud suivant de la liste chaînée. Cette progression simple et directe permet de parcourir l'intégralité de la liste sans nécessiter de compteurs ou de conditions complexes, s'appuyant sur la terminaison naturelle de la liste par un pointeur NULL.
+
+Cette fonction constitue un **outil de débogage précieux** pour visualiser l'état actuel de l'environnement du shell, permettant aux développeurs de vérifier que les opérations de manipulation d'environnement (ajout, modification, suppression de variables) fonctionnent correctement. Elle peut également servir d'implémentation alternative ou de complément aux commandes built-in comme `env` dans votre minishell.
+
+ENV_LEN
+Cette fonction `env_len()` implémente un **compteur générique de liste chaînée** qui détermine le nombre total d'éléments dans une liste d'environnement, fournissant une mesure de la taille complète de la collection sans filtrage ni condition particulière.
+
+La fonction utilise une **approche de parcours exhaustif** avec une boucle while qui visite chaque nœud de la liste chaînée depuis la tête jusqu'à la fin. À chaque itération, elle incrémente simplement le compteur avec `count++` puis avance vers le nœud suivant avec `env = env->next`. Cette logique linéaire garantit que tous les éléments de la liste sont comptabilisés, indépendamment de leur contenu ou de leur validité.
+
+Contrairement à `count_exportable()` qui filtre les variables selon leur exportabilité, cette fonction effectue un **décompte brut** de tous les nœuds présents dans la liste. Elle compte aussi bien les variables avec des valeurs assignées que celles déclarées sans valeur, ainsi que les éventuels nœuds corrompus ou vides. Cette approche en fait un utilitaire de mesure de la structure de données elle-même plutôt que de son contenu sémantique.
+
+La **simplicité de l'implémentation** reflète son objectif généraliste : obtenir rapidement la taille totale d'une liste chaînée sans traitement particulier. Cette fonction est particulièrement utile pour des opérations d'allocation de mémoire qui nécessitent de connaître la taille maximale possible, pour des statistiques de diagnostic, ou pour valider la cohérence de la structure de données après des opérations de manipulation.
+
+Cette mesure de longueur brute complète l'arsenal des fonctions utilitaires d'environnement en fournissant une métrique simple mais essentielle sur la taille de la collection, permettant au code appelant de prendre des décisions éclairées sur la gestion mémoire et les optimisations de performance basées sur la taille réelle de la liste d'environnement.
+
+FREE_ENV_LIST
+Cette fonction `free_env_list()` implémente un **destructeur de liste chaînée** spécialisé pour libérer proprement une liste de variables d'environnement, gérant la désallocation de tous les niveaux de structures imbriquées selon une approche hiérarchique rigoureuse.
+
+La fonction utilise une **technique de parcours sécurisé** en sauvegardant systématiquement le pointeur vers le nœud suivant avec `next = lst->next` avant de commencer toute opération de libération sur le nœud courant. Cette précaution est cruciale car l'accès à `lst->next` devient impossible après avoir libéré la mémoire de `lst`, et sans cette sauvegarde, la fonction perdrait la capacité de continuer le parcours, provoquant potentiellement un comportement indéfini.
+
+Le **déballage et la validation du contenu** s'effectuent via le cast `(t_env *)lst->content` qui extrait la structure d'environnement encapsulée dans le nœud générique de liste. La vérification `if (e)` constitue une protection défensive contre les nœuds contenant des pointeurs NULL ou corrompus, permettant à la fonction de gérer robustement des listes partiellement initialisées ou endommagées sans provoquer de segfaults.
+
+La **séquence de libération hiérarchique** respecte un ordre logique strict : elle commence par libérer les données les plus profondes avec `free(e->key)` et `free(e->value)` (les chaînes de caractères allouées dynamiquement), puis remonte vers la structure contenante avec `free(e)` (la structure `t_env` elle-même), et termine par le conteneur avec `free(lst)` (le nœud de liste). Cette approche en "pelures d'oignon" garantit qu'aucune référence n'est perdue avant libération.
+
+L'**avancement sécurisé** `lst = next` utilise la valeur préalablement sauvegardée pour passer au nœud suivant, permettant à la boucle `while (lst)` de continuer jusqu'à atteindre naturellement la fin de la liste marquée par NULL. Cette implémentation est robuste et peut gérer des listes de n'importe quelle taille, y compris des listes vides, sans risquer de fuites mémoire ou d'accès invalides.
+
+
