@@ -20,15 +20,19 @@
         Anatomie complète de MINISHELL
         1. Structure centrale
 
-        Le programme repose sur la structure t_shell, véritable « noyau » de l’exécution : elle enregistre l’environnement, les arguments bruts, le tableau de tokens, la liste chaînée de commandes, les redirections, un tableau de PIDs, les copies de stdin/stdout, ainsi que l’état du terminal.
-        Une variable globale g_exit_status, déclarée volatile sig_atomic_t, sert de canal de communication entre la boucle principale et les gestionnaires de signaux pour reporter la cause de la dernière terminaison (code de retour ou signal).
+        Le programme repose sur la structure t_shell, véritable « noyau » de l’exécution : 
+        elle enregistre l’environnement, les arguments bruts, le tableau de tokens, la liste chaînée de commandes, 
+        les redirections, un tableau de PIDs, les copies de stdin/stdout, ainsi que l’état du terminal.
+        Une variable globale g_exit_status, déclarée volatile sig_atomic_t, sert de canal de communication entre la 
+        boucle principale et les gestionnaires de signaux pour reporter la cause de la dernière terminaison (code de retour ou signal).
         2. Initialisation (SRC/init)
-
-            start_shell efface la structure, configure le terminal (term_init), installe les handlers de signaux (init_signals) et transforme envp en liste chaînée (init_env). Les redirections et tableaux de commandes sont initialisés à des états neutres.
+        start_shell efface la structure, configure le terminal (term_init), installe les handlers de signaux (init_signals) et transforme 
+        envp en liste chaînée (init_env). Les redirections et tableaux         de commandes sont initialisés à des états neutres.
 
             term_init récupère les attributs du terminal, désactive l’affichage de ^C et applique les réglages adaptés au mode canonique.
 
-            init_signals installe handle_sigint et handle_sigquit, tandis que parent_signals/child_signals rétablissent l’ignorance ou le comportement par défaut lors des forks.
+            init_signals installe handle_sigint et handle_sigquit, tandis que parent_signals/child_signals rétablissent l’ignorance ou le 
+            comportement par défaut lors des forks.
 
             t_arr et t_dic (sous-dossier t_arr/) implémentent des tableaux dynamiques utilisés pour indexer les builtins (bcmd) et les opérateurs (oper).
 
@@ -56,7 +60,8 @@
 
             assign_redirs analyse la liste d’arguments, détache les opérateurs de redirection et relie le fichier cible à la commande courante.
 
-            build_cmd_list convertit le tableau de tokens en liste chaînée de commandes prêtes à l’exécution, en sauvegardant pour chacune les éventuelles redirections et le compte d’arguments.
+            build_cmd_list convertit le tableau de tokens en liste chaînée de commandes prêtes à l’exécution, en sauvegardant pour chacune les 
+            éventuelles redirections et le compte d’arguments.
 
         5. Gestion de l’environnement (SRC/env)
 
@@ -72,9 +77,11 @@
 
             get_builtin_handler renvoie le pointeur de fonction dans bcmd, stocké comme dictionnaire dynamique.
 
-            builtin_cd contrôle le nombre d’arguments, choisit la destination (HOME, OLDPWD ou argument explicite), réalise le chdir puis met à jour PWD et OLDPWD dans l’environnement.
+            builtin_cd contrôle le nombre d’arguments, choisit la destination (HOME, OLDPWD ou argument explicite), réalise le chdir 
+            puis met à jour PWD et OLDPWD dans l’environnement.
 
-            builtin_echo reconnaît les options -n, traite les variables (via replace_variables.c) et imprime les arguments en tenant compte des quotes et des échappements.
+            builtin_echo reconnaît les options -n, traite les variables (via replace_variables.c) et imprime les arguments 
+            en tenant compte des quotes et des échappements.
 
             builtin_exit valide l’argument numérique, gère l’erreur « too many arguments » et quitte le shell en libérant toutes les ressources.
 
@@ -82,32 +89,39 @@
 
         7. Expansion avancée (SRC/expand, SRC/parser/expand_p)
 
-            expand_input remplace d’abord $? par shell->exit_status grâce à replace_exit.c, tout en respectant les quotes : le parcours tient compte des contextes in_sq/in_dq pour éviter les expansions interdites.
+            expand_input remplace d’abord $? par shell->exit_status grâce à replace_exit.c, tout en respectant les quotes : 
+            le parcours tient compte des contextes in_sq/in_dq pour éviter les expansions interdites.
 
-            Dans parser/expand_p/expand_container.c, chaque argument est découpé en sous‑tokens (texte, variable), résolu avec l’environnement puis recomposé ; les quotes sont retirées par remove_quotes.
+            Dans parser/expand_p/expand_container.c, chaque argument est découpé en sous‑tokens (texte, variable), 
+            résolu avec l’environnement puis recomposé ; les quotes sont retirées par remove_quotes.
 
         8. Exécution (SRC/parser/launch, SRC/exec)
 
             Préparatifs
-            launch_process restaure le terminal, prépare les heredocs et, si la ligne se réduit à un seul builtin, l’exécute directement dans le processus courant (run_single_builtin_if_alone).
+            launch_process restaure le terminal, prépare les heredocs et, si la ligne se réduit à un seul builtin, 
+            l’exécute directement dans le processus courant (run_single_builtin_if_alone).
 
             Fork/pipe
             Pour chaque commande d’un pipeline :
 
                 check_pipe ouvre un pipe si nécessaire ;
 
-                try_fork_and_run effectue le fork, configure les signaux (parent_signals/child_signals) puis confie au fils child_exec l’application des redirections et l’exécution de la commande.
+                try_fork_and_run effectue le fork, configure les signaux (parent_signals/child_signals)
+                puis confie au fils child_exec l’application des redirections et l’exécution de la commande.
 
                 Le parent referme les extrémités inutilisées et enregistre le PID.
 
             Exécution réelle
 
-                prepare_or_run_builtin développe les arguments (expand_cmd) ; si le premier est un builtin, il est exécuté immédiatement ; sinon, le tableau d’arguments est renvoyé au lanceur externe.
+                prepare_or_run_builtin développe les arguments (expand_cmd) ; si le premier est un builtin, il est exécuté immédiatement ; 
+                sinon, le tableau d’arguments est renvoyé au lanceur externe.
 
-                execute_cmd cherche le binaire (find_command_path), construit envp (list_to_envp) et invoque execve. En cas d’échec (ENOENT, EACCES, etc.) un message est émis et le processus fils quitte avec le code approprié.
+                execute_cmd cherche le binaire (find_command_path), construit envp (list_to_envp) et invoque execve. 
+                En cas d’échec (ENOENT, EACCES, etc.) un message est émis et le processus fils quitte avec le code approprié.
 
             Attente et statut
-            wait_all_update_status récupère non‑bloquant les fils déjà terminés, puis attend les autres. Pour le dernier PID, g_exit_status prend soit le code de retour (WIFEXITED), soit 128 + signal (WIFSIGNALED) ; le shell imprime ^C ou Quit (core dumped) si nécessaire.
+            wait_all_update_status récupère non‑bloquant les fils déjà terminés, puis attend les autres. 
+            Pour le dernier PID, g_exit_status prend soit le code de retour (WIFEXITED), soit 128 + signal (WIFSIGNALED) ; le shell imprime ^C ou Quit (core dumped) si nécessaire.
 
         9. Redirections & Heredocs (SRC/redir)
 
@@ -178,7 +192,8 @@
           close(p1[0], p1[1], p2[0], p2[1], fd)
           execve("wc","-l")
 
-        Chaque fils applique d’abord ses redirections (fichiers, pipes) via dup2, puis exécute le binaire. Le parent ferme les extrémités inemployées pour éviter les blocages et récolte les statuts.
+        Chaque fils applique d’abord ses redirections (fichiers, pipes) via dup2, puis exécute le binaire. 
+        Le parent ferme les extrémités inemployées pour éviter les blocages et récolte les statuts.
         13. Rôle de g_exit_status
 
             Mis à -1 avant un fork pour différencier les signaux enfants.
@@ -201,7 +216,8 @@
 
             Nettoyage : chaque itération libère tokens, commandes, FD temporaires, garantissant un état sain pour la suivante.
 
-        Grâce à cette structure, le projet reproduit l’essentiel du comportement d’un shell POSIX et peut servir de base à des extensions plus poussées. Vous détenez désormais la compréhension exhaustive de MINISHELL — bonne maîtrise !
+        Grâce à cette structure, le projet reproduit l’essentiel du comportement d’un shell 
+        POSIX et peut servir de base à des extensions plus poussées. Vous détenez désormais la compréhension exhaustive de MINISHELL — bonne maîtrise !
 
 
 
